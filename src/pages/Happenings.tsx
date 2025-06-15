@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mail, CalendarDays } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import EventCalendar from '@/components/EventCalendar';
 
 const recurringEvents = [
   {
@@ -65,6 +66,15 @@ const Happenings = () => {
             We keep the fun rolling at Champions with weekly and seasonal events that bring the community together. Here’s what’s live right now:
           </p>
         </div>
+
+        <section className="mt-16">
+          <h2 className="text-3xl md:text-4xl font-bold font-serif text-center mb-12">
+            📅 Event Calendar
+          </h2>
+          <div className="flex justify-center">
+            <EventCalendar />
+          </div>
+        </section>
 
         <section className="mt-16">
           <h2 className="text-3xl md:text-4xl font-bold font-serif text-center mb-12">
