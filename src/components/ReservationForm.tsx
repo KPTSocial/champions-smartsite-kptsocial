@@ -4,10 +4,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 import { reservationSchema, ReservationFormData } from "@/lib/validations/reservation";
 import { useAddReservation } from "@/hooks/useAddReservation";
 import { Database } from "@/integrations/supabase/types";
+import { getEvents, Event } from "@/services/eventService";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -25,17 +27,30 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 type ReservationInsert = Database["public"]["Tables"]["reservations"]["Insert"];
 
 const ReservationForm = () => {
+  const { data: events, isLoading: isLoadingEvents } = useQuery<Event[]>({
+    queryKey: ["events"],
+    queryFn: getEvents,
+  });
+  
   const form = useForm<ReservationFormData>({
     resolver: zodResolver(reservationSchema),
     defaultValues: {
+      reservationType: "",
       fullName: "",
       email: "",
-      partySize: 6,
+      partySize: 1,
       reservationDate: undefined,
       reservationTime: "18:00",
       notes: "",
@@ -43,11 +58,14 @@ const ReservationForm = () => {
   });
 
   const mutation = useAddReservation(form);
+  const reservationType = form.watch("reservationType");
 
   const onSubmit = (data: ReservationFormData) => {
     const [hour, minute] = data.reservationTime.split(':').map(Number);
     const combinedDateTime = new Date(data.reservationDate);
     combinedDateTime.setHours(hour, minute);
+
+    const isTableReservation = data.reservationType === 'table';
 
     const reservationData: ReservationInsert = {
       full_name: data.fullName,
@@ -55,7 +73,8 @@ const ReservationForm = () => {
       party_size: data.partySize,
       reservation_date: combinedDateTime.toISOString(),
       notes: data.notes,
-      reservation_type: 'Table',
+      reservation_type: isTableReservation ? 'Table' : 'Event',
+      event_id: isTableReservation ? null : data.reservationType,
     };
     
     mutation.mutate(reservationData);
@@ -64,6 +83,31 @@ const ReservationForm = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+            control={form.control}
+            name="reservationType"
+            render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Reservation For</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                            <SelectTrigger disabled={isLoadingEvents}>
+                                <SelectValue placeholder={isLoadingEvents ? "Loading events..." : "Select what you're booking..."} />
+                            </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            <SelectItem value="table">General Dining</SelectItem>
+                            {events?.map(event => (
+                                <SelectItem key={event.id} value={event.id}>
+                                    {event.event_title}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <FormMessage />
+                </FormItem>
+            )}
+        />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <FormField
             control={form.control}
@@ -99,9 +143,9 @@ const ReservationForm = () => {
                 name="partySize"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Party Size (6+)</FormLabel>
+                    <FormLabel>Party Size {reservationType === 'table' ? '(6+)' : ''}</FormLabel>
                     <FormControl>
-                        <Input type="number" min="6" {...field} />
+                        <Input type="number" min={reservationType === 'table' ? 6 : 1} {...field} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
@@ -181,8 +225,8 @@ const ReservationForm = () => {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full" disabled={mutation.isPending}>
-          {mutation.isPending ? 'Booking...' : 'Book Your Table'}
+        <Button type="submit" className="w-full" disabled={mutation.isPending || isLoadingEvents}>
+          {mutation.isPending ? 'Booking...' : 'Book Your Spot'}
         </Button>
       </form>
     </Form>
