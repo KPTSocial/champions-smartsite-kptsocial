@@ -68,7 +68,7 @@ const Index = () => {
                     className="flex flex-col items-center group"
                   >
                     <img
-                      src="/lovable-uploads/9e6c2e09-f0dd-417f-9833-67d7da7ac705.png"
+                      src="/lovable-uploads/ec5bd889-11fa-4a28-bc26-43be4d716800.png"
                       alt="Scan me for bottle list"
                       className="w-32 h-32 sm:w-40 sm:h-40 object-contain rounded-md border border-border transition-transform group-hover:scale-105"
                     />
