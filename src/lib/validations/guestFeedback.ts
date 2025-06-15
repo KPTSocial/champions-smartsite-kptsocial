@@ -2,8 +2,9 @@
 import { z } from "zod";
 
 export const guestFeedbackSchema = z.object({
-  name: z.string().optional(),
-  email: z.string().email().optional().or(z.literal("")),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().optional(),
+  email: z.string().email("Please enter a valid email address."),
   visitDate: z.date({
     required_error: "Visit date is required",
   }),

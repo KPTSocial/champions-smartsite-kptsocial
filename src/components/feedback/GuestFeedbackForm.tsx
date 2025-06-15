@@ -27,7 +27,8 @@ export const GuestFeedbackForm = () => {
   const form = useForm<GuestFeedbackFormData>({
     resolver: zodResolver(guestFeedbackSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       visitDate: undefined,
       rating: 5,
@@ -42,13 +43,18 @@ export const GuestFeedbackForm = () => {
     setSubmitting(true);
     setSuccess(false);
 
+    // Join first and last name
+    const name = data.lastName
+      ? `${data.firstName.trim()} ${data.lastName.trim()}`
+      : data.firstName.trim();
+
     // Insert feedback in DB with status and no AI response yet
     const { error, data: dbData } = await supabase
       .from("guest_feedback")
       .insert([
         {
-          name: data.name || null,
-          email: data.email || null,
+          name: name,
+          email: data.email,
           visit_date: format(data.visitDate, "yyyy-MM-dd"),
           rating: data.rating,
           feedback: data.feedback,
@@ -101,16 +107,30 @@ export const GuestFeedbackForm = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <FormField
             control={form.control}
-            name="name"
+            name="firstName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name (optional)</FormLabel>
+                <FormLabel>First Name <span className="text-destructive">*</span></FormLabel>
                 <FormControl>
-                  <Input placeholder="Your name" {...field} />
+                  <Input placeholder="Jane" {...field} />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="lastName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Last Name <span className="text-muted-foreground">(Optional)</span></FormLabel>
+                <FormControl>
+                  <Input placeholder="Doe" {...field} />
+                </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -119,10 +139,11 @@ export const GuestFeedbackForm = () => {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email (optional)</FormLabel>
+                <FormLabel>Email <span className="text-destructive">*</span></FormLabel>
                 <FormControl>
                   <Input placeholder="you@example.com" {...field} />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
