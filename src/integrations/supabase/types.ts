@@ -9,6 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      events: {
+        Row: {
+          allow_rsvp: boolean
+          created_at: string
+          description: string | null
+          event_date: string
+          event_title: string
+          event_type: Database["public"]["Enums"]["event_type"]
+          id: string
+          image_url: string | null
+          is_featured: boolean
+          rsvp_link: string | null
+        }
+        Insert: {
+          allow_rsvp?: boolean
+          created_at?: string
+          description?: string | null
+          event_date: string
+          event_title: string
+          event_type: Database["public"]["Enums"]["event_type"]
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          rsvp_link?: string | null
+        }
+        Update: {
+          allow_rsvp?: boolean
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          event_title?: string
+          event_type?: Database["public"]["Enums"]["event_type"]
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          rsvp_link?: string | null
+        }
+        Relationships: []
+      }
       menu_categories: {
         Row: {
           description: string | null
@@ -218,6 +257,50 @@ export type Database = {
         }
         Relationships: []
       }
+      reservations: {
+        Row: {
+          created_at: string
+          email: string
+          event_id: string | null
+          full_name: string
+          id: string
+          notes: string | null
+          party_size: number
+          reservation_date: string
+          reservation_type: Database["public"]["Enums"]["reservation_type"]
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          event_id?: string | null
+          full_name: string
+          id?: string
+          notes?: string | null
+          party_size: number
+          reservation_date: string
+          reservation_type: Database["public"]["Enums"]["reservation_type"]
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          event_id?: string | null
+          full_name?: string
+          id?: string
+          notes?: string | null
+          party_size?: number
+          reservation_date?: string
+          reservation_type?: Database["public"]["Enums"]["reservation_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sauces: {
         Row: {
           description: string | null
@@ -316,7 +399,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      event_type: "Live Music" | "Game Night" | "Specials"
+      reservation_type: "Event" | "Table"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -431,6 +515,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      event_type: ["Live Music", "Game Night", "Specials"],
+      reservation_type: ["Event", "Table"],
+    },
   },
 } as const
