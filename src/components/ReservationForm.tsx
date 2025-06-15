@@ -38,6 +38,13 @@ import { Textarea } from "@/components/ui/textarea";
 
 type ReservationInsert = Database["public"]["Tables"]["reservations"]["Insert"];
 
+const reservationTypes = [
+  { value: "table", label: "General Dining" },
+  { value: "bingo", label: "Bingo Night" },
+  { value: "trivia", label: "Trivia Night" },
+  { value: "special-event", label: "Special Event" },
+];
+
 const ReservationForm = () => {
   const { data: events, isLoading: isLoadingEvents } = useQuery<Event[]>({
     queryKey: ["events"],
@@ -54,6 +61,7 @@ const ReservationForm = () => {
       reservationDate: undefined,
       reservationTime: "18:00",
       notes: "",
+      specialEventReason: "",
     },
   });
 
@@ -65,19 +73,51 @@ const ReservationForm = () => {
     const combinedDateTime = new Date(data.reservationDate);
     combinedDateTime.setHours(hour, minute);
 
-    const isTableReservation = data.reservationType === 'table';
+    if (data.reservationType === 'bingo' || data.reservationType === 'trivia') {
+        const eventType = data.reservationType === 'bingo' ? 'Bingo' : 'Trivia';
+        const selectedDate = new Date(data.reservationDate);
+        selectedDate.setHours(0, 0, 0, 0);
 
-    const reservationData: ReservationInsert = {
-      full_name: data.fullName,
-      email: data.email,
-      party_size: data.partySize,
-      reservation_date: combinedDateTime.toISOString(),
-      notes: data.notes,
-      reservation_type: isTableReservation ? 'Table' : 'Event',
-      event_id: isTableReservation ? null : data.reservationType,
-    };
-    
-    mutation.mutate(reservationData);
+        const matchingEvent = events?.find(event => {
+            if (!event.event_date) return false;
+            const eventDate = new Date(event.event_date);
+            eventDate.setHours(0, 0, 0, 0);
+            return event.event_type === eventType && eventDate.getTime() === selectedDate.getTime();
+        });
+
+        if (!matchingEvent) {
+            form.setError('reservationDate', { type: 'manual', message: `No ${eventType} Night is scheduled for this date.` });
+            return;
+        }
+
+        const reservationData: ReservationInsert = {
+          full_name: data.fullName,
+          email: data.email,
+          party_size: data.partySize,
+          reservation_date: combinedDateTime.toISOString(),
+          notes: data.notes,
+          reservation_type: 'Event',
+          event_id: matchingEvent.id,
+        };
+        mutation.mutate(reservationData);
+
+    } else { // 'table' or 'special-event'
+        let finalNotes = data.notes || '';
+        if (data.reservationType === 'special-event' && data.specialEventReason) {
+          finalNotes = `Special Event: ${data.specialEventReason}\n\n${finalNotes}`.trim();
+        }
+
+        const reservationData: ReservationInsert = {
+          full_name: data.fullName,
+          email: data.email,
+          party_size: data.partySize,
+          reservation_date: combinedDateTime.toISOString(),
+          notes: finalNotes || null,
+          reservation_type: 'Table',
+          event_id: null,
+        };
+        mutation.mutate(reservationData);
+    }
   };
 
   return (
@@ -91,15 +131,14 @@ const ReservationForm = () => {
                     <FormLabel>Reservation For</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
-                            <SelectTrigger disabled={isLoadingEvents}>
-                                <SelectValue placeholder={isLoadingEvents ? "Loading events..." : "Select what you're booking..."} />
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a reservation type..." />
                             </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                            <SelectItem value="table">General Dining</SelectItem>
-                            {events?.map(event => (
-                                <SelectItem key={event.id} value={event.id}>
-                                    {event.event_title}
+                            {reservationTypes.map(type => (
+                                <SelectItem key={type.value} value={type.value}>
+                                    {type.label}
                                 </SelectItem>
                             ))}
                         </SelectContent>
@@ -108,6 +147,23 @@ const ReservationForm = () => {
                 </FormItem>
             )}
         />
+
+        {reservationType === 'special-event' && (
+            <FormField
+                control={form.control}
+                name="specialEventReason"
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Reason for Special Event</FormLabel>
+                        <FormControl>
+                            <Input placeholder="e.g., Birthday Party" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <FormField
             control={form.control}
