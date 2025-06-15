@@ -3,14 +3,14 @@ import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getMenuData } from '@/services/menuService';
 import { Input } from '@/components/ui/input';
-import { MenuCategory } from '@/types/menu';
+import { MenuSection, MenuCategory } from '@/types/menu';
 import MenuCategorySection from '@/components/MenuCategorySection';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
 const Menu = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const { data: menuData, isLoading, isError, error } = useQuery<MenuCategory[], Error>({
+  const { data: menuData, isLoading, isError, error } = useQuery<MenuSection[], Error>({
     queryKey: ['menuData'],
     queryFn: getMenuData,
     retry: false, // Don't retry on auth/config errors
@@ -23,24 +23,43 @@ const Menu = () => {
     const lowercasedFilter = searchTerm.toLowerCase();
 
     return menuData
-      .map(category => {
-        if (category.name.toLowerCase().includes(lowercasedFilter)) {
-          return category;
+      .map(section => {
+        if (section.name.toLowerCase().includes(lowercasedFilter)) {
+          return section;
         }
 
-        const filteredItems = category.items.filter(
-          item =>
-            item.name.toLowerCase().includes(lowercasedFilter) ||
-            item.description?.toLowerCase().includes(lowercasedFilter)
-        );
+        const filteredCategories = section.categories
+          .map(category => {
+            if (category.name.toLowerCase().includes(lowercasedFilter)) {
+              return category;
+            }
 
-        if (filteredItems.length > 0) {
-          return { ...category, items: filteredItems };
+            const filteredItems = category.items.filter(
+              item =>
+                item.name.toLowerCase().includes(lowercasedFilter) ||
+                item.description?.toLowerCase().includes(lowercasedFilter)
+            );
+
+            if (filteredItems.length > 0) {
+              return { ...category, items: filteredItems };
+            }
+            return null;
+          })
+          .filter((category): category is MenuCategory => category !== null);
+
+        if (filteredCategories.length > 0) {
+          return { ...section, categories: filteredCategories };
         }
         return null;
       })
-      .filter((category): category is MenuCategory => category !== null);
+      .filter((section): section is MenuSection => section !== null);
   }, [menuData, searchTerm]);
+  
+  const allCategories = useMemo(() => {
+    if (!menuData) return []; // Use original menuData for nav to show all categories
+    return menuData.flatMap(section => section.categories);
+  }, [menuData]);
+
 
   if (isLoading) {
     return (
@@ -77,8 +96,9 @@ const Menu = () => {
             <p className="mt-2">Could not fetch data from Supabase. This is likely a configuration issue. Please check the following:</p>
             <ul className="list-disc list-inside mt-2 space-y-1">
               <li>The Supabase integration is correctly configured in Lovable with your project's <strong>API URL</strong> and <strong>Anon Key</strong>.</li>
-              <li>Row Level Security (RLS) is enabled on your <code>menu_categories</code> and <code>menu_items</code> tables, and a policy exists that allows <strong>read access (`SELECT`)</strong> for non-authenticated users.</li>
-              <li>The table names in <code>src/services/menuService.ts</code> match your Supabase schema exactly.</li>
+              <li>Row Level Security (RLS) is enabled on your <code>menu_sections</code>, <code>menu_categories</code> and <code>menu_items</code> tables, and a policy exists that allows <strong>read access (`SELECT`)</strong> for non-authenticated users. I just added these for you, but it's good to double-check.</li>
+              <li>The table and column names in <code>src/services/menuService.ts</code> match your Supabase schema exactly.</li>
+              <li>The foreign key relationships between sections, categories, and items are correctly configured in Supabase.</li>
             </ul>
           </div>
         )}
@@ -101,7 +121,7 @@ const Menu = () => {
 
       <div className="sticky top-[81px] bg-background/80 z-40 py-4 mb-8 backdrop-blur-sm -mx-6 px-6 border-b">
         <div className="container mx-auto flex flex-wrap gap-x-4 gap-y-2 justify-center">
-        {filteredMenuData && filteredMenuData.map(category => (
+        {allCategories.map(category => (
             <a 
               key={category.id} 
               href={`#${category.name.toLowerCase().replace(/\s+/g, '-')}`}
@@ -116,7 +136,7 @@ const Menu = () => {
       <div className="mb-12 max-w-lg mx-auto">
         <Input
           type="text"
-          placeholder="Search for a dish..."
+          placeholder="Search for a dish, category, or section..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="text-lg p-6"
@@ -124,9 +144,17 @@ const Menu = () => {
       </div>
 
       {filteredMenuData && filteredMenuData.length > 0 ? (
-        <div className="space-y-16">
-          {filteredMenuData.map(category => (
-            <MenuCategorySection key={category.id} category={category} />
+        <div className="space-y-20">
+          {filteredMenuData.map(section => (
+            <section key={section.id} id={section.name.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-20">
+              <h2 className="text-5xl font-serif font-bold mb-4 text-center text-primary">{section.name}</h2>
+              {section.description && <p className="text-muted-foreground mb-12 max-w-3xl mx-auto text-center">{section.description}</p>}
+              <div className="space-y-16">
+                {section.categories.map(category => (
+                  <MenuCategorySection key={category.id} category={category} />
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       ) : (

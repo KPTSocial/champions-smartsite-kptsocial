@@ -1,29 +1,36 @@
 
 import { supabase } from '@/lib/supabase';
-import { MenuCategory } from '@/types/menu';
+import { MenuSection } from '@/types/menu';
 
 /**
- * Fetches all menu categories and their associated menu items.
- * This function assumes a 'menu_items' table with a foreign key relationship
- * to the 'menu_categories' table.
- * The relationship must be configured in Supabase for the nested query to work.
+ * Fetches all menu sections, their associated categories, and their associated menu items.
+ * This function assumes a 'menu_items' table with a foreign key to 'menu_categories',
+ * and 'menu_categories' with a foreign key to 'menu_sections'.
+ * The relationships must be configured in Supabase for the nested query to work.
  */
-export async function getMenuData(): Promise<MenuCategory[]> {
+export async function getMenuData(): Promise<MenuSection[]> {
   const { data, error } = await supabase
-    .from('menu_categories')
+    .from('menu_sections')
     .select(`
       id,
       name,
       description,
-      items:menu_items (
+      categories:menu_categories (
         id,
         name,
         description,
-        price,
-        image_url
+        items:menu_items (
+          id,
+          name,
+          description,
+          price,
+          image_url
+        )
       )
     `)
-    .order('id', { ascending: true });
+    .order('sort_order', { ascending: true })
+    .order('sort_order', { foreignTable: 'menu_categories', ascending: true });
+
 
   if (error) {
     console.error('Error fetching menu data:', error);
@@ -31,7 +38,6 @@ export async function getMenuData(): Promise<MenuCategory[]> {
     throw error;
   }
 
-  // With the alias, data should already have the 'items' property.
   // Supabase might return null if the table is empty or RLS fails.
   return data || [];
 }
