@@ -1,112 +1,75 @@
 
 import React from 'react';
-import { Separator } from "@/components/ui/separator";
 
 const AboutUs = () => {
   return (
-    <div className="bg-background">
-      <style>
-        {`
-          .fade-in-section {
-            opacity: 0;
-          }
-        `}
-      </style>
-      {/* Hero */}
-      <section className="py-16 md:py-24">
-        <div className="container text-center">
-          <h1 className="text-4xl md:text-6xl font-bold font-serif animate-fade-in fade-in-section">
-            Meet the Champions Behind Champions Sports Bar & Grill
-          </h1>
-        </div>
-      </section>
-
-      {/* Jared's Story */}
-      <section className="py-16 md:py-24 bg-card">
-        <div className="container max-w-4xl mx-auto text-center animate-fade-in fade-in-section" style={{ animationDelay: '200ms' }}>
-          <h2 className="font-serif text-3xl md:text-5xl font-semibold mb-6">Jared Bailie: Local Legend. Sports Enthusiast. Community Pillar.</h2>
-          <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
-            <p>
-              Born and raised in Hillsboro, Jared Bailie is more than just the co-founder of Champions—he is a champion of the community. From his early days on the Reedville baseball fields to graduating from Hillsboro High, Jared’s roots run deep in this town.
-            </p>
-            <p>
-              His journey didn’t stop there. Jared played collegiate baseball at Mt. Hood Community College and Western Oregon University, chasing the dream with grit and dedication—just like his older brother, who played both collegiate and minor league ball. Today, his love for the game lives on not only through memories but in the lively, sports-driven environment he’s helped build.
-            </p>
-            <p>
-              After nearly 20 years with Columbia Distributing, Jared traded in his corporate badge for a dream fulfilled: opening a bar and grill where locals could come together, enjoy great food, and catch the game in good company. Whether he’s teeing off on the golf course or cheering on the Trail Blazers, Jared brings that same passion into every detail of Champions.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Michelle's Story */}
-      <section className="py-16 md:py-24">
-        <div className="container max-w-4xl mx-auto text-center animate-fade-in fade-in-section" style={{ animationDelay: '400ms' }}>
-          <h2 className="font-serif text-3xl md:text-5xl font-semibold mb-6">Michelle Wales: The Heartbeat of Hospitality</h2>
-          <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
-            <p>
-              If Jared is the fire, Michelle is the flame that keeps it burning bright. With years of experience in customer-focused service, Michelle has a gift for making guests feel seen, heard, and appreciated from the moment they walk in. Her warm, welcoming energy defines the soul of Champions, where no one stays a stranger for long.
-            </p>
-            <p>
-              Michelle’s standards for hospitality are sky-high—and that’s why the atmosphere here feels more like a second home than just another bar. Her leadership behind the scenes ensures that everything runs smoothly, and every guest leaves happier than they came in.
-            </p>
-          </div>
-        </div>
-      </section>
-
+    <div className="bg-background py-16 md:py-24">
       <div className="container">
-        <Separator className="my-8" />
-      </div>
-
-      {/* A Team with a Purpose */}
-      <section className="py-16 md:py-24">
-        <div className="container text-center animate-fade-in fade-in-section" style={{ animationDelay: '600ms' }}>
-          <h2 className="text-3xl md:text-5xl font-serif font-semibold">A Team with Purpose</h2>
-          <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
-            Jared and Michelle didn’t just build a bar—they built a hub for Hillsboro.
+        <div className="text-center">
+          <h1 className="text-4xl md:text-6xl font-bold font-serif">Our Story</h1>
+          <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
+            From lifelong friends to business partners, our dream was to create a place where community, sports, and good food come together.
           </p>
-          <div className="mt-12 max-w-4xl mx-auto space-y-4 text-muted-foreground text-lg leading-relaxed">
-            <p>
-              Champions isn’t just about craft cocktails, 20 beers on tap, and weekend brunch (although let’s be honest—those are all pretty great). It’s about giving back. From sponsoring Reedville Baseball to supporting The Ronald McDonald House, Rock’n Rooms, Reclaiming Hope Ranch, and Ladybug Run, they’ve made giving part of their mission.
-            </p>
-            <p>
-              They’ve even partnered with the Hillsboro Elks Lodge to support local families in need, especially during the holidays—because building community isn’t a seasonal thing, it’s a way of life.
-            </p>
-          </div>
         </div>
-      </section>
 
-      {/* What sets them apart */}
-      <section className="py-16 md:py-24 bg-card">
-        <div className="container animate-fade-in fade-in-section" style={{ animationDelay: '800ms' }}>
-          <div className="text-center">
-            <h2 className="text-3xl md:text-5xl font-serif font-semibold mb-12">What Sets Jared & Michelle Apart</h2>
+        <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div>
+            <img 
+              src="/lovable-uploads/0b56b4f0-9ad3-4e31-b61a-272b24721a8e.png"
+              alt="Michelle and Jared, owners of Champions"
+              className="rounded-lg shadow-xl w-full"
+            />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div>
-              <h3 className="text-2xl font-semibold font-serif mb-2">Rooted in Hillsboro</h3>
-              <p className="text-muted-foreground">Jared’s story is Hillsboro’s story—local boy, turned athlete, turned entrepreneur.</p>
-            </div>
-            <div>
-              <h3 className="text-2xl font-semibold font-serif mb-2">Service That Feels Like Family</h3>
-              <p className="text-muted-foreground">Michelle’s warmth and leadership make every guest experience unforgettable.</p>
-            </div>
-            <div>
-              <h3 className="text-2xl font-semibold font-serif mb-2">Champions for the Community</h3>
-              <p className="text-muted-foreground">Their name isn’t just a brand—it’s a promise to show up for the people of Hillsboro, every single day.</p>
-            </div>
+          <div>
+            <h2 className="font-serif text-4xl font-semibold mb-4">Meet Michelle & Jared</h2>
+            <p className="text-muted-foreground text-lg mb-4 leading-relaxed">
+              We're Michelle and Jared, and we've been part of this community our whole lives. We grew up watching the big games, celebrating wins, and sharing meals with family and friends. We always dreamed of a place that captured that spirit—a place that felt like home, but with better food and more TVs!
+            </p>
+            <p className="text-muted-foreground text-lg leading-relaxed">
+              Champions is the realization of that dream. It's more than a sports bar; it's a commitment to our hometown. We partner with local farms to bring you a menu that's as fresh as it is delicious. We believe in the power of a shared meal and a cheering crowd. We're so glad you're here to be a part of it.
+            </p>
           </div>
         </div>
-      </section>
 
-      {/* Final Quote */}
-      <section className="py-16 md:py-24 bg-primary text-primary-foreground">
-        <div className="container text-center animate-fade-in fade-in-section" style={{ animationDelay: '1000ms' }}>
-          <blockquote className="text-2xl md:text-3xl font-serif italic max-w-4xl mx-auto">
-            “You’ll come for the 20 beers on tap... but you’ll stay for the atmosphere, the energy, and the people behind the bar who make this place feel like home.”
-          </blockquote>
+        <div className="mt-24">
+            <div className="text-center">
+                <h2 className="text-4xl font-serif font-semibold">Our Community Commitment</h2>
+                <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
+                    We're more than just a sports bar; we're part of the fabric of this town. We believe in giving back to the community that supports us.
+                </p>
+            </div>
+            <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h3 className="font-serif text-3xl font-semibold mb-4">Sponsoring Local Youth Sports</h3>
+                    <p className="text-muted-foreground text-lg mb-4 leading-relaxed">
+                        This year, we're proud sponsors of the "Flavor Town Fireballs," our local youth soccer league. We're providing team jerseys and post-game meals, helping kids stay active, build friendships, and learn the value of teamwork.
+                    </p>
+                    <p className="text-muted-foreground text-lg leading-relaxed">
+                        Seeing the kids' faces light up after a game is the real win for us. It's our way of investing in the next generation of champions.
+                    </p>
+                </div>
+                <div>
+                     <img 
+                      src="https://images.unsplash.com/photo-1517022812141-23620dba5c23?q=80&w=2742&auto=format&fit=crop"
+                      alt="A local youth sports team sponsored by Champions"
+                      className="rounded-lg shadow-xl w-full"
+                    />
+                </div>
+            </div>
         </div>
-      </section>
+
+        <div className="mt-24 text-center">
+            <h2 className="text-4xl font-serif font-semibold">Our Commitment to Farm-to-Table</h2>
+            <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
+                We believe great food starts with great ingredients. That's why we're proud to partner with local farmers and purveyors to bring you the freshest flavors of the season.
+            </p>
+        </div>
+         <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <img src="https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?q=80&w=2070&auto=format&fit=crop" alt="Fresh vegetables" className="rounded-lg object-cover aspect-square shadow-md"/>
+            <img src="https://images.unsplash.com/photo-1627992499112-595f9e855b55?q=80&w=2070&auto=format=fit=crop" alt="Local farm" className="rounded-lg object-cover aspect-square shadow-md"/>
+            <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1981&auto=format=fit=crop" alt="Finished pizza dish" className="rounded-lg object-cover aspect-square shadow-md"/>
+        </div>
+      </div>
     </div>
   );
 };
