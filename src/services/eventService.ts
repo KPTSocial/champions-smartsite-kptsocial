@@ -1,15 +1,7 @@
-
 import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
 
-// This interface is based on the plan. We can adjust if your DB schema differs.
-export interface Event {
-  id: number;
-  created_at: string;
-  title: string;
-  date: string; // 'YYYY-MM-DD'
-  recurring: 'weekly' | null;
-  day_of_week: number | null; // Sunday = 0, Saturday = 6
-}
+export type Event = Tables<'events'>;
 
 export const getEvents = async (): Promise<Event[]> => {
   const { data, error } = await supabase.from('events').select('*');

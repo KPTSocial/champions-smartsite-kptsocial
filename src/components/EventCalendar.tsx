@@ -2,59 +2,50 @@
 import React, { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Calendar } from '@/components/ui/calendar';
-import { getEvents, Event as EventType } from '@/services/eventService';
-import { addDays, endOfMonth, getDay, startOfMonth } from 'date-fns';
+import { getEvents, type Event as EventType } from '@/services/eventService';
+import { addDays } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import WeeklyCalendarView from './WeeklyCalendarView';
 
 const EventCalendar = () => {
-    const [month, setMonth] = useState(new Date());
+    const [displayDate, setDisplayDate] = useState(new Date());
+    const [view, setView] = useState<'month' | 'week'>('month');
 
     const { data: dbEvents = [], isLoading } = useQuery<EventType[]>({
         queryKey: ['db-events'],
         queryFn: getEvents
     });
 
-    const eventDates = useMemo(() => {
-        const dates = new Set<string>();
-        if (!dbEvents.length) return dates;
-
-        const viewStart = startOfMonth(month);
-        const viewEnd = endOfMonth(month);
-
-        dbEvents.forEach(event => {
-            if (event.recurring === 'weekly' && event.day_of_week !== null) {
-                let day = viewStart;
-                while (day <= viewEnd) {
-                    if (getDay(day) === event.day_of_week) {
-                        dates.add(day.toISOString().split('T')[0]);
-                    }
-                    day = addDays(day, 1);
-                }
-            } else if (event.date) {
-                // Ensure date is treated as UTC to avoid timezone shifts
-                const eventDate = new Date(event.date + "T00:00:00Z");
-                if (eventDate >= viewStart && eventDate <= viewEnd) {
-                    dates.add(event.date);
-                }
-            }
-        });
-
-        return dates;
-    }, [dbEvents, month]);
-
     const eventDaysForPicker = useMemo(() => {
+        const eventDates = new Set<string>();
+        if (dbEvents.length > 0) {
+            dbEvents.forEach(event => {
+                if (event.event_date) {
+                    eventDates.add(event.event_date.split('T')[0]);
+                }
+            });
+        }
+        
         return Array.from(eventDates).map(dateStr => {
             const [year, month, day] = dateStr.split('-').map(Number);
             return new Date(Date.UTC(year, month - 1, day));
         });
-    }, [eventDates]);
+    }, [dbEvents]);
 
     if (isLoading) {
-        return <Skeleton className="h-[365px] w-full max-w-sm rounded-lg" />;
+        return <Skeleton className="h-[430px] w-full max-w-sm rounded-lg" />;
+    }
+    
+    const handlePrevWeek = () => {
+        setDisplayDate(prev => addDays(prev, -7));
+    }
+    const handleNextWeek = () => {
+        setDisplayDate(prev => addDays(prev, 7));
     }
 
     return (
-        <>
+        <div className="w-full max-w-sm">
             <style>{`
                 .day-with-event {
                     position: relative;
@@ -80,14 +71,31 @@ const EventCalendar = () => {
                     background-color: hsl(var(--primary-foreground));
                 }
             `}</style>
-            <Calendar
-                month={month}
-                onMonthChange={setMonth}
-                modifiers={{ hasEvent: eventDaysForPicker }}
-                modifiersClassNames={{ hasEvent: 'day-with-event' }}
-                className="rounded-lg border bg-card text-card-foreground shadow-sm"
-            />
-        </>
+             <div className="flex justify-center gap-2 mb-4">
+                <Button variant={view === 'month' ? 'default' : 'outline'} size="sm" onClick={() => setView('month')}>
+                    Month
+                </Button>
+                <Button variant={view === 'week' ? 'default' : 'outline'} size="sm" onClick={() => setView('week')}>
+                    Week
+                </Button>
+            </div>
+            {view === 'month' ? (
+                 <Calendar
+                    month={displayDate}
+                    onMonthChange={setDisplayDate}
+                    modifiers={{ hasEvent: eventDaysForPicker }}
+                    modifiersClassNames={{ hasEvent: 'day-with-event' }}
+                    className="rounded-lg border bg-card text-card-foreground shadow-sm"
+                />
+            ) : (
+                <WeeklyCalendarView
+                    events={dbEvents}
+                    currentDate={displayDate}
+                    onPrevWeek={handlePrevWeek}
+                    onNextWeek={handleNextWeek}
+                />
+            )}
+        </div>
     );
 };
 
