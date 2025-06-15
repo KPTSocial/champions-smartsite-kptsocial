@@ -25,7 +25,7 @@ const Header = () => {
             Champions
           </span>
         </Link>
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden lg:flex items-center gap-6">
           {navItems.map((item) => (
             <NavLink
               key={item.name}
@@ -38,10 +38,10 @@ const Header = () => {
             </NavLink>
           ))}
         </nav>
-        <div className="hidden md:flex">
+        <div className="hidden lg:flex">
           <Button>Reservations</Button>
         </div>
-        <div className="md:hidden">
+        <div className="lg:hidden">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon">
