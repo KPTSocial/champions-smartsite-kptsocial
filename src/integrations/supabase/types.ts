@@ -87,6 +87,33 @@ export type Database = {
         }
         Relationships: []
       }
+      loyalty_points: {
+        Row: {
+          created_at: string | null
+          id: string
+          points: number
+          reason: string | null
+          source_referral_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          points: number
+          reason?: string | null
+          source_referral_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          points?: number
+          reason?: string | null
+          source_referral_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       menu_categories: {
         Row: {
           description: string | null
@@ -266,6 +293,36 @@ export type Database = {
         }
         Relationships: []
       }
+      mug_club_members: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          engraved_name: string
+          id: string
+          joined_date: string
+          renewal_date: string | null
+          user_id: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          engraved_name: string
+          id?: string
+          joined_date?: string
+          renewal_date?: string | null
+          user_id: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          engraved_name?: string
+          id?: string
+          joined_date?: string
+          renewal_date?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       photo_booth_uploads: {
         Row: {
           approved: boolean
@@ -293,6 +350,36 @@ export type Database = {
           image_url?: string
           uploaded_at?: string
           user_name?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          created_at: string | null
+          id: string
+          joined: boolean | null
+          points_awarded: number | null
+          referral_code: string | null
+          referred_email: string
+          referrer_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          joined?: boolean | null
+          points_awarded?: number | null
+          referral_code?: string | null
+          referred_email: string
+          referrer_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          joined?: boolean | null
+          points_awarded?: number | null
+          referral_code?: string | null
+          referred_email?: string
+          referrer_id?: string
         }
         Relationships: []
       }
@@ -394,6 +481,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_profiles: {
+        Row: {
+          created_at: string | null
+          id: string
+          referral_code: string | null
+          user_email: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id: string
+          referral_code?: string | null
+          user_email?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          referral_code?: string | null
+          user_email?: string | null
+        }
+        Relationships: []
+      }
       vip_applications: {
         Row: {
           approved: boolean
@@ -427,6 +535,33 @@ export type Database = {
           referral_code?: string | null
           social_handle?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      whiskey_room_members: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          id: string
+          joined_date: string
+          personalized_locker: string | null
+          user_id: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          id?: string
+          joined_date?: string
+          personalized_locker?: string | null
+          user_id: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          id?: string
+          joined_date?: string
+          personalized_locker?: string | null
+          user_id?: string
         }
         Relationships: []
       }

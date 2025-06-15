@@ -1,67 +1,30 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ReferralWidget } from "@/components/member-dashboard/ReferralWidget";
+import { MugClubWidget } from "@/components/member-dashboard/MugClubWidget";
+import { WhiskeyRoomWidget } from "@/components/member-dashboard/WhiskeyRoomWidget";
 import { Badge } from "@/components/ui/badge";
 import { Beer, GlassWater, Trophy, Handshake } from "lucide-react";
 
 const MemberDashboard = () => {
-  const demo_mode = true;
-  const user_name = "Jordan P.";
+  const demo_mode = false;
 
   return (
     <div className="bg-background py-16 md:py-24">
       <div className="container pb-20">
         <div className="mb-12">
           <h1 className="text-4xl md:text-5xl font-bold font-serif">
-            Welcome back, {demo_mode ? user_name : "{{name}}"}
+            Welcome back!
           </h1>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {demo_mode ? (
-              <>
-                <Badge variant="secondary" className="text-sm">Mug Club Member</Badge>
-                <Badge variant="secondary" className="text-sm">Whiskey Room Member</Badge>
-              </>
-            ) : (
-              <Badge variant="secondary" className="text-sm">{"{{tier}}"}</Badge>
-            )}
-          </div>
+          {/* Optionally, show a user badge or their roles/status here */}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-3 text-3xl">
-                <Beer className="text-primary" />
-                Your Mug Club Perks
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                <li>Your own engraved mug waiting for you behind the bar.</li>
-                <li>Discounted pours on all draft beers, all the time.</li>
-                <li>First dibs on limited edition and seasonal brews.</li>
-                <li>Exclusive invites to our "Brewer's Night" events.</li>
-              </ul>
-            </CardContent>
-          </Card>
+        {/* NEW WIDGETS */}
+        <ReferralWidget />
+        <MugClubWidget />
+        <WhiskeyRoomWidget />
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-3 text-3xl">
-                <GlassWater className="text-primary" />
-                The Whiskey Room
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
-                <li>Exclusive access to a curated selection of rare and premium whiskeys.</li>
-                <li>Member-only tasting events with master distillers.</li>
-                <li>Personalized locker to store your favorite bottles.</li>
-                <li>Priority reservations for the private Whiskey Room lounge.</li>
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
-
+        {/* Opportunities Section (optional, legacy) */}
         <div className="mt-8">
             <Card>
                 <CardHeader>
@@ -80,12 +43,6 @@ const MemberDashboard = () => {
             </Card>
         </div>
       </div>
-
-      {demo_mode && (
-        <div className="fixed bottom-0 left-0 right-0 bg-accent text-accent-foreground p-3 text-center text-sm font-semibold z-50">
-          <p>🧪 Demo Mode: Loyalty Data Simulated</p>
-        </div>
-      )}
     </div>
   );
 };
