@@ -48,6 +48,45 @@ export type Database = {
         }
         Relationships: []
       }
+      guest_feedback: {
+        Row: {
+          ai_response: string | null
+          consent_to_share: boolean
+          created_at: string
+          email: string | null
+          feedback: string
+          id: string
+          name: string | null
+          rating: number
+          status: string
+          visit_date: string
+        }
+        Insert: {
+          ai_response?: string | null
+          consent_to_share?: boolean
+          created_at?: string
+          email?: string | null
+          feedback: string
+          id?: string
+          name?: string | null
+          rating: number
+          status?: string
+          visit_date: string
+        }
+        Update: {
+          ai_response?: string | null
+          consent_to_share?: boolean
+          created_at?: string
+          email?: string | null
+          feedback?: string
+          id?: string
+          name?: string | null
+          rating?: number
+          status?: string
+          visit_date?: string
+        }
+        Relationships: []
+      }
       menu_categories: {
         Row: {
           description: string | null
