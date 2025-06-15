@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -43,7 +42,7 @@ const PhotoBooth = () => {
               <Textarea id="caption" placeholder="Best night ever at Champions!" defaultValue="Best night ever at Champions!" readOnly className="bg-background/50" />
             </div>
             <div className="flex items-center space-x-2">
-              <Checkbox id="consent" checked readOnly/>
+              <Checkbox id="consent" checked disabled />
               <label
                 htmlFor="consent"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
