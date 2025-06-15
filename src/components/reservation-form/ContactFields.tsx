@@ -9,15 +9,28 @@ export const ContactFields = () => {
   const { control } = useFormContext<ReservationFormData>();
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
       <FormField
         control={control}
-        name="fullName"
+        name="firstName"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Full Name</FormLabel>
+            <FormLabel>First Name <span className="text-destructive">*</span></FormLabel>
             <FormControl>
-              <Input placeholder="John Doe" {...field} />
+              <Input placeholder="Jane" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={control}
+        name="lastName"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Last Name <span className="text-muted-foreground">(Optional)</span></FormLabel>
+            <FormControl>
+              <Input placeholder="Doe" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -28,7 +41,7 @@ export const ContactFields = () => {
         name="email"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Email</FormLabel>
+            <FormLabel>Email <span className="text-destructive">*</span></FormLabel>
             <FormControl>
               <Input placeholder="you@example.com" {...field} />
             </FormControl>

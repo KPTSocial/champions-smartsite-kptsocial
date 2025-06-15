@@ -27,7 +27,8 @@ const ReservationForm = () => {
     resolver: zodResolver(reservationSchema),
     defaultValues: {
       reservationType: "",
-      fullName: "",
+      firstName: "",
+      lastName: "",
       email: "",
       partySize: 1,
       reservationDate: undefined,
@@ -43,6 +44,11 @@ const ReservationForm = () => {
     const [hour, minute] = data.reservationTime.split(':').map(Number);
     const combinedDateTime = new Date(data.reservationDate);
     combinedDateTime.setHours(hour, minute);
+
+    // Concatenate full name for DB insertion
+    const fullName = data.lastName 
+      ? `${data.firstName.trim()} ${data.lastName.trim()}`
+      : data.firstName.trim();
 
     if (data.reservationType === 'bingo' || data.reservationType === 'trivia') {
         const eventType = data.reservationType === 'bingo' ? 'Bingo' : 'Trivia';
@@ -62,7 +68,7 @@ const ReservationForm = () => {
         }
 
         const reservationData: ReservationInsert = {
-          full_name: data.fullName,
+          full_name: fullName,
           email: data.email,
           party_size: data.partySize,
           reservation_date: combinedDateTime.toISOString(),
@@ -79,7 +85,7 @@ const ReservationForm = () => {
         }
 
         const reservationData: ReservationInsert = {
-          full_name: data.fullName,
+          full_name: fullName,
           email: data.email,
           party_size: data.partySize,
           reservation_date: combinedDateTime.toISOString(),

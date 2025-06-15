@@ -3,7 +3,8 @@ import { z } from "zod";
 
 export const reservationSchema = z.object({
   reservationType: z.string().min(1, "Please select the type of reservation."),
-  fullName: z.string().min(2, "Full name must be at least 2 characters."),
+  firstName: z.string().min(1, "First name is required."),
+  lastName: z.string().optional(),
   email: z.string().email("Please enter a valid email address."),
   partySize: z.coerce.number().min(1, "Party size must be at least 1."),
   reservationDate: z.date({ required_error: "A date is required." }),
@@ -26,6 +27,5 @@ export const reservationSchema = z.object({
         });
     }
 });
-
 
 export type ReservationFormData = z.infer<typeof reservationSchema>;
