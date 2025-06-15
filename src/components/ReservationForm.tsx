@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +7,7 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { Database } from "@/integrations/supabase/types";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -31,7 +31,7 @@ import { toast } from "@/components/ui/use-toast";
 const reservationSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters."),
   email: z.string().email("Please enter a valid email address."),
-  partySize: z.coerce.number().min(1, "Party size must be at least 1."),
+  partySize: z.coerce.number().min(6, "Reservations are for parties of 6 or more."),
   reservationDate: z.date({ required_error: "A date is required." }),
   reservationTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Please use HH:MM format (e.g., 19:00)."),
   notes: z.string().max(500, "Notes cannot exceed 500 characters.").optional(),
@@ -60,7 +60,7 @@ const ReservationForm = () => {
     defaultValues: {
       fullName: "",
       email: "",
-      partySize: 1,
+      partySize: 6,
       reservationDate: undefined,
       reservationTime: "18:00",
       notes: "",
@@ -140,9 +140,9 @@ const ReservationForm = () => {
                 name="partySize"
                 render={({ field }) => (
                     <FormItem>
-                    <FormLabel>Party Size</FormLabel>
+                    <FormLabel>Party Size (6+)</FormLabel>
                     <FormControl>
-                        <Input type="number" min="1" {...field} />
+                        <Input type="number" min="6" {...field} />
                     </FormControl>
                     <FormMessage />
                     </FormItem>
