@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
@@ -82,7 +81,7 @@ const Index = () => {
                     className="flex flex-col items-center group"
                   >
                     <img
-                      src="/lovable-uploads/73594643-5bfb-441f-83b2-b18ce2eb7019.png"
+                      src="/lovable-uploads/4169d955-5253-4d18-9d98-1718628bc80e.png"
                       alt="Scan me for draft list"
                       className="w-32 h-32 sm:w-40 sm:h-40 object-contain rounded-md border border-border transition-transform group-hover:scale-105"
                     />
