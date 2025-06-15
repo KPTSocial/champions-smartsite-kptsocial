@@ -10,6 +10,7 @@ const navItems = [
   { name: 'About Us', path: '/about' },
   { name: 'Photo Booth', path: '/photo-booth' },
   { name: 'Menu', path: '/menu' },
+  { name: 'Member Login', path: '/member-dashboard' },
 ];
 
 const Header = () => {

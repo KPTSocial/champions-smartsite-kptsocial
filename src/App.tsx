@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import AboutUs from "./pages/AboutUs";
 import PhotoBooth from "./pages/PhotoBooth";
 import Menu from "./pages/Menu";
+import MemberDashboard from "./pages/MemberDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/about" element={<AboutUs />} />
             <Route path="/photo-booth" element={<PhotoBooth />} />
             <Route path="/menu" element={<Menu />} />
+            <Route path="/member-dashboard" element={<MemberDashboard />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>

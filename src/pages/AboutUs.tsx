@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 const AboutUs = () => {
@@ -29,6 +28,33 @@ const AboutUs = () => {
               Champions is the realization of that dream. It's more than a sports bar; it's a commitment to our hometown. We partner with local farms to bring you a menu that's as fresh as it is delicious. We believe in the power of a shared meal and a cheering crowd. We're so glad you're here to be a part of it.
             </p>
           </div>
+        </div>
+
+        <div className="mt-24">
+            <div className="text-center">
+                <h2 className="text-4xl font-serif font-semibold">Our Community Commitment</h2>
+                <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
+                    We're more than just a sports bar; we're part of the fabric of this town. We believe in giving back to the community that supports us.
+                </p>
+            </div>
+            <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h3 className="font-serif text-3xl font-semibold mb-4">Sponsoring Local Youth Sports</h3>
+                    <p className="text-muted-foreground text-lg mb-4 leading-relaxed">
+                        This year, we're proud sponsors of the "Flavor Town Fireballs," our local youth soccer league. We're providing team jerseys and post-game meals, helping kids stay active, build friendships, and learn the value of teamwork.
+                    </p>
+                    <p className="text-muted-foreground text-lg leading-relaxed">
+                        Seeing the kids' faces light up after a game is the real win for us. It's our way of investing in the next generation of champions.
+                    </p>
+                </div>
+                <div>
+                     <img 
+                      src="https://images.unsplash.com/photo-1517022812141-23620dba5c23?q=80&w=2742&auto=format&fit=crop"
+                      alt="A local youth sports team sponsored by Champions"
+                      className="rounded-lg shadow-xl w-full"
+                    />
+                </div>
+            </div>
         </div>
 
         <div className="mt-24 text-center">

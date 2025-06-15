@@ -1,4 +1,3 @@
-
 import { UtensilsCrossed } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -25,6 +24,7 @@ const Footer = () => {
                 <li><Link to="/about" className="hover:text-primary transition-colors">About Us</Link></li>
                 <li><Link to="/menu" className="hover:text-primary transition-colors">Menu</Link></li>
                 <li><Link to="/photo-booth" className="hover:text-primary transition-colors">Photo Booth</Link></li>
+                <li><Link to="/member-dashboard" className="hover:text-primary transition-colors">Member Area</Link></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Reservations</a></li>
               </ul>
             </div>
