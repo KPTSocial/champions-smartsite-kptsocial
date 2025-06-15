@@ -40,7 +40,9 @@ const Header = () => {
           ))}
         </nav>
         <div className="hidden lg:flex">
-          <Button>Reservations</Button>
+          <Button asChild>
+            <Link to="/reservations">Reservations</Link>
+          </Button>
         </div>
         <div className="lg:hidden">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -63,7 +65,9 @@ const Header = () => {
                     {item.name}
                   </NavLink>
                 ))}
-                 <Button className="mt-4">Reservations</Button>
+                 <Button asChild className="mt-4">
+                    <Link to="/reservations">Reservations</Link>
+                 </Button>
               </nav>
             </SheetContent>
           </Sheet>

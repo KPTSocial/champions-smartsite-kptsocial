@@ -33,6 +33,11 @@ const recurringEvents = [
       "June: 11th & 25th",
       "July: 9th & 23rd",
     ],
+    cta: {
+      text: "Reserve a Spot",
+      href: "/reservations",
+      external: false,
+    },
   },
 ];
 
@@ -86,7 +91,7 @@ const Happenings = () => {
                     )}
                     {event.cta && (
                          <Button asChild className="mt-6 w-full">
-                            {event.external ? 
+                            {event.cta.external ? 
                                 <a href={event.cta.href} target="_blank" rel="noopener noreferrer">{event.cta.text}</a> :
                                 <Link to={event.cta.href}>{event.cta.text}</Link>
                             }

@@ -25,9 +25,10 @@ const Footer = () => {
             <ul className="mt-4 space-y-2">
               <li><Link to="/about" className="hover:text-primary transition-colors">About Us</Link></li>
               <li><Link to="/menu" className="hover:text-primary transition-colors">Menu</Link></li>
+              <li><Link to="/happenings" className="hover:text-primary transition-colors">Happenings</Link></li>
               <li><Link to="/photo-booth" className="hover:text-primary transition-colors">Photo Booth</Link></li>
               <li><Link to="/member-dashboard" className="hover:text-primary transition-colors">Member Area</Link></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Reservations</a></li>
+              <li><Link to="/reservations" className="hover:text-primary transition-colors">Reservations</Link></li>
             </ul>
           </div>
 
