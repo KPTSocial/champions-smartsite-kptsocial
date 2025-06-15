@@ -1,12 +1,12 @@
+
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 
-import { supabase } from "@/integrations/supabase/client";
+import { reservationSchema, ReservationFormData } from "@/lib/validations/reservation";
+import { useAddReservation } from "@/hooks/useAddReservation";
 import { Database } from "@/integrations/supabase/types";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -26,33 +26,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/use-toast";
 
-const reservationSchema = z.object({
-  fullName: z.string().min(2, "Full name must be at least 2 characters."),
-  email: z.string().email("Please enter a valid email address."),
-  partySize: z.coerce.number().min(6, "Reservations are for parties of 6 or more."),
-  reservationDate: z.date({ required_error: "A date is required." }),
-  reservationTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Please use HH:MM format (e.g., 19:00)."),
-  notes: z.string().max(500, "Notes cannot exceed 500 characters.").optional(),
-});
-
-type ReservationFormData = z.infer<typeof reservationSchema>;
 type ReservationInsert = Database["public"]["Tables"]["reservations"]["Insert"];
-
-const addReservation = async (reservation: ReservationInsert) => {
-  const { data, error } = await supabase
-    .from("reservations")
-    .insert(reservation)
-    .select()
-    .single();
-
-  if (error) {
-    console.error("Supabase error:", error);
-    throw new Error("Failed to create reservation. " + error.message);
-  }
-  return data;
-};
 
 const ReservationForm = () => {
   const form = useForm<ReservationFormData>({
@@ -67,23 +42,7 @@ const ReservationForm = () => {
     },
   });
 
-  const mutation = useMutation({
-    mutationFn: addReservation,
-    onSuccess: () => {
-      toast({
-        title: "Reservation Confirmed!",
-        description: "Your table has been booked. We look forward to seeing you!",
-      });
-      form.reset();
-    },
-    onError: (error) => {
-      toast({
-        title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your reservation. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
+  const mutation = useAddReservation(form);
 
   const onSubmit = (data: ReservationFormData) => {
     const [hour, minute] = data.reservationTime.split(':').map(Number);
