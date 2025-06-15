@@ -1,9 +1,6 @@
-
 import React from 'react';
-
 const AboutUs = () => {
-  return (
-    <div className="bg-background py-16 md:py-24">
+  return <div className="bg-background py-16 md:py-24">
       <div className="container">
         <div className="text-center">
           <h1 className="text-4xl md:text-6xl font-bold font-serif">Meet the Champions Behind Champions Sports Bar & Grill</h1>
@@ -12,11 +9,7 @@ const AboutUs = () => {
         {/* Jared's Story */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
-            <img 
-              src="/lovable-uploads/0b56b4f0-9ad3-4e31-b61a-272b24721a8e.png"
-              alt="Jared Bailie and Michelle Wales, co-founders of Champions"
-              className="rounded-lg shadow-xl w-full"
-            />
+            <img src="/lovable-uploads/0b56b4f0-9ad3-4e31-b61a-272b24721a8e.png" alt="Jared Bailie and Michelle Wales, co-founders of Champions" className="rounded-lg shadow-xl w-full" />
           </div>
           <div>
             <h2 className="font-serif text-4xl font-semibold mb-4">Jared Bailie: Local Legend. Sports Enthusiast. Community Pillar.</h2>
@@ -35,11 +28,7 @@ const AboutUs = () => {
         {/* Michelle's Story */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="md:order-2">
-                <img 
-                    src="https://images.unsplash.com/photo-1544717297-fa95b6ee9643?q=80&w=2580&auto=format&fit=crop"
-                    alt="Michelle Wales ensuring a welcoming atmosphere at Champions"
-                    className="rounded-lg shadow-xl w-full h-full max-h-[600px] object-cover"
-                />
+                
             </div>
             <div className="md:order-1">
                 <h2 className="font-serif text-4xl font-semibold mb-4">Michelle Wales: The Heartbeat of Hospitality</h2>
@@ -99,8 +88,6 @@ const AboutUs = () => {
         </div>
 
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AboutUs;
