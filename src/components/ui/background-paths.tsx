@@ -1,8 +1,13 @@
-
 "use client";
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+
+type BackgroundPathsProps = {
+    title?: string;
+    buttonLabel?: string;
+    onButtonClick?: () => void;
+};
 
 function FloatingPaths({ position }: { position: number }) {
     const paths = Array.from({ length: 36 }, (_, i) => ({
@@ -54,10 +59,8 @@ function FloatingPaths({ position }: { position: number }) {
 export function BackgroundPaths({
     title = "Meet the Champions Behind Champions",
     buttonLabel = "Discover Our Story",
-}: {
-    title?: string;
-    buttonLabel?: string;
-}) {
+    onButtonClick,
+}: BackgroundPathsProps) {
     const words = title.split(" ");
 
     return (
@@ -116,6 +119,8 @@ export function BackgroundPaths({
                             text-black dark:text-white transition-all duration-300 
                             group-hover:-translate-y-0.5 border border-black/10 dark:border-white/10
                             hover:shadow-md dark:hover:shadow-neutral-800/50"
+                            onClick={onButtonClick}
+                            type="button"
                         >
                             <span className="opacity-90 group-hover:opacity-100 transition-opacity">
                                 {buttonLabel}

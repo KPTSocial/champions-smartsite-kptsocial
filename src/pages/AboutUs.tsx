@@ -1,13 +1,22 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { BackgroundPaths } from "@/components/ui/background-paths";
 
 const AboutUs = () => {
+  const jaredSectionRef = useRef<HTMLDivElement | null>(null);
+
+  const handleHeroButtonClick = () => {
+    if (jaredSectionRef.current) {
+      jaredSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="bg-background">
       {/* Hero with animated background paths */}
       <BackgroundPaths
         title="Meet the Champions Behind Champions"
         buttonLabel="Discover Our Story"
+        onButtonClick={handleHeroButtonClick}
       />
 
       {/* Existing About Us Content */}
@@ -28,7 +37,7 @@ const AboutUs = () => {
           </div>
 
           <div className="mt-24 space-y-16 max-w-4xl mx-auto">
-            <div className="animate-fade-in">
+            <div ref={jaredSectionRef} className="animate-fade-in">
               <h2 className="font-serif text-4xl font-semibold mb-2">Jared Bailie</h2>
               <p className="text-primary font-bold text-xl mb-4">Local Legend. Sports Enthusiast. Community Pillar.</p>
               <div className="text-muted-foreground text-lg space-y-4 leading-relaxed">
