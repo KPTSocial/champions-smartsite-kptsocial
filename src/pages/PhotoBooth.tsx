@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,6 +11,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from "@/hooks/use-toast";
 import { Camera, Loader2, PartyPopper, Heart, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { uploadToPhotoBucket } from "@/utils/uploadToPhotoBucket";
+import { supabase } from "@/integrations/supabase/client";
 
 const photoFormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -52,7 +53,7 @@ const valueProps = [
 const PhotoBooth = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const form = useForm<z.infer<typeof photoFormSchema>>({
     resolver: zodResolver(photoFormSchema),
     defaultValues: {
@@ -63,18 +64,62 @@ const PhotoBooth = () => {
     },
   });
 
+  // NEW: Submit handler with actual file upload and metadata save
   const onSubmit = async (values: z.infer<typeof photoFormSchema>) => {
     setIsLoading(true);
-    console.log("Form submitted:", values); // In a real app, you'd upload this to Supabase
 
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      const file = values.picture[0];
+      // 1. Upload image to Supabase Storage bucket "photos"
+      const publicUrl = await uploadToPhotoBucket(file, values.name);
 
-    setIsLoading(false);
-    toast({
-      title: '🎉 Submission Successful!',
-      description: "Thanks for sharing! We'll review your photo shortly.",
-    });
-    form.reset();
+      // 2. Save upload metadata to photo_booth_uploads
+      const { error } = await supabase
+        .from("photo_booth_uploads")
+        .insert([
+          {
+            user_name: values.name,
+            caption: values.caption,
+            consent_to_share: values.consent,
+            image_url: publicUrl
+          }
+        ]);
+
+      if (error) {
+        throw error;
+      }
+
+      // Optional: Wire up n8n webhook for GPT/automation 
+      // Uncomment and set your endpoint below:
+      /*
+      await fetch("https://your-n8n-endpoint.com/webhook/photo-upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: values.name,
+          caption: values.caption,
+          consent: values.consent,
+          image_url: publicUrl,
+        }),
+      });
+      */
+
+      toast({
+        title: '🎉 Submission Successful!',
+        description: "Thanks for sharing! We'll review your photo shortly.",
+      });
+      form.reset();
+
+    } catch (err: any) {
+      toast({
+        title: "Upload Failed",
+        description: err.message || "Something went wrong during your upload.",
+        variant: "destructive",
+      });
+      console.error("PhotoBooth upload error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
