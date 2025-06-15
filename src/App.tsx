@@ -10,6 +10,7 @@ import AboutUs from "./pages/AboutUs";
 import PhotoBooth from "./pages/PhotoBooth";
 import Menu from "./pages/Menu";
 import MemberDashboard from "./pages/MemberDashboard";
+import Happenings from "./pages/Happenings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/about" element={<AboutUs />} />
+            <Route path="/happenings" element={<Happenings />} />
             <Route path="/photo-booth" element={<PhotoBooth />} />
             <Route path="/menu" element={<Menu />} />
             <Route path="/member-dashboard" element={<MemberDashboard />} />
