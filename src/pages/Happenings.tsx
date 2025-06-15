@@ -18,12 +18,15 @@ const Happenings = () => {
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold font-serif">Champions Happenings</h1>
           <p className="mt-4 text-lg md:text-xl text-muted-foreground">
-            We keep the fun rolling at Champions with weekly and seasonal events that bring the community together. Check out the calendar or browse all upcoming events below.
+            We keep the fun rolling at Champions with weekly and seasonal events that bring the community together. Check out the calendar for a monthly overview or browse all upcoming events below.
           </p>
         </div>
 
         <section className="mt-16">
-            <EventCalendar />
+          <h2 className="text-3xl md:text-4xl font-bold font-serif text-center mb-8">
+            Event Calendar
+          </h2>
+          <EventCalendar />
         </section>
 
         <section className="mt-24">
@@ -40,11 +43,15 @@ const Happenings = () => {
                 <p>Sorry, we couldn't load the events right now. Please try again later.</p>
              </div>
           )}
-          {events && (
+          {events && events.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {events.map((event) => (
                     <EventCard key={event.id} event={event} />
                 ))}
+            </div>
+          ) : (
+            !isLoading && <div className="text-center text-muted-foreground bg-card border rounded-lg p-8">
+                <p>No upcoming events at the moment. Please check back soon!</p>
             </div>
           )}
         </section>
