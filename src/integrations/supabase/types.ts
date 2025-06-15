@@ -325,31 +325,43 @@ export type Database = {
       }
       photo_booth_uploads: {
         Row: {
+          ai_caption_requested: boolean
           approved: boolean
           caption: string | null
           consent_to_share: boolean
+          email: string
+          first_name: string
           id: string
           image_url: string
+          last_name: string
           uploaded_at: string
-          user_name: string
+          user_name: string | null
         }
         Insert: {
+          ai_caption_requested?: boolean
           approved?: boolean
           caption?: string | null
           consent_to_share?: boolean
+          email?: string
+          first_name?: string
           id?: string
           image_url: string
+          last_name?: string
           uploaded_at?: string
-          user_name: string
+          user_name?: string | null
         }
         Update: {
+          ai_caption_requested?: boolean
           approved?: boolean
           caption?: string | null
           consent_to_share?: boolean
+          email?: string
+          first_name?: string
           id?: string
           image_url?: string
+          last_name?: string
           uploaded_at?: string
-          user_name?: string
+          user_name?: string | null
         }
         Relationships: []
       }
