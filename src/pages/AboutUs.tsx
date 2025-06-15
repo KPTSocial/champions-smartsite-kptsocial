@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 const AboutUs = () => {
@@ -14,7 +15,7 @@ const AboutUs = () => {
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
             <img 
-              src="https://images.unsplash.com/photo-1556742059-4f32c3214555?q=80&w=2070&auto=format&fit=crop"
+              src="/lovable-uploads/0b56b4f0-9ad3-4e31-b61a-272b24721a8e.png"
               alt="Michelle and Jared, owners of Champions"
               className="rounded-lg shadow-xl w-full"
             />
