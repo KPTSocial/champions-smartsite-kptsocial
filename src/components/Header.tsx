@@ -1,3 +1,4 @@
+
 import { Link, NavLink } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Menu as MenuIcon } from 'lucide-react';
@@ -21,7 +22,7 @@ const Header = () => {
       <div className="container h-20 flex items-center justify-between">
         <Link to="/" className="flex items-center">
           <img 
-            src="/lovable-uploads/67358992-a1b5-4f0a-86fb-29a46730c102.png" 
+            src="/lovable-uploads/cf92096a-fadb-4815-a25a-bc8d845a92c1.png" 
             alt="Champions Sports Bar & Grill Logo" 
             className="h-12 w-auto object-contain"
           />
