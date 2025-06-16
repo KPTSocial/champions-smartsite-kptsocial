@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import { BackgroundPaths } from "@/components/ui/background-paths";
 
@@ -42,13 +43,13 @@ const AboutUs = () => {
               <p className="text-primary font-bold text-xl mb-4">Local Legend. Sports Enthusiast. Community Pillar.</p>
               <div className="text-muted-foreground text-lg space-y-4 leading-relaxed">
                   <p>
-                      Born and raised in Hillsboro, Jared Bailie is more than just the co-founder of Champions—he is a champion of the community. From his early days on the Reedville baseball fields to graduating from Hillsboro High, Jared’s roots run deep in this town.
+                      Born and raised in Hillsboro, Jared Bailie is more than just the co-founder of Champions—he is a champion of the community. From his early days on the Reedville baseball fields to graduating from Hillsboro High, Jared's roots run deep in this town.
                   </p>
                   <p>
-                      His journey didn’t stop there. Jared played collegiate baseball at Mt. Hood Community College and Western Oregon University, chasing the dream with grit and dedication—just like his older brother, who played both collegiate and minor league ball. Today, Jared’s love for the game lives on not only through memories but in the lively, sports-driven environment he’s helped build.
+                      His journey didn't stop there. Jared played collegiate baseball at Mt. Hood Community College and Western Oregon University, chasing the dream with grit and dedication—just like his older brother, who played both collegiate and minor league ball. Today, Jared's love for the game lives on not only through memories but in the lively, sports-driven environment he's helped build.
                   </p>
                   <p>
-                      After nearly 20 years with Columbia Distributing, Jared traded in his corporate badge for a dream fulfilled: opening a bar and grill where locals could come together, enjoy great food, and catch the game in good company. Whether he’s teeing off on the golf course or cheering on the Trail Blazers, Jared brings that same passion into every detail of Champions.
+                      After nearly 20 years with Columbia Distributing, Jared traded in his corporate badge for a dream fulfilled: opening a bar and grill where locals could come together, enjoy great food, and catch the game in good company. Whether he's teeing off on the golf course or cheering on the Trail Blazers, Jared brings that same passion into every detail of Champions.
                   </p>
               </div>
             </div>
@@ -61,7 +62,7 @@ const AboutUs = () => {
                       If Jared is the fire, Michelle is the flame that keeps it burning bright. With years of experience in customer-focused service, Michelle has a gift for making guests feel seen, heard, and appreciated from the moment they walk in. Her warm, welcoming energy defines the soul of Champions, where no one stays a stranger for long.
                   </p>
                   <p>
-                    Michelle’s standards for hospitality are sky-high—and that’s why the atmosphere here feels more like a second home than just another bar. Her leadership behind the scenes ensures that everything runs smoothly, and every guest leaves happier than they came in.
+                    Michelle's standards for hospitality are sky-high—and that's why the atmosphere here feels more like a second home than just another bar. Her leadership behind the scenes ensures that everything runs smoothly, and every guest leaves happier than they came in.
                   </p>
               </div>
             </div>
@@ -70,10 +71,10 @@ const AboutUs = () => {
               <h2 className="font-serif text-4xl font-semibold mb-4">A Team with Purpose</h2>
               <div className="text-muted-foreground text-lg space-y-4 leading-relaxed">
                   <p>
-                      Jared and Michelle didn’t just build a bar—they built a hub for Hillsboro. Champions isn’t just about craft cocktails, 20 beers on tap, and weekend brunch (although let’s be honest—those are all pretty great). It’s about giving back.
+                      Jared and Michelle didn't just build a bar—they built a hub for Hillsboro. Champions isn't just about craft cocktails, 20 beers on tap, and weekend brunch (although let's be honest—those are all pretty great). It's about giving back.
                   </p>
                   <p>
-                    From sponsoring Reedville Baseball to supporting The Ronald McDonald House, Rock’n Rooms, Reclaiming Hope Ranch, and Ladybug Run, they’ve made giving part of their mission. They’ve even partnered with the Hillsboro Elks Lodge to support local families in need, especially during the holidays—because building community isn’t a seasonal thing, it’s a way of life.
+                    From sponsoring Reedville Baseball to supporting The Ronald McDonald House, Rock'n Rooms, Reclaiming Hope Ranch, and Ladybug Run, they've made giving part of their mission. They've even partnered with the Hillsboro Elks Lodge to support local families in need, especially during the holidays—because building community isn't a seasonal thing, it's a way of life.
                   </p>
               </div>
             </div>
@@ -81,14 +82,14 @@ const AboutUs = () => {
             <div className="animate-fade-in bg-secondary/20 p-8 rounded-lg" style={{ animationDelay: '600ms' }}>
                 <h2 className="font-serif text-4xl font-semibold mb-4 text-center">What Sets Jared & Michelle Apart</h2>
                 <ul className="list-disc list-inside text-muted-foreground text-lg space-y-2 max-w-2xl mx-auto">
-                    <li><span className="font-semibold text-foreground">Rooted in Hillsboro:</span> Jared’s story is Hillsboro’s story—local boy, turned athlete, turned entrepreneur.</li>
-                    <li><span className="font-semibold text-foreground">Service That Feels Like Family:</span> Michelle’s warmth and leadership make every guest experience unforgettable.</li>
-                    <li><span className="font-semibold text-foreground">Champions for the Community:</span> Their name isn’t just a brand—it’s a promise to show up for the people of Hillsboro, every single day.</li>
+                    <li><span className="font-semibold text-foreground">Rooted in Hillsboro:</span> Jared's story is Hillsboro's story—local boy, turned athlete, turned entrepreneur.</li>
+                    <li><span className="font-semibold text-foreground">Service That Feels Like Family:</span> Michelle's warmth and leadership make every guest experience unforgettable.</li>
+                    <li><span className="font-semibold text-foreground">Champions for the Community:</span> Their name isn't just a brand—it's a promise to show up for the people of Hillsboro, every single day.</li>
                 </ul>
             </div>
             
             <blockquote className="animate-fade-in text-center text-2xl md:text-3xl font-serif italic text-foreground border-l-4 border-primary pl-6" style={{ animationDelay: '800ms' }}>
-                “You’ll come for the 20 beers on tap... but you’ll stay for the atmosphere, the energy, and the people behind the bar who make this place feel like home.”
+                "You'll come for the 20 beers on tap... but you'll stay for the atmosphere, the energy, and the people behind the bar who make this place feel like home."
             </blockquote>
           </div>
 
@@ -100,7 +101,7 @@ const AboutUs = () => {
           </div>
           <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               <img src="https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?q=80&w=2070&auto=format&fit=crop" alt="Fresh vegetables" className="rounded-lg object-cover aspect-square shadow-md"/>
-              <img src="https://images.unsplash.com/photo-1627992499112-595f9e855b55?q=80&w=2070&auto=format=fit=crop" alt="Local farm" className="rounded-lg object-cover aspect-square shadow-md"/>
+              <img src="/lovable-uploads/ee724b66-149b-4ba3-b850-c971d1f9832e.png" alt="Local farm landscape" className="rounded-lg object-cover aspect-square shadow-md"/>
               <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1981&auto=format&fit=crop" alt="Finished pizza dish" className="rounded-lg object-cover aspect-square shadow-md"/>
           </div>
         </div>
