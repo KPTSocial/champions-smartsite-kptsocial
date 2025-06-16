@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getMenuData } from '@/services/menuService';
@@ -7,59 +6,109 @@ import { MenuSection, MenuCategory } from '@/types/menu';
 import MenuCategorySection from '@/components/MenuCategorySection';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/use-mobile';
+import MobileMenuNavigation from '@/components/MobileMenuNavigation';
+import DesktopMenuNavigation from '@/components/DesktopMenuNavigation';
 
 const Menu = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedMenuType, setSelectedMenuType] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const isMobile = useIsMobile();
+
   const { data: menuData, isLoading, isError, error } = useQuery<MenuSection[], Error>({
     queryKey: ['menuData'],
     queryFn: getMenuData,
-    retry: false, // Don't retry on auth/config errors
+    retry: false,
   });
 
   const filteredMenuData = useMemo(() => {
     if (!menuData) return [];
-    if (!searchTerm) return menuData;
 
-    const lowercasedFilter = searchTerm.toLowerCase();
+    let filtered = menuData;
 
-    return menuData
-      .map(section => {
-        if (section.name.toLowerCase().includes(lowercasedFilter)) {
-          return section;
+    // Filter by menu type on mobile
+    if (isMobile && selectedMenuType) {
+      const isFood = selectedMenuType === 'food';
+      filtered = menuData.filter(section => {
+        const sectionName = section.name.toLowerCase();
+        if (isFood) {
+          return sectionName.includes('food') || 
+                 sectionName.includes('appetizer') || 
+                 sectionName.includes('entree') || 
+                 sectionName.includes('main') ||
+                 sectionName.includes('dessert') ||
+                 sectionName.includes('salad') ||
+                 sectionName.includes('soup');
+        } else {
+          return sectionName.includes('drink') || 
+                 sectionName.includes('beverage') || 
+                 sectionName.includes('cocktail') || 
+                 sectionName.includes('beer') || 
+                 sectionName.includes('wine') ||
+                 sectionName.includes('coffee') ||
+                 sectionName.includes('tea');
         }
+      });
+    }
 
-        const filteredCategories = section.categories
-          .map(category => {
-            if (category.name.toLowerCase().includes(lowercasedFilter)) {
-              return category;
-            }
+    // Filter by selected category
+    if (selectedCategory) {
+      filtered = filtered
+        .map(section => ({
+          ...section,
+          categories: section.categories.filter(category => category.id === selectedCategory)
+        }))
+        .filter(section => section.categories.length > 0);
+    }
 
-            const filteredItems = category.items.filter(
-              item =>
-                item.name.toLowerCase().includes(lowercasedFilter) ||
-                item.description?.toLowerCase().includes(lowercasedFilter)
-            );
+    // Apply search filter
+    if (searchTerm) {
+      const lowercasedFilter = searchTerm.toLowerCase();
+      filtered = filtered
+        .map(section => {
+          if (section.name.toLowerCase().includes(lowercasedFilter)) {
+            return section;
+          }
 
-            if (filteredItems.length > 0) {
-              return { ...category, items: filteredItems };
-            }
-            return null;
-          })
-          .filter((category): category is MenuCategory => category !== null);
+          const filteredCategories = section.categories
+            .map(category => {
+              if (category.name.toLowerCase().includes(lowercasedFilter)) {
+                return category;
+              }
 
-        if (filteredCategories.length > 0) {
-          return { ...section, categories: filteredCategories };
-        }
-        return null;
-      })
-      .filter((section): section is MenuSection => section !== null);
-  }, [menuData, searchTerm]);
-  
-  const allCategories = useMemo(() => {
-    if (!menuData) return []; // Use original menuData for nav to show all categories
-    return menuData.flatMap(section => section.categories);
-  }, [menuData]);
+              const filteredItems = category.items.filter(
+                item =>
+                  item.name.toLowerCase().includes(lowercasedFilter) ||
+                  item.description?.toLowerCase().includes(lowercasedFilter)
+              );
 
+              if (filteredItems.length > 0) {
+                return { ...category, items: filteredItems };
+              }
+              return null;
+            })
+            .filter((category): category is MenuCategory => category !== null);
+
+          if (filteredCategories.length > 0) {
+            return { ...section, categories: filteredCategories };
+          }
+          return null;
+        })
+        .filter((section): section is MenuSection => section !== null);
+    }
+
+    return filtered;
+  }, [menuData, searchTerm, selectedMenuType, selectedCategory, isMobile]);
+
+  const handleMenuTypeChange = (value: string) => {
+    setSelectedMenuType(value);
+    setSelectedCategory(null); // Reset category when menu type changes
+  };
+
+  const handleCategoryChange = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+  };
 
   if (isLoading) {
     return (
@@ -119,19 +168,26 @@ const Menu = () => {
         </p>
       </div>
 
-      <div className="sticky top-[81px] bg-background/80 z-40 py-4 mb-8 backdrop-blur-sm -mx-6 px-6 border-b">
-        <div className="container mx-auto flex flex-wrap gap-x-4 gap-y-2 justify-center">
-        {allCategories.map(category => (
-            <a 
-              key={category.id} 
-              href={`#${category.name.toLowerCase().replace(/\s+/g, '-')}`}
-              className="px-4 py-2 rounded-full border bg-card hover:bg-primary hover:text-primary-foreground transition-colors text-sm font-medium"
-            >
-              {category.name}
-            </a>
-          ))}
-        </div>
-      </div>
+      {/* Responsive Navigation */}
+      {menuData && (
+        <>
+          {isMobile ? (
+            <MobileMenuNavigation
+              menuData={menuData}
+              selectedMenuType={selectedMenuType}
+              selectedCategory={selectedCategory}
+              onMenuTypeChange={handleMenuTypeChange}
+              onCategoryChange={handleCategoryChange}
+            />
+          ) : (
+            <DesktopMenuNavigation
+              menuData={menuData}
+              selectedCategory={selectedCategory}
+              onCategoryChange={handleCategoryChange}
+            />
+          )}
+        </>
+      )}
       
       <div className="mb-12 max-w-lg mx-auto">
         <Input
@@ -159,8 +215,21 @@ const Menu = () => {
         </div>
       ) : (
         <div className="text-center py-16">
-          <p className="text-2xl text-muted-foreground">No dishes found for "{searchTerm}".</p>
-          <p className="text-muted-foreground mt-2">Try a different search term or clear your search.</p>
+          {searchTerm ? (
+            <>
+              <p className="text-2xl text-muted-foreground">No dishes found for "{searchTerm}".</p>
+              <p className="text-muted-foreground mt-2">Try a different search term or clear your search.</p>
+            </>
+          ) : selectedCategory ? (
+            <>
+              <p className="text-2xl text-muted-foreground">No items available in this category.</p>
+              <p className="text-muted-foreground mt-2">Please select a different category.</p>
+            </>
+          ) : (
+            <>
+              <p className="text-2xl text-muted-foreground">Please select a menu type and category to view items.</p>
+            </>
+          )}
         </div>
       )}
     </div>
