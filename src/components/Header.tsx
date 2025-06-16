@@ -1,7 +1,6 @@
-
 import { Link, NavLink } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { UtensilsCrossed, Menu as MenuIcon } from 'lucide-react';
+import { Menu as MenuIcon } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from 'react';
 
@@ -20,12 +19,14 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container h-20 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <UtensilsCrossed className="h-6 w-6 text-primary" />
-          <span className="font-serif text-2xl font-bold text-foreground">
-            Champions
-          </span>
+        <Link to="/" className="flex items-center">
+          <img 
+            src="/lovable-uploads/67358992-a1b5-4f0a-86fb-29a46730c102.png" 
+            alt="Champions Sports Bar & Grill Logo" 
+            className="h-12 w-auto object-contain"
+          />
         </Link>
+        
         <nav className="hidden lg:flex items-center gap-6">
           {navItems.map((item) => (
             <NavLink
@@ -44,6 +45,7 @@ const Header = () => {
             <Link to="/reservations">Reservations</Link>
           </Button>
         </div>
+        
         <div className="lg:hidden">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
