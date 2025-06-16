@@ -1,6 +1,7 @@
 
 import { useRef, useEffect } from "react"
 import { cn } from "@/lib/utils"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface WavesProps {
   lineColor?: string
@@ -117,6 +118,7 @@ export function Waves({
   maxCursorMove = 100,
   className,
 }: WavesProps) {
+  const isMobile = useIsMobile()
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null)
@@ -185,39 +187,42 @@ export function Waves({
           p.wave.x = Math.cos(move) * waveAmpX
           p.wave.y = Math.sin(move) * waveAmpY
 
-          const dx = p.x - mouse.sx,
-            dy = p.y - mouse.sy
-          const dist = Math.hypot(dx, dy),
-            l = Math.max(175, mouse.vs)
-          if (dist < l) {
-            const s = 1 - dist / l
-            const f = Math.cos(dist * 0.001) * s
-            p.cursor.vx += Math.cos(mouse.a) * f * l * mouse.vs * 0.00065
-            p.cursor.vy += Math.sin(mouse.a) * f * l * mouse.vs * 0.00065
+          // Only apply cursor effects on desktop
+          if (!isMobile) {
+            const dx = p.x - mouse.sx,
+              dy = p.y - mouse.sy
+            const dist = Math.hypot(dx, dy),
+              l = Math.max(175, mouse.vs)
+            if (dist < l) {
+              const s = 1 - dist / l
+              const f = Math.cos(dist * 0.001) * s
+              p.cursor.vx += Math.cos(mouse.a) * f * l * mouse.vs * 0.00065
+              p.cursor.vy += Math.sin(mouse.a) * f * l * mouse.vs * 0.00065
+            }
+
+            p.cursor.vx += (0 - p.cursor.x) * tension
+            p.cursor.vy += (0 - p.cursor.y) * tension
+            p.cursor.vx *= friction
+            p.cursor.vy *= friction
+            p.cursor.x += p.cursor.vx * 2
+            p.cursor.y += p.cursor.vy * 2
+
+            p.cursor.x = Math.min(
+              maxCursorMove,
+              Math.max(-maxCursorMove, p.cursor.x),
+            )
+            p.cursor.y = Math.min(
+              maxCursorMove,
+              Math.max(-maxCursorMove, p.cursor.y),
+            )
           }
-
-          p.cursor.vx += (0 - p.cursor.x) * tension
-          p.cursor.vy += (0 - p.cursor.y) * tension
-          p.cursor.vx *= friction
-          p.cursor.vy *= friction
-          p.cursor.x += p.cursor.vx * 2
-          p.cursor.y += p.cursor.vy * 2
-
-          p.cursor.x = Math.min(
-            maxCursorMove,
-            Math.max(-maxCursorMove, p.cursor.x),
-          )
-          p.cursor.y = Math.min(
-            maxCursorMove,
-            Math.max(-maxCursorMove, p.cursor.y),
-          )
         })
       })
     }
 
     function moved(point, withCursor = true) {
-      const x = point.x + point.wave.x + (withCursor ? point.cursor.x : 0)
-      const y = point.y + point.wave.y + (withCursor ? point.cursor.y : 0)
+      const x = point.x + point.wave.x + (withCursor && !isMobile ? point.cursor.x : 0)
+      const y = point.y + point.wave.y + (withCursor && !isMobile ? point.cursor.y : 0)
       return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 }
     }
 
@@ -248,21 +253,24 @@ export function Waves({
     function tick(t) {
       const mouse = mouseRef.current
 
-      mouse.sx += (mouse.x - mouse.sx) * 0.1
-      mouse.sy += (mouse.y - mouse.sy) * 0.1
+      // Only update mouse tracking on desktop
+      if (!isMobile) {
+        mouse.sx += (mouse.x - mouse.sx) * 0.1
+        mouse.sy += (mouse.y - mouse.sy) * 0.1
 
-      const dx = mouse.x - mouse.lx,
-        dy = mouse.y - mouse.ly
-      const d = Math.hypot(dx, dy)
-      mouse.v = d
-      mouse.vs += (d - mouse.vs) * 0.1
-      mouse.vs = Math.min(100, mouse.vs)
-      mouse.lx = mouse.x
-      mouse.ly = mouse.y
-      mouse.a = Math.atan2(dy, dx)
+        const dx = mouse.x - mouse.lx,
+          dy = mouse.y - mouse.ly
+        const d = Math.hypot(dx, dy)
+        mouse.v = d
+        mouse.vs += (d - mouse.vs) * 0.1
+        mouse.vs = Math.min(100, mouse.vs)
+        mouse.lx = mouse.x
+        mouse.ly = mouse.y
+        mouse.a = Math.atan2(dy, dx)
 
-      container.style.setProperty("--x", `${mouse.sx}px`)
-      container.style.setProperty("--y", `${mouse.sy}px`)
+        container.style.setProperty("--x", `${mouse.sx}px`)
+        container.style.setProperty("--y", `${mouse.sy}px`)
+      }
 
       movePoints(t)
       drawLines()
@@ -277,9 +285,12 @@ export function Waves({
       updateMouse(e.pageX, e.pageY)
     }
     function onTouchMove(e) {
-      e.preventDefault()
-      const touch = e.touches[0]
-      updateMouse(touch.clientX, touch.clientY)
+      // Only prevent default on desktop for cursor precision
+      if (!isMobile) {
+        e.preventDefault()
+        const touch = e.touches[0]
+        updateMouse(touch.clientX, touch.clientY)
+      }
     }
     function updateMouse(x, y) {
       const mouse = mouseRef.current
@@ -299,15 +310,22 @@ export function Waves({
     setLines()
     requestAnimationFrame(tick)
     window.addEventListener("resize", onResize)
-    window.addEventListener("mousemove", onMouseMove)
-    window.addEventListener("touchmove", onTouchMove, { passive: false })
+    
+    // Only add mouse/touch listeners on desktop
+    if (!isMobile) {
+      window.addEventListener("mousemove", onMouseMove)
+      window.addEventListener("touchmove", onTouchMove, { passive: false })
+    }
 
     return () => {
       window.removeEventListener("resize", onResize)
-      window.removeEventListener("mousemove", onMouseMove)
-      window.removeEventListener("touchmove", onTouchMove)
+      if (!isMobile) {
+        window.removeEventListener("mousemove", onMouseMove)
+        window.removeEventListener("touchmove", onTouchMove)
+      }
     }
   }, [
+    isMobile,
     lineColor,
     backgroundColor,
     waveSpeedX,
@@ -332,17 +350,20 @@ export function Waves({
         className,
       )}
     >
-      <div
-        className={cn(
-          "absolute top-0 left-0 rounded-full",
-          "w-2 h-2 bg-foreground/10",
-        )}
-        style={{
-          transform:
-            "translate3d(calc(var(--x) - 50%), calc(var(--y) - 50%), 0)",
-          willChange: "transform",
-        }}
-      />
+      {/* Only show cursor indicator on desktop */}
+      {!isMobile && (
+        <div
+          className={cn(
+            "absolute top-0 left-0 rounded-full",
+            "w-2 h-2 bg-foreground/10",
+          )}
+          style={{
+            transform:
+              "translate3d(calc(var(--x) - 50%), calc(var(--y) - 50%), 0)",
+            willChange: "transform",
+          }}
+        />
+      )}
       <canvas ref={canvasRef} className="block w-full h-full" />
     </div>
   )
