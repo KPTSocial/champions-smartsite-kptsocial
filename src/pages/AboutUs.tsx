@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { BackgroundPaths } from "@/components/ui/background-paths";
 
@@ -82,9 +81,9 @@ const AboutUs = () => {
             <div className="animate-fade-in bg-secondary/20 p-8 rounded-lg" style={{ animationDelay: '600ms' }}>
                 <h2 className="font-serif text-4xl font-semibold mb-4 text-center">What Sets Jared & Michelle Apart</h2>
                 <ul className="list-disc list-inside text-muted-foreground text-lg space-y-2 max-w-2xl mx-auto">
-                    <li><span className="font-semibold text-foreground">Rooted in Hillsboro:</span> Jared’s story is Hillsboro’s story—local boy, turned athlete, turned entrepreneur.</li>
-                    <li><span className="font-semibold text-foreground">Service That Feels Like Family:</span> Michelle’s warmth and leadership make every guest experience unforgettable.</li>
-                    <li><span className="font-semibold text-foreground">Champions for the Community:</span> Their name isn’t just a brand—it’s a promise to show up for the people of Hillsboro, every single day.</li>
+                    <li><span className="font-semibold text-foreground">Rooted in Hillsboro:</span> Jared's story is Hillsboro's story—local boy, turned athlete, turned entrepreneur.</li>
+                    <li><span className="font-semibold text-foreground">Service That Feels Like Family:</span> Michelle's warmth and leadership make every guest experience unforgettable.</li>
+                    <li><span className="font-semibold text-foreground">Champions for the Community:</span> Their name isn't just a brand—it's a promise to show up for the people of Hillsboro, every single day.</li>
                 </ul>
             </div>
             
@@ -101,7 +100,7 @@ const AboutUs = () => {
           </div>
           <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               <img src="/lovable-uploads/87b81721-a2b0-43d9-a597-f6e88d0f489c.png" alt="Local vineyard" className="rounded-lg object-cover aspect-square shadow-md"/>
-              <img src="/lovable-uploads/4169d955-5253-4d18-9d98-1718628bc80e.png" alt="Fresh local produce at farmers market" className="rounded-lg object-cover aspect-square shadow-md"/>
+              <img src="/lovable-uploads/80deca4e-dc00-4030-9b42-5aef0cb2164f.png" alt="Fresh local produce display with chalkboard sign at farmers market" className="rounded-lg object-cover aspect-square shadow-md"/>
               <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1981&auto=format&fit=crop" alt="Finished pizza dish" className="rounded-lg object-cover aspect-square shadow-md"/>
           </div>
         </div>
