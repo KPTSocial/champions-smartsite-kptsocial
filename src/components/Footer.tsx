@@ -1,4 +1,3 @@
-
 import { UtensilsCrossed, MapPin, Phone, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -10,7 +9,11 @@ const Footer = () => {
           
           <div>
             <Link to="/" className="flex items-center gap-2">
-              <UtensilsCrossed className="h-8 w-8 text-primary" />
+              <img 
+                src="/lovable-uploads/3945cf0e-e4bd-4a9f-b682-9710e263952f.png" 
+                alt="Champions Sports Bar & Grill Logo" 
+                className="h-16 w-16 object-contain"
+              />
               <span className="font-serif text-3xl font-bold">
                 Champions
               </span>
@@ -90,4 +93,3 @@ const Footer = () => {
 };
 
 export default Footer;
-
