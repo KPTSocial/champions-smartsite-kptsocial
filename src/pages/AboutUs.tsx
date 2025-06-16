@@ -89,7 +89,7 @@ const AboutUs = () => {
             </div>
             
             <blockquote className="animate-fade-in text-center text-2xl md:text-3xl font-serif italic text-foreground border-l-4 border-primary pl-6" style={{ animationDelay: '800ms' }}>
-                “You’ll come for the 20 beers on tap... but you’ll stay for the atmosphere, the energy, and the people behind the bar who make this place feel like home.”
+                "You'll come for the 20 beers on tap... but you'll stay for the atmosphere, the energy, and the people behind the bar who make this place feel like home."
             </blockquote>
           </div>
 
@@ -101,7 +101,7 @@ const AboutUs = () => {
           </div>
           <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               <img src="/lovable-uploads/87b81721-a2b0-43d9-a597-f6e88d0f489c.png" alt="Local vineyard" className="rounded-lg object-cover aspect-square shadow-md"/>
-              <img src="https://images.unsplash.com/photo-1627992499112-595f9e855b55?q=80&w=2070&auto=format=fit=crop" alt="Local farm" className="rounded-lg object-cover aspect-square shadow-md"/>
+              <img src="/lovable-uploads/4169d955-5253-4d18-9d98-1718628bc80e.png" alt="Fresh local produce at farmers market" className="rounded-lg object-cover aspect-square shadow-md"/>
               <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1981&auto=format&fit=crop" alt="Finished pizza dish" className="rounded-lg object-cover aspect-square shadow-md"/>
           </div>
         </div>
