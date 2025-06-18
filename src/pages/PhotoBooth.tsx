@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,9 +10,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from "@/hooks/use-toast";
-import { Camera, Loader2, PartyPopper, Heart, Users } from 'lucide-react';
+import { Camera, Loader2, PartyPopper, Heart, Users, X, Upload } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { uploadToPhotoBucket } from "@/utils/uploadToPhotoBucket";
+import { sendToWebhook, formatDateToMMDDYY } from "@/utils/webhookService";
 import { supabase } from "@/integrations/supabase/client";
 
 // Updated Schema: first/last/email required, caption optional.
@@ -21,9 +23,13 @@ const photoFormSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
   picture: z.any()
     .refine((files) => files?.length === 1, 'A photo is required.')
-    .refine((files) => files?.[0]?.size <= 5000000, `Max file size is 5MB.`),
+    .refine((files) => files?.[0]?.size <= 5000000, `Max file size is 5MB.`)
+    .refine((files) => {
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+      return allowedTypes.includes(files?.[0]?.type);
+    }, 'Please select a valid image file (JPEG, PNG, WebP, or GIF).'),
   caption: z.string().max(150, { message: 'Caption cannot be more than 150 characters.' }).optional(),
-  wantAICaption: z.boolean().optional(), // Only relevant if no caption
+  wantAICaption: z.boolean().optional(),
   consent: z.boolean().refine((val) => val === true, { message: 'You must consent to sharing your photo.' }),
 }).refine(
   (data) => data.caption?.trim()?.length || data.wantAICaption,
@@ -60,6 +66,7 @@ const valueProps = [
 const PhotoBooth = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof photoFormSchema>>({
     resolver: zodResolver(photoFormSchema),
@@ -77,14 +84,32 @@ const PhotoBooth = () => {
   const captionValue = form.watch("caption");
   const wantAICaption = form.watch("wantAICaption");
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setImagePreview(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const clearImagePreview = () => {
+    setImagePreview(null);
+    form.setValue('picture', null);
+  };
+
   const onSubmit = async (values: z.infer<typeof photoFormSchema>) => {
     setIsLoading(true);
 
     try {
       const file = values.picture[0];
       const userFullName = `${values.firstName} ${values.lastName}`;
+      
       // Upload photo
       const publicUrl = await uploadToPhotoBucket(file, userFullName);
+      
       // Write to Supabase
       const { error } = await supabase
         .from("photo_booth_uploads")
@@ -98,13 +123,29 @@ const PhotoBooth = () => {
           consent_to_share: values.consent,
           image_url: publicUrl,
         }]);
+      
       if (error) throw error;
+
+      // Send to webhook
+      const now = new Date();
+      await sendToWebhook({
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        caption: values.caption?.trim() || null,
+        imageUrl: publicUrl,
+        timestamp: now.toISOString(),
+        formattedDate: formatDateToMMDDYY(now),
+        aiCaptionRequested: !values.caption?.trim() && values.wantAICaption ? true : false,
+      });
 
       toast({
         title: '🎉 Submission Successful!',
         description: "Thanks for sharing! We'll review your photo shortly.",
       });
+      
       form.reset();
+      setImagePreview(null);
 
     } catch (err: any) {
       toast({
@@ -134,13 +175,6 @@ const PhotoBooth = () => {
               <CardTitle className="text-3xl font-serif font-semibold">Submit Your Photo</CardTitle>
             </CardHeader>
             <CardContent>
-              <Alert className="mb-6 bg-accent/20 border-accent/50 text-accent-foreground">
-                <Camera className="h-4 w-4" />
-                <AlertTitle className="font-semibold">Demo Mode</AlertTitle>
-                <AlertDescription>
-                  This form is for demonstration. File uploads will be enabled with backend integration.
-                </AlertDescription>
-              </Alert>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField control={form.control} name="firstName" render={({ field }) => (
@@ -152,6 +186,7 @@ const PhotoBooth = () => {
                       <FormMessage />
                     </FormItem>
                   )} />
+                  
                   <FormField control={form.control} name="lastName" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Last Name</FormLabel>
@@ -161,6 +196,7 @@ const PhotoBooth = () => {
                       <FormMessage />
                     </FormItem>
                   )} />
+                  
                   <FormField control={form.control} name="email" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email</FormLabel>
@@ -170,15 +206,46 @@ const PhotoBooth = () => {
                       <FormMessage />
                     </FormItem>
                   )} />
+                  
                   <FormField control={form.control} name="picture" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Upload Photo</FormLabel>
                       <FormControl>
-                        <Input type="file" accept="image/*" onChange={(e) => field.onChange(e.target.files)} />
+                        <div className="space-y-4">
+                          <Input 
+                            type="file" 
+                            accept="image/*" 
+                            capture="environment"
+                            onChange={(e) => {
+                              field.onChange(e.target.files);
+                              handleFileChange(e);
+                            }}
+                            className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer"
+                          />
+                          {imagePreview && (
+                            <div className="relative inline-block">
+                              <img 
+                                src={imagePreview} 
+                                alt="Preview" 
+                                className="max-w-full h-48 object-cover rounded-lg border"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                className="absolute top-2 right-2 h-6 w-6 p-0"
+                                onClick={clearImagePreview}
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
+                  
                   <FormField control={form.control} name="caption" render={({ field }) => (
                     <FormItem>
                       <FormLabel>
@@ -190,6 +257,7 @@ const PhotoBooth = () => {
                       <FormMessage />
                     </FormItem>
                   )} />
+                  
                   {/* Show AI caption checkbox ONLY when no caption is entered */}
                   {!captionValue?.trim() && (
                     <FormField control={form.control} name="wantAICaption" render={({ field }) => (
@@ -205,6 +273,7 @@ const PhotoBooth = () => {
                       </FormItem>
                     )} />
                   )}
+                  
                   <FormField control={form.control} name="consent" render={({ field }) => (
                     <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                       <FormControl>
@@ -215,14 +284,19 @@ const PhotoBooth = () => {
                       </div>
                     </FormItem>
                   )} />
+                  
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</> : 'Submit Photo'}
+                    {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</> : <>
+                      <Upload className="mr-2 h-4 w-4" />
+                      Submit Photo
+                    </>}
                   </Button>
                 </form>
               </Form>
             </CardContent>
           </Card>
         </div>
+        
         <div className="lg:col-span-3">
           <h2 className="text-3xl font-serif font-semibold mb-6">Wall of Fame</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
