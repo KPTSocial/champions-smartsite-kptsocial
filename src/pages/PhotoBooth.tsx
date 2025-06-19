@@ -3,6 +3,8 @@ import React from 'react';
 import PhotoBoothForm from '@/components/photobooth/PhotoBoothForm';
 import PhotoGallery from '@/components/photobooth/PhotoGallery';
 import ValuePropsSection from '@/components/photobooth/ValuePropsSection';
+import QRCodeGenerator from '@/components/qr-generator/QRCodeGenerator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const PhotoBooth = () => {
   return (
@@ -14,12 +16,26 @@ const PhotoBooth = () => {
         </p>
       </div>
 
-      <div className="mt-16 grid grid-cols-1 lg:grid-cols-5 gap-12">
-        <PhotoBoothForm />
-        <PhotoGallery />
+      <div className="mt-16">
+        <Tabs defaultValue="upload" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsTrigger value="upload">Photo Upload</TabsTrigger>
+            <TabsTrigger value="qr-generator">QR Code Generator</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="upload" className="space-y-12">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
+              <PhotoBoothForm />
+              <PhotoGallery />
+            </div>
+            <ValuePropsSection />
+          </TabsContent>
+          
+          <TabsContent value="qr-generator">
+            <QRCodeGenerator />
+          </TabsContent>
+        </Tabs>
       </div>
-
-      <ValuePropsSection />
     </div>
   );
 };
