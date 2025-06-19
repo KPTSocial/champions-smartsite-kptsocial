@@ -52,76 +52,109 @@ export const GuestFeedbackForm = () => {
     setSubmitting(true);
     setSuccess(false);
 
+    // Add mobile-specific logging
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    console.log('Guest feedback form submission started:', {
+      device: isMobile ? 'mobile' : 'desktop',
+      online: navigator.onLine,
+      guestName: data.firstName,
+      rating: data.rating
+    });
+
     // Join first and last name
     const name = data.lastName
       ? `${data.firstName.trim()} ${data.lastName.trim()}`
       : data.firstName.trim();
 
-    // Insert feedback in DB with status and no AI response yet
-    const { error, data: dbData } = await supabase
-      .from("guest_feedback")
-      .insert([
-        {
-          name: name,
-          email: data.email,
-          visit_date: format(data.visitDate, "yyyy-MM-dd"),
-          rating: data.rating,
-          feedback: data.feedback,
-          consent_to_share: data.consentToShare,
-          status: data.rating <= 3 ? "flagged" : "new",
-        },
-      ])
-      .select()
-      .single();
+    try {
+      // Insert feedback in DB with status and no AI response yet
+      const { error, data: dbData } = await supabase
+        .from("guest_feedback")
+        .insert([
+          {
+            name: name,
+            email: data.email,
+            visit_date: format(data.visitDate, "yyyy-MM-dd"),
+            rating: data.rating,
+            feedback: data.feedback,
+            consent_to_share: data.consentToShare,
+            status: data.rating <= 3 ? "flagged" : "new",
+          },
+        ])
+        .select()
+        .single();
 
-    if (error) {
-      toast({ title: "Error", description: "Could not submit feedback.", variant: "destructive" });
-      setSubmitting(false);
-      return;
-    }
+      if (error) {
+        console.error('Database insertion failed:', error);
+        toast({ title: "Error", description: "Could not submit feedback.", variant: "destructive" });
+        setSubmitting(false);
+        return;
+      }
 
-    // Send initial feedback webhook to Make.com
-    const webhookPayload = {
-      guestName: name,
-      email: data.email,
-      visitDate: format(data.visitDate, "yyyy-MM-dd"),
-      rating: data.rating,
-      feedback: data.feedback,
-      consentToShare: data.consentToShare,
-      status: data.rating <= 3 ? "flagged" : "new",
-      timestamp: new Date().toISOString(),
-      formattedVisitDate: formatDateForWebhook(data.visitDate),
-      feedbackId: dbData.id,
-    };
+      console.log('Feedback saved to database successfully:', dbData.id);
 
-    // Send webhook (non-blocking)
-    sendGuestFeedbackWebhook(webhookPayload);
-
-    // Trigger AI response generation
-    fetch("/functions/v1/generate_review_response", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        feedbackId: dbData.id,
-        feedback: data.feedback,
-        rating: data.rating,
+      // Send initial feedback webhook to Make.com
+      const webhookPayload = {
         guestName: name,
         email: data.email,
         visitDate: format(data.visitDate, "yyyy-MM-dd"),
+        rating: data.rating,
+        feedback: data.feedback,
         consentToShare: data.consentToShare,
-      }),
-    }).then(() => {
-      // No-op, show success regardless of response
-    });
+        status: data.rating <= 3 ? "flagged" : "new",
+        timestamp: new Date().toISOString(),
+        formattedVisitDate: formatDateForWebhook(data.visitDate),
+        feedbackId: dbData.id,
+      };
 
-    setSuccess(true);
-    setSubmitting(false);
-    form.reset();
-    toast({
-      title: "Thanks for your feedback! We appreciate you.",
-      description: "We'll use your comments to make Champions even better.",
-      variant: "default",
-    });
+      // Send webhook (non-blocking with improved mobile handling)
+      sendGuestFeedbackWebhook(webhookPayload);
+
+      // Trigger AI response generation with better error handling
+      console.log('Triggering AI response generation...');
+      try {
+        const aiResponse = await fetch("/functions/v1/generate_review_response", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            feedbackId: dbData.id,
+            feedback: data.feedback,
+            rating: data.rating,
+            guestName: name,
+            email: data.email,
+            visitDate: format(data.visitDate, "yyyy-MM-dd"),
+            consentToShare: data.consentToShare,
+          }),
+        });
+
+        if (aiResponse.ok) {
+          console.log('AI response generation triggered successfully');
+        } else {
+          console.error('AI response generation failed:', aiResponse.status, aiResponse.statusText);
+        }
+      } catch (aiError) {
+        console.error('AI response generation error:', aiError);
+        // Don't fail the submission if AI generation fails
+      }
+
+      setSuccess(true);
+      setSubmitting(false);
+      form.reset();
+      toast({
+        title: "Thanks for your feedback! We appreciate you.",
+        description: "We'll use your comments to make Champions even better.",
+        variant: "default",
+      });
+
+    } catch (submitError) {
+      console.error('Form submission error:', submitError);
+      toast({ 
+        title: "Error", 
+        description: "Could not submit feedback. Please try again.", 
+        variant: "destructive" 
+      });
+      setSubmitting(false);
+    }
   };
 
   if (success) {
