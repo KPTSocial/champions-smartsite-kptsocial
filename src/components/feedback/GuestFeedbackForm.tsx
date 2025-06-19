@@ -19,18 +19,6 @@ import { RatingField } from "./GuestFeedbackFormFields/RatingField";
 import { FeedbackField } from "./GuestFeedbackFormFields/FeedbackField";
 import { ConsentToShareField } from "./GuestFeedbackFormFields/ConsentToShareField";
 
-type DBFeedback = {
-  id: string;
-  name: string | null;
-  email: string | null;
-  visit_date: string;
-  rating: number;
-  feedback: string;
-  consent_to_share: boolean;
-  ai_response: string | null;
-  status: string;
-};
-
 export const GuestFeedbackForm = () => {
   const form = useForm<GuestFeedbackFormData>({
     resolver: zodResolver(guestFeedbackSchema),
@@ -51,15 +39,6 @@ export const GuestFeedbackForm = () => {
   const onSubmit = async (data: GuestFeedbackFormData) => {
     setSubmitting(true);
     setSuccess(false);
-
-    // Add mobile-specific logging
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    console.log('Guest feedback form submission started:', {
-      device: isMobile ? 'mobile' : 'desktop',
-      online: navigator.onLine,
-      guestName: data.firstName,
-      rating: data.rating
-    });
 
     // Join first and last name
     const name = data.lastName
@@ -85,15 +64,12 @@ export const GuestFeedbackForm = () => {
         .single();
 
       if (error) {
-        console.error('Database insertion failed:', error);
         toast({ title: "Error", description: "Could not submit feedback.", variant: "destructive" });
         setSubmitting(false);
         return;
       }
 
-      console.log('Feedback saved to database successfully:', dbData.id);
-
-      // Send initial feedback webhook to Make.com
+      // Send initial feedback webhook to Make.com (silent - no error handling shown to user)
       const webhookPayload = {
         guestName: name,
         email: data.email,
@@ -107,16 +83,15 @@ export const GuestFeedbackForm = () => {
         feedbackId: dbData.id,
       };
 
-      // Send webhook (non-blocking with improved mobile handling)
-      sendGuestFeedbackWebhook(webhookPayload);
+      // Send webhook (completely silent)
+      sendGuestFeedbackWebhook(webhookPayload).catch(() => {
+        // Silent error handling - don't show anything to user
+      });
 
-      // Trigger AI response generation with better error handling
-      console.log('Triggering AI response generation...');
+      // Trigger AI response generation (silent - don't block user experience)
       try {
-        const aiResponse = await fetch("/functions/v1/generate_review_response", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+        await supabase.functions.invoke("generate_review_response", {
+          body: {
             feedbackId: dbData.id,
             feedback: data.feedback,
             rating: data.rating,
@@ -124,19 +99,13 @@ export const GuestFeedbackForm = () => {
             email: data.email,
             visitDate: format(data.visitDate, "yyyy-MM-dd"),
             consentToShare: data.consentToShare,
-          }),
+          },
         });
-
-        if (aiResponse.ok) {
-          console.log('AI response generation triggered successfully');
-        } else {
-          console.error('AI response generation failed:', aiResponse.status, aiResponse.statusText);
-        }
-      } catch (aiError) {
-        console.error('AI response generation error:', aiError);
-        // Don't fail the submission if AI generation fails
+      } catch {
+        // Silent error handling - AI generation failure doesn't affect user experience
       }
 
+      // Always show success to user regardless of webhook/AI status
       setSuccess(true);
       setSubmitting(false);
       form.reset();
@@ -146,8 +115,7 @@ export const GuestFeedbackForm = () => {
         variant: "default",
       });
 
-    } catch (submitError) {
-      console.error('Form submission error:', submitError);
+    } catch {
       toast({ 
         title: "Error", 
         description: "Could not submit feedback. Please try again.", 
