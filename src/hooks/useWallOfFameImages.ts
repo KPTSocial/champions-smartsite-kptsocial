@@ -9,12 +9,12 @@ interface WallOfFameImage {
 }
 
 const fallbackImages = [
-  { src: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=2070&auto=format&fit=crop", alt: "Friends cheering at a concert" },
-  { src: "https://images.unsplash.com/photo-1567406991534-e4c32a76f22e?q=80&w=1964&auto=format&fit=crop", alt: "Group of friends taking a selfie" },
-  { src: "https://images.unsplash.com/photo-1600891964725-e0a52c03f678?q=80&w=2070&auto=format&fit=crop", alt: "People enjoying a meal together" },
-  { src: "https://images.unsplash.com/photo-1522881451255-f5f69c5fdfd7?q=80&w=1974&auto=format&fit=crop", alt: "Friends having fun at a bar" },
-  { src: "https://images.unsplash.com/photo-1529156069898-fac51a492240?q=80&w=2070&auto=format&fit=crop", alt: "Group of friends laughing" },
-  { src: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1974&auto=format=fit=crop", alt: "Interior of a vibrant bar" },
+  { src: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=2070&auto=format&fit=crop", alt: "Friends cheering at a concert", name: "fallback-1.jpg" },
+  { src: "https://images.unsplash.com/photo-1567406991534-e4c32a76f22e?q=80&w=1964&auto=format&fit=crop", alt: "Group of friends taking a selfie", name: "fallback-2.jpg" },
+  { src: "https://images.unsplash.com/photo-1600891964725-e0a52c03f678?q=80&w=2070&auto=format&fit=crop", alt: "People enjoying a meal together", name: "fallback-3.jpg" },
+  { src: "https://images.unsplash.com/photo-1522881451255-f5f69c5fdfd7?q=80&w=1974&auto=format&fit=crop", alt: "Friends having fun at a bar", name: "fallback-4.jpg" },
+  { src: "https://images.unsplash.com/photo-1529156069898-fac51a492240?q=80&w=2070&auto=format&fit=crop", alt: "Group of friends laughing", name: "fallback-5.jpg" },
+  { src: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1974&auto=format=fit=crop", alt: "Interior of a vibrant bar", name: "fallback-6.jpg" },
 ];
 
 export const useWallOfFameImages = () => {
