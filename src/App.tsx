@@ -8,7 +8,6 @@ import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import AboutUs from "./pages/AboutUs";
 import PhotoBooth from "./pages/PhotoBooth";
-import MobilePhotoUpload from "./pages/MobilePhotoUpload";
 import Menu from "./pages/Menu";
 import MemberDashboard from "./pages/MemberDashboard";
 import Happenings from "./pages/Happenings";
@@ -29,7 +28,6 @@ const App = () => (
             <Route path="/about" element={<AboutUs />} />
             <Route path="/happenings" element={<Happenings />} />
             <Route path="/photo-booth" element={<PhotoBooth />} />
-            <Route path="/mobile-upload" element={<MobilePhotoUpload />} />
             <Route path="/menu" element={<Menu />} />
             <Route path="/member-dashboard" element={<MemberDashboard />} />
             <Route path="/reservations" element={<Reservations />} />
