@@ -2,6 +2,7 @@
 interface ReservationWebhookPayload {
   fullName: string;
   email: string;
+  phoneNumber?: string;
   partySize: number;
   reservationType: string;
   reservationDate: string;

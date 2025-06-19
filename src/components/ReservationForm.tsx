@@ -31,6 +31,7 @@ const ReservationForm = () => {
       firstName: "",
       lastName: "",
       email: "",
+      phoneNumber: "",
       partySize: 1,
       reservationDate: undefined,
       reservationTime: "18:00",
@@ -71,6 +72,7 @@ const ReservationForm = () => {
         const reservationData: ReservationInsert = {
           full_name: fullName,
           email: data.email,
+          phone_number: data.phoneNumber || null,
           party_size: data.partySize,
           reservation_date: combinedDateTime.toISOString(),
           notes: data.notes,
@@ -82,6 +84,7 @@ const ReservationForm = () => {
         const webhookPayload = {
           fullName: fullName,
           email: data.email,
+          phoneNumber: data.phoneNumber,
           partySize: data.partySize,
           reservationType: data.reservationType,
           reservationDate: combinedDateTime.toISOString(),
@@ -106,6 +109,7 @@ const ReservationForm = () => {
         const reservationData: ReservationInsert = {
           full_name: fullName,
           email: data.email,
+          phone_number: data.phoneNumber || null,
           party_size: data.partySize,
           reservation_date: combinedDateTime.toISOString(),
           notes: finalNotes || null,
@@ -117,6 +121,7 @@ const ReservationForm = () => {
         const webhookPayload = {
           fullName: fullName,
           email: data.email,
+          phoneNumber: data.phoneNumber,
           partySize: data.partySize,
           reservationType: data.reservationType,
           reservationDate: combinedDateTime.toISOString(),

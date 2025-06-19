@@ -6,6 +6,11 @@ export const reservationSchema = z.object({
   firstName: z.string().min(1, "First name is required."),
   lastName: z.string().optional(),
   email: z.string().email("Please enter a valid email address."),
+  phoneNumber: z.string()
+    .optional()
+    .refine((val) => !val || /^[\+]?[1-9][\d]{0,15}$/.test(val.replace(/[\s\-\(\)]/g, '')), {
+      message: "Please enter a valid phone number"
+    }),
   partySize: z.coerce.number().min(1, "Party size must be at least 1."),
   reservationDate: z.date({ required_error: "A date is required." }),
   reservationTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Please use HH:MM format (e.g., 19:00)."),

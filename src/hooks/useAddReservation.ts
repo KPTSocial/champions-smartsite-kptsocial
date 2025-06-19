@@ -32,6 +32,7 @@ export const useAddReservation = (form: ReturnType<typeof useForm<ReservationFor
           const webhookPayload = {
             fullName: variables.full_name || '',
             email: variables.email || '',
+            phoneNumber: variables.phone_number || undefined,
             partySize: variables.party_size || 0,
             reservationType: variables.reservation_type || '',
             reservationDate: variables.reservation_date || '',

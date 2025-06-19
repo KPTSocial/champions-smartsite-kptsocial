@@ -404,6 +404,7 @@ export type Database = {
           id: string
           notes: string | null
           party_size: number
+          phone_number: string | null
           reservation_date: string
           reservation_type: Database["public"]["Enums"]["reservation_type"]
         }
@@ -415,6 +416,7 @@ export type Database = {
           id?: string
           notes?: string | null
           party_size: number
+          phone_number?: string | null
           reservation_date: string
           reservation_type: Database["public"]["Enums"]["reservation_type"]
         }
@@ -426,6 +428,7 @@ export type Database = {
           id?: string
           notes?: string | null
           party_size?: number
+          phone_number?: string | null
           reservation_date?: string
           reservation_type?: Database["public"]["Enums"]["reservation_type"]
         }
