@@ -8,6 +8,7 @@ import { Form } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { sendGuestFeedbackWebhook, formatDateForWebhook } from "@/utils/guestFeedbackWebhookService";
 
 // Import refactored field components
 import { FirstNameField } from "./GuestFeedbackFormFields/FirstNameField";
@@ -79,6 +80,24 @@ export const GuestFeedbackForm = () => {
       return;
     }
 
+    // Send initial feedback webhook to Make.com
+    const webhookPayload = {
+      guestName: name,
+      email: data.email,
+      visitDate: format(data.visitDate, "yyyy-MM-dd"),
+      rating: data.rating,
+      feedback: data.feedback,
+      consentToShare: data.consentToShare,
+      status: data.rating <= 3 ? "flagged" : "new",
+      timestamp: new Date().toISOString(),
+      formattedVisitDate: formatDateForWebhook(data.visitDate),
+      feedbackId: dbData.id,
+    };
+
+    // Send webhook (non-blocking)
+    sendGuestFeedbackWebhook(webhookPayload);
+
+    // Trigger AI response generation
     fetch("/functions/v1/generate_review_response", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -86,6 +105,10 @@ export const GuestFeedbackForm = () => {
         feedbackId: dbData.id,
         feedback: data.feedback,
         rating: data.rating,
+        guestName: name,
+        email: data.email,
+        visitDate: format(data.visitDate, "yyyy-MM-dd"),
+        consentToShare: data.consentToShare,
       }),
     }).then(() => {
       // No-op, show success regardless of response
