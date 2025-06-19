@@ -8,6 +8,7 @@ import { reservationSchema, ReservationFormData } from "@/lib/validations/reserv
 import { useAddReservation } from "@/hooks/useAddReservation";
 import { Database } from "@/integrations/supabase/types";
 import { getEvents, Event } from "@/services/eventService";
+import { sendReservationWebhook, formatDateForWebhook } from "@/utils/reservationWebhookService";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { ReservationTypeSelect } from "./reservation-form/ReservationTypeSelect";
@@ -42,8 +43,6 @@ const ReservationForm = () => {
   const mutation = useAddReservation(form);
 
   const onSubmit = (data: ReservationFormData) => {
-    console.log('Form submission data:', data);
-    
     const [hour, minute] = data.reservationTime.split(':').map(Number);
     const combinedDateTime = new Date(data.reservationDate);
     combinedDateTime.setHours(hour, minute);
@@ -81,12 +80,25 @@ const ReservationForm = () => {
           event_id: matchingEvent.id,
         };
 
-        // Pass original form data to mutation for webhook
-        mutation.mutate(reservationData, {
-          onSuccess: () => {
-            // Webhook will be sent from useAddReservation with original form data
-          }
-        });
+        // Send webhook with complete form data
+        const webhookPayload = {
+          fullName: fullName,
+          email: data.email,
+          phoneNumber: data.phoneNumber,
+          partySize: data.partySize,
+          reservationType: data.reservationType,
+          reservationDate: combinedDateTime.toISOString(),
+          reservationTime: data.reservationTime,
+          notes: data.notes || null,
+          eventId: matchingEvent.id,
+          eventType: eventType,
+          timestamp: new Date().toISOString(),
+          formattedDate: formatDateForWebhook(combinedDateTime),
+        };
+
+        // Trigger mutation and webhook will be sent in onSuccess
+        mutation.mutate(reservationData);
+        sendReservationWebhook(webhookPayload);
 
     } else { // 'table' or 'special-event'
         let finalNotes = data.notes || '';
@@ -105,12 +117,25 @@ const ReservationForm = () => {
           event_id: null,
         };
 
-        // Pass original form data to mutation for webhook
-        mutation.mutate(reservationData, {
-          onSuccess: () => {
-            // Webhook will be sent from useAddReservation with original form data
-          }
-        });
+        // Send webhook with complete form data
+        const webhookPayload = {
+          fullName: fullName,
+          email: data.email,
+          phoneNumber: data.phoneNumber,
+          partySize: data.partySize,
+          reservationType: data.reservationType,
+          reservationDate: combinedDateTime.toISOString(),
+          reservationTime: data.reservationTime,
+          notes: finalNotes || null,
+          specialEventReason: data.specialEventReason || undefined,
+          eventId: null,
+          timestamp: new Date().toISOString(),
+          formattedDate: formatDateForWebhook(combinedDateTime),
+        };
+
+        // Trigger mutation and webhook will be sent in onSuccess
+        mutation.mutate(reservationData);
+        sendReservationWebhook(webhookPayload);
     }
   };
 
