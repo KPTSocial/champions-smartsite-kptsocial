@@ -28,20 +28,31 @@ export const useAddReservation = (form: ReturnType<typeof useForm<ReservationFor
     return useMutation({
         mutationFn: addReservation,
         onSuccess: (data, variables) => {
-          // Send webhook with all reservation details
+          console.log('Reservation created successfully:', data);
+          console.log('Database variables:', variables);
+          
+          // Get the original form data to send proper webhook
+          const formData = form.getValues();
+          console.log('Original form data for webhook:', formData);
+
+          // Build proper webhook payload with original form data
           const webhookPayload = {
             fullName: variables.full_name || '',
             email: variables.email || '',
             phoneNumber: variables.phone_number || undefined,
             partySize: variables.party_size || 0,
-            reservationType: variables.reservation_type || '',
+            reservationType: formData.reservationType || '', // Use original form selection
             reservationDate: variables.reservation_date || '',
-            reservationTime: variables.reservation_date ? new Date(variables.reservation_date).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
+            reservationTime: formData.reservationTime || '', // Use original form time
             notes: variables.notes || null,
+            specialEventReason: formData.specialEventReason || undefined,
             eventId: variables.event_id || null,
+            eventType: variables.event_id ? (formData.reservationType === 'bingo' ? 'Bingo' : 'Trivia') : undefined,
             timestamp: new Date().toISOString(),
             formattedDate: variables.reservation_date ? formatDateForWebhook(new Date(variables.reservation_date)) : '',
           };
+
+          console.log('Sending webhook payload:', webhookPayload);
 
           // Send webhook (non-blocking)
           sendReservationWebhook(webhookPayload);
