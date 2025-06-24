@@ -323,6 +323,30 @@ export type Database = {
         }
         Relationships: []
       }
+      photo_booth_posts: {
+        Row: {
+          caption: string
+          created_at: string
+          id: string
+          image_url: string
+          uploaded_by: string
+        }
+        Insert: {
+          caption: string
+          created_at?: string
+          id?: string
+          image_url: string
+          uploaded_by: string
+        }
+        Update: {
+          caption?: string
+          created_at?: string
+          id?: string
+          image_url?: string
+          uploaded_by?: string
+        }
+        Relationships: []
+      }
       photo_booth_uploads: {
         Row: {
           ai_caption_requested: boolean
