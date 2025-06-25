@@ -1,3 +1,4 @@
+
 import { UtensilsCrossed, MapPin, Phone, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -21,33 +22,8 @@ const Footer = () => {
             <p className="mt-4 text-sm text-secondary-foreground/70">
               Vibrant sports bar with a farm-to-table soul.
             </p>
-          </div>
-          
-          <div>
-            <h3 className="font-serif text-lg font-semibold tracking-wider uppercase text-primary">Links</h3>
-            <ul className="mt-4 space-y-2">
-              <li><Link to="/about" className="hover:text-primary transition-colors">About Us</Link></li>
-              <li><Link to="/menu" className="hover:text-primary transition-colors">Menu</Link></li>
-              <li><Link to="/happenings" className="hover:text-primary transition-colors">Happenings</Link></li>
-              <li><Link to="/photo-booth" className="hover:text-primary transition-colors">Photo Booth</Link></li>
-              <li><Link to="/member-dashboard" className="hover:text-primary transition-colors">Member Area</Link></li>
-              <li><Link to="/reservations" className="hover:text-primary transition-colors">Reservations</Link></li>
-            </ul>
-          </div>
-
-          <div className="space-y-8">
-            <div>
-              <h3 className="font-serif text-lg font-semibold tracking-wider uppercase text-primary">Hours</h3>
-              <ul className="mt-4 space-y-2 text-sm text-secondary-foreground/70">
-                  <li><span className="font-semibold text-secondary-foreground">Sun - Tue:</span> 11AM - 10PM</li>
-                  <li><span className="font-semibold text-secondary-foreground">Wed - Thu:</span> 11AM - 11PM</li>
-                  <li><span className="font-semibold text-secondary-foreground">Fri:</span> 11AM - 12AM</li>
-                  <li><span className="font-semibold text-secondary-foreground">Sat:</span> 11AM - 11PM</li>
-                  <li className="pt-2 text-accent"><span className="font-bold">Brunch:</span> Daily 11AM - 2PM</li>
-                  <li className="text-accent"><span className="font-bold">Happy Hour:</span> Daily 2:30PM - 5:30PM</li>
-              </ul>
-            </div>
-            <div>
+            
+            <div className="mt-6">
               <h3 className="font-serif text-lg font-semibold tracking-wider uppercase text-primary">Contact</h3>
               <ul className="mt-4 space-y-3 text-sm text-secondary-foreground/70">
                 <li className="flex items-start gap-3">
@@ -66,6 +42,30 @@ const Footer = () => {
                 </li>
               </ul>
             </div>
+          </div>
+          
+          <div>
+            <h3 className="font-serif text-lg font-semibold tracking-wider uppercase text-primary">Links</h3>
+            <ul className="mt-4 space-y-2">
+              <li><Link to="/about" className="hover:text-primary transition-colors">About Us</Link></li>
+              <li><Link to="/menu" className="hover:text-primary transition-colors">Menu</Link></li>
+              <li><Link to="/happenings" className="hover:text-primary transition-colors">Happenings</Link></li>
+              <li><Link to="/photo-booth" className="hover:text-primary transition-colors">Photo Booth</Link></li>
+              <li><Link to="/member-dashboard" className="hover:text-primary transition-colors">Member Area</Link></li>
+              <li><Link to="/reservations" className="hover:text-primary transition-colors">Reservations</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-serif text-lg font-semibold tracking-wider uppercase text-primary">Hours</h3>
+            <ul className="mt-4 space-y-2 text-sm text-secondary-foreground/70">
+                <li><span className="font-semibold text-secondary-foreground">Sun - Tue:</span> 11AM - 10PM</li>
+                <li><span className="font-semibold text-secondary-foreground">Wed - Thu:</span> 11AM - 11PM</li>
+                <li><span className="font-semibold text-secondary-foreground">Fri:</span> 11AM - 12AM</li>
+                <li><span className="font-semibold text-secondary-foreground">Sat:</span> 11AM - 11PM</li>
+                <li className="pt-2 text-accent"><span className="font-bold">Brunch:</span> Daily 11AM - 2PM</li>
+                <li className="text-accent"><span className="font-bold">Happy Hour:</span> Daily 2:30PM - 5:30PM</li>
+            </ul>
           </div>
           
           <div>
