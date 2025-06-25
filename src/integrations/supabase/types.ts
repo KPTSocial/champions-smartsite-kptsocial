@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          email: string
+          id: string
+          last_login: string | null
+          role: Database["public"]["Enums"]["admin_role"]
+          user_id: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          email: string
+          id?: string
+          last_login?: string | null
+          role?: Database["public"]["Enums"]["admin_role"]
+          user_id?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          last_login?: string | null
+          role?: Database["public"]["Enums"]["admin_role"]
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           allow_rsvp: boolean
@@ -325,27 +355,60 @@ export type Database = {
       }
       photo_booth_posts: {
         Row: {
+          admin_notes: string | null
+          approved_at: string | null
+          approved_by: string | null
           caption: string
           created_at: string
+          event_id: string | null
           id: string
           image_url: string
+          status: string | null
+          tags: string[] | null
           uploaded_by: string
         }
         Insert: {
+          admin_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           caption: string
           created_at?: string
+          event_id?: string | null
           id?: string
           image_url: string
+          status?: string | null
+          tags?: string[] | null
           uploaded_by: string
         }
         Update: {
+          admin_notes?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           caption?: string
           created_at?: string
+          event_id?: string | null
           id?: string
           image_url?: string
+          status?: string | null
+          tags?: string[] | null
           uploaded_by?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "photo_booth_posts_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "photo_booth_posts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       photo_booth_uploads: {
         Row: {
@@ -609,9 +672,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_admin_role: {
+        Args: { user_uuid: string }
+        Returns: Database["public"]["Enums"]["admin_role"]
+      }
+      is_admin: {
+        Args: { user_uuid: string }
+        Returns: boolean
+      }
     }
     Enums: {
+      admin_role: "super_admin" | "admin" | "moderator"
       event_type: "Live Music" | "Game Night" | "Specials"
       reservation_type: "Event" | "Table"
     }
@@ -729,6 +800,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      admin_role: ["super_admin", "admin", "moderator"],
       event_type: ["Live Music", "Game Night", "Specials"],
       reservation_type: ["Event", "Table"],
     },
