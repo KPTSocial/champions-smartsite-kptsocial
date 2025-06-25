@@ -1,5 +1,4 @@
-
-import { UtensilsCrossed, MapPin, Phone, Mail } from 'lucide-react';
+import { UtensilsCrossed, MapPin, Phone, Mail, Facebook, Instagram } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
@@ -41,6 +40,30 @@ const Footer = () => {
                   <a href="mailto:champions.sportsbar.grill@gmail.com" className="hover:text-primary transition-colors break-all">champions.sportsbar.grill@gmail.com</a>
                 </li>
               </ul>
+            </div>
+
+            <div className="mt-6">
+              <h3 className="font-serif text-lg font-semibold tracking-wider uppercase text-primary">Follow Us</h3>
+              <div className="mt-4 flex gap-4">
+                <a 
+                  href="https://www.facebook.com/profile.php?id=100063835066138#" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:text-primary/80 transition-colors"
+                  aria-label="Follow us on Facebook"
+                >
+                  <Facebook className="h-6 w-6" />
+                </a>
+                <a 
+                  href="https://www.instagram.com/champs_hillsboro/?hl=en" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:text-primary/80 transition-colors"
+                  aria-label="Follow us on Instagram"
+                >
+                  <Instagram className="h-6 w-6" />
+                </a>
+              </div>
             </div>
           </div>
           
