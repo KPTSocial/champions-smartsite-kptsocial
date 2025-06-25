@@ -25,8 +25,7 @@ export const usePhotoBoothPosts = (filters: PhotoBoothFilters = {}) => {
         .from('photo_booth_posts')
         .select(`
           *,
-          events(event_title, event_date),
-          admin_users(email)
+          events(event_title, event_date)
         `)
         .order('created_at', { ascending: false });
 
