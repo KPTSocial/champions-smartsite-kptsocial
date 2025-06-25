@@ -30,7 +30,7 @@ export const usePhotoBoothPosts = (filters: PhotoBoothFilters = {}) => {
         .order('created_at', { ascending: false });
 
       // Apply filters
-      if (filters.status) {
+      if (filters.status && filters.status !== 'all') {
         query = query.eq('status', filters.status);
       }
       if (filters.eventId) {

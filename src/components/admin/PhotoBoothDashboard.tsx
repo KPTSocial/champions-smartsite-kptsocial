@@ -7,7 +7,7 @@ import PhotoBoothPostCard from './PhotoBoothPostCard';
 
 const PhotoBoothDashboard: React.FC = () => {
   const [filters, setFilters] = useState({
-    status: '',
+    status: 'all',
     dateFrom: '',
     dateTo: '',
     searchTerm: '',
