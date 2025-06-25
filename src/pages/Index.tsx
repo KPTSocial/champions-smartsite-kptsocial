@@ -1,17 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-
 const Index = () => {
-  return (
-    <div>
+  return <div>
       {/* Hero Section */}
       <section className="relative h-[60vh] md:h-[80vh] w-full flex items-center justify-center text-center text-white">
         <div className="absolute inset-0 bg-black/50 z-10"></div>
-        <img 
-          src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=3000&auto=format&fit=crop" 
-          alt="Delicious food platter" 
-          className="absolute inset-0 w-full h-full object-cover" 
-        />
+        <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=3000&auto=format&fit=crop" alt="Delicious food platter" className="absolute inset-0 w-full h-full object-cover" />
         <div className="relative z-20 container px-4">
           <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold drop-shadow-lg">
             Where Great Sports & Great Food Meet
@@ -24,11 +18,7 @@ const Index = () => {
               <Link to="/menu">View The Menu</Link>
             </Button>
             <Button asChild size="lg" variant="secondary">
-              <a 
-                href="https://championssportbar.shop.securetree.com/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
+              <a href="https://championssportbar.shop.securetree.com/" target="_blank" rel="noopener noreferrer">
                 Gift Cards
               </a>
             </Button>
@@ -50,7 +40,7 @@ const Index = () => {
             {/* Card 1: Farm-to-Table */}
             <div className="text-center p-6 border border-border rounded-lg bg-card shadow-sm">
               <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=2070&auto=format&fit=crop" className="w-full h-48 object-cover rounded-md mb-4" alt="Farm to table salad" />
-              <h3 className="text-2xl font-serif font-semibold">Farm-to-Table</h3>
+              <h3 className="text-2xl font-serif font-semibold">Scratch-Made Goodness</h3>
               <p className="mt-2 text-muted-foreground">Savor the difference with fresh, locally-sourced ingredients in every dish.</p>
             </div>
             {/* Card 2: Every Game, Every Screen */}
@@ -81,7 +71,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
 export default Index;
