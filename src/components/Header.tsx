@@ -50,28 +50,48 @@ const Header = () => {
         <div className="lg:hidden">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <Button variant="outline" size="icon">
-                <MenuIcon className="h-6 w-6" />
+              <Button variant="outline" size="icon" className="h-10 w-10">
+                <MenuIcon className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right">
-              <nav className="grid gap-6 text-lg font-medium mt-12">
-                {navItems.map((item) => (
-                  <NavLink
-                    key={item.name}
-                    to={item.path}
-                    onClick={() => setIsOpen(false)}
-                     className={({ isActive }) =>
-                      `transition-colors hover:text-primary ${isActive ? 'text-primary' : 'text-muted-foreground'}`
-                    }
-                  >
-                    {item.name}
-                  </NavLink>
-                ))}
-                 <Button asChild className="mt-4">
-                    <Link to="/reservations">Reservations</Link>
-                 </Button>
-              </nav>
+            <SheetContent side="right" className="w-80 px-0">
+              <div className="px-6 py-6">
+                <div className="flex items-center mb-8">
+                  <img 
+                    src="/lovable-uploads/cf92096a-fadb-4815-a25a-bc8d845a92c1.png" 
+                    alt="Champions Logo" 
+                    className="h-8 w-auto object-contain mr-3"
+                  />
+                  <span className="font-serif text-xl font-bold">Champions</span>
+                </div>
+                
+                <nav className="space-y-1">
+                  {navItems.map((item) => (
+                    <NavLink
+                      key={item.name}
+                      to={item.path}
+                      onClick={() => setIsOpen(false)}
+                      className={({ isActive }) =>
+                        `block px-4 py-3 text-base font-medium rounded-lg transition-colors hover:bg-accent hover:text-accent-foreground ${
+                          isActive 
+                            ? 'bg-primary/10 text-primary border border-primary/20' 
+                            : 'text-foreground hover:text-primary'
+                        }`
+                      }
+                    >
+                      {item.name}
+                    </NavLink>
+                  ))}
+                </nav>
+                
+                <div className="mt-8 px-4">
+                  <Button asChild className="w-full h-12 text-base font-medium">
+                    <Link to="/reservations" onClick={() => setIsOpen(false)}>
+                      Make Reservation
+                    </Link>
+                  </Button>
+                </div>
+              </div>
             </SheetContent>
           </Sheet>
         </div>

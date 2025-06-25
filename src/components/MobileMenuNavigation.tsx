@@ -2,6 +2,7 @@
 import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MenuSection, MenuCategory } from '@/types/menu';
+import { ChevronDown } from 'lucide-react';
 
 interface MobileMenuNavigationProps {
   menuData: MenuSection[];
@@ -50,34 +51,46 @@ const MobileMenuNavigation = ({
   const availableCategories = getAvailableCategories();
 
   return (
-    <div className="space-y-4 mb-8">
-      <Select value={selectedMenuType || ''} onValueChange={onMenuTypeChange}>
-        <SelectTrigger className="text-lg p-6">
-          <SelectValue placeholder="Select Menu Type" />
-        </SelectTrigger>
-        <SelectContent>
-          {foodSections.length > 0 && (
-            <SelectItem value="food">Food Menu</SelectItem>
-          )}
-          {beverageSections.length > 0 && (
-            <SelectItem value="beverage">Drink Menu</SelectItem>
-          )}
-        </SelectContent>
-      </Select>
-
-      {selectedMenuType && availableCategories.length > 0 && (
-        <Select value={selectedCategory || ''} onValueChange={onCategoryChange}>
-          <SelectTrigger className="text-lg p-6">
-            <SelectValue placeholder="Select Category" />
+    <div className="space-y-3 mb-6 px-4">
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-muted-foreground">Menu Type</label>
+        <Select value={selectedMenuType || ''} onValueChange={onMenuTypeChange}>
+          <SelectTrigger className="h-12 text-base font-medium bg-card border-2 hover:border-primary/20 transition-colors">
+            <SelectValue placeholder="Choose Menu Type" />
+            <ChevronDown className="h-4 w-4 opacity-50" />
           </SelectTrigger>
-          <SelectContent>
-            {availableCategories.map(category => (
-              <SelectItem key={category.id} value={category.id}>
-                {category.name}
+          <SelectContent className="bg-card border-2">
+            {foodSections.length > 0 && (
+              <SelectItem value="food" className="h-12 text-base">
+                🍽️ Food Menu
               </SelectItem>
-            ))}
+            )}
+            {beverageSections.length > 0 && (
+              <SelectItem value="beverage" className="h-12 text-base">
+                🍺 Drink Menu
+              </SelectItem>
+            )}
           </SelectContent>
         </Select>
+      </div>
+
+      {selectedMenuType && availableCategories.length > 0 && (
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-muted-foreground">Category</label>
+          <Select value={selectedCategory || ''} onValueChange={onCategoryChange}>
+            <SelectTrigger className="h-12 text-base font-medium bg-card border-2 hover:border-primary/20 transition-colors">
+              <SelectValue placeholder="Choose Category" />
+              <ChevronDown className="h-4 w-4 opacity-50" />
+            </SelectTrigger>
+            <SelectContent className="bg-card border-2">
+              {availableCategories.map(category => (
+                <SelectItem key={category.id} value={category.id} className="h-12 text-base">
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       )}
     </div>
   );
