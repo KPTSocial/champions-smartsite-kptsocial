@@ -1,11 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+
 const Index = () => {
-  return <div>
+  return (
+    <div>
       {/* Hero Section */}
       <section className="relative h-[60vh] md:h-[80vh] w-full flex items-center justify-center text-center text-white">
         <div className="absolute inset-0 bg-black/50 z-10"></div>
-        <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=3000&auto=format&fit=crop" alt="Delicious food platter" className="absolute inset-0 w-full h-full object-cover" />
+        <img 
+          src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=3000&auto=format&fit=crop" 
+          alt="Delicious food platter" 
+          className="absolute inset-0 w-full h-full object-cover" 
+        />
         <div className="relative z-20 container px-4">
           <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold drop-shadow-lg">
             Where Great Sports & Great Food Meet
@@ -17,8 +23,14 @@ const Index = () => {
             <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
               <Link to="/menu">View The Menu</Link>
             </Button>
-            <Button size="lg" variant="secondary">
-              Book a Table
+            <Button asChild size="lg" variant="secondary">
+              <a 
+                href="https://championssportbar.shop.securetree.com/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                Gift Cards
+              </a>
             </Button>
           </div>
         </div>
@@ -69,6 +81,7 @@ const Index = () => {
           </div>
         </div>
       </section>
-    </div>;
+    </div>
+  );
 };
 export default Index;
