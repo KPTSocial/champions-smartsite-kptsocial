@@ -15,6 +15,7 @@ import Reservations from "./pages/Reservations";
 import NotFound from "./pages/NotFound";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminPhotoBoothPage from "./pages/AdminPhotoBoothPage";
+import AdminMenuPage from "./pages/AdminMenuPage";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
           {/* Admin routes without public layout */}
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin/photo-booth" element={<AdminPhotoBoothPage />} />
+          <Route path="/admin/menu" element={<AdminMenuPage />} />
           
           {/* 404 */}
           <Route path="*" element={<Layout><NotFound /></Layout>} />

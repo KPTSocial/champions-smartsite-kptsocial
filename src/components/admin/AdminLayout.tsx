@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { Button } from '@/components/ui/button';
 import { LogOut, Camera, Calendar, Menu as MenuIcon, Users } from 'lucide-react';
@@ -11,6 +11,7 @@ interface AdminLayoutProps {
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const { isAdmin, loading, signOut, adminUser } = useAdminAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -27,6 +28,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const handleSignOut = async () => {
     await signOut();
   };
+
+  const isActiveRoute = (path: string) => location.pathname === path;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -63,28 +66,44 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           <div className="flex space-x-8">
             <a
               href="/admin/photo-booth"
-              className="flex items-center space-x-2 px-3 py-4 text-sm font-medium text-gray-900 border-b-2 border-blue-500"
+              className={`flex items-center space-x-2 px-3 py-4 text-sm font-medium ${
+                isActiveRoute('/admin/photo-booth')
+                  ? 'text-gray-900 border-b-2 border-blue-500'
+                  : 'text-gray-500 hover:text-gray-900'
+              }`}
             >
               <Camera className="h-4 w-4" />
               <span>Photo Booth</span>
             </a>
             <a
-              href="/admin/events"
-              className="flex items-center space-x-2 px-3 py-4 text-sm font-medium text-gray-500 hover:text-gray-900"
-            >
-              <Calendar className="h-4 w-4" />
-              <span>Events</span>
-            </a>
-            <a
               href="/admin/menu"
-              className="flex items-center space-x-2 px-3 py-4 text-sm font-medium text-gray-500 hover:text-gray-900"
+              className={`flex items-center space-x-2 px-3 py-4 text-sm font-medium ${
+                isActiveRoute('/admin/menu')
+                  ? 'text-gray-900 border-b-2 border-blue-500'
+                  : 'text-gray-500 hover:text-gray-900'
+              }`}
             >
               <MenuIcon className="h-4 w-4" />
               <span>Menu</span>
             </a>
             <a
+              href="/admin/events"
+              className={`flex items-center space-x-2 px-3 py-4 text-sm font-medium ${
+                isActiveRoute('/admin/events')
+                  ? 'text-gray-900 border-b-2 border-blue-500'
+                  : 'text-gray-500 hover:text-gray-900'
+              }`}
+            >
+              <Calendar className="h-4 w-4" />
+              <span>Events</span>
+            </a>
+            <a
               href="/admin/members"
-              className="flex items-center space-x-2 px-3 py-4 text-sm font-medium text-gray-500 hover:text-gray-900"
+              className={`flex items-center space-x-2 px-3 py-4 text-sm font-medium ${
+                isActiveRoute('/admin/members')
+                  ? 'text-gray-900 border-b-2 border-blue-500'
+                  : 'text-gray-500 hover:text-gray-900'
+              }`}
             >
               <Users className="h-4 w-4" />
               <span>Members</span>

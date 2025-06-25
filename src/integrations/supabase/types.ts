@@ -267,9 +267,14 @@ export type Database = {
           description: string | null
           id: string
           image_url: string | null
+          is_available: boolean | null
+          is_featured: boolean | null
+          is_special: boolean | null
           name: string
           price: number | null
           sort_order: number
+          special_end_date: string | null
+          special_start_date: string | null
           tags: string[] | null
         }
         Insert: {
@@ -277,9 +282,14 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          is_available?: boolean | null
+          is_featured?: boolean | null
+          is_special?: boolean | null
           name: string
           price?: number | null
           sort_order: number
+          special_end_date?: string | null
+          special_start_date?: string | null
           tags?: string[] | null
         }
         Update: {
@@ -287,9 +297,14 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          is_available?: boolean | null
+          is_featured?: boolean | null
+          is_special?: boolean | null
           name?: string
           price?: number | null
           sort_order?: number
+          special_end_date?: string | null
+          special_start_date?: string | null
           tags?: string[] | null
         }
         Relationships: [
