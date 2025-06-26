@@ -24,14 +24,23 @@ const EventCalendar = () => {
         if (dbEvents.length > 0) {
             dbEvents.forEach(event => {
                 if (event.event_date) {
-                    eventDates.add(event.event_date.split('T')[0]);
+                    // Convert UTC event date to local Pacific Time
+                    const eventDate = new Date(event.event_date);
+                    const year = eventDate.getFullYear();
+                    const month = eventDate.getMonth();
+                    const day = eventDate.getDate();
+                    
+                    // Create date string in YYYY-MM-DD format using local date components
+                    const localDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    eventDates.add(localDateStr);
                 }
             });
         }
         
         return Array.from(eventDates).map(dateStr => {
             const [year, month, day] = dateStr.split('-').map(Number);
-            return new Date(Date.UTC(year, month - 1, day));
+            // Create local date (not UTC) for calendar display
+            return new Date(year, month - 1, day);
         });
     }, [dbEvents]);
 

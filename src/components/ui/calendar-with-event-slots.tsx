@@ -30,35 +30,51 @@ export function CalendarWithEventSlots({
     onDateSelect?.(newDate);
   };
 
-  // Filter events for the selected date
+  // Filter events for the selected date using Pacific Time conversion
   const eventsForSelectedDate = React.useMemo(() => {
     if (!date) return [];
     
-    const dateStr = format(date, 'yyyy-MM-dd');
+    // Get the selected date in YYYY-MM-DD format
+    const selectedDateStr = format(date, 'yyyy-MM-dd');
+    
     return events.filter(event => {
       if (!event.event_date) return false;
-      const eventDateStr = event.event_date.split('T')[0];
-      return eventDateStr === dateStr;
+      
+      // Convert UTC event date to local Pacific Time
+      const eventDate = new Date(event.event_date);
+      const eventLocalDateStr = format(eventDate, 'yyyy-MM-dd');
+      
+      return eventLocalDateStr === selectedDateStr;
     });
   }, [events, date]);
 
-  // Create event days for calendar modifiers
+  // Create event days for calendar modifiers using Pacific Time
   const eventDays = React.useMemo(() => {
     const eventDates = new Set<string>();
     events.forEach(event => {
       if (event.event_date) {
-        eventDates.add(event.event_date.split('T')[0]);
+        // Convert UTC event date to local Pacific Time
+        const eventDate = new Date(event.event_date);
+        const year = eventDate.getFullYear();
+        const month = eventDate.getMonth();
+        const day = eventDate.getDate();
+        
+        // Create date string in YYYY-MM-DD format using local date components
+        const localDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        eventDates.add(localDateStr);
       }
     });
     
     return Array.from(eventDates).map(dateStr => {
       const [year, month, day] = dateStr.split('-').map(Number);
-      return new Date(Date.UTC(year, month - 1, day));
+      // Create local date (not UTC) for calendar display
+      return new Date(year, month - 1, day);
     });
   }, [events]);
 
   const formatEventTime = (eventDate: string) => {
     try {
+      // Convert UTC to local Pacific Time and format
       const date = new Date(eventDate);
       return format(date, 'h:mm a');
     } catch {
