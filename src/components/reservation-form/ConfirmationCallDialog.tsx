@@ -48,8 +48,7 @@ export const ConfirmationCallDialog = ({ open, onOpenChange, partySize, reservat
           </AlertDialogAction>
           <AlertDialogAction 
             onClick={() => onOpenChange(false)}
-            variant="outline"
-            className="w-full"
+            className="w-full border border-input bg-background hover:bg-accent hover:text-accent-foreground"
           >
             I'll Call Later
           </AlertDialogAction>
