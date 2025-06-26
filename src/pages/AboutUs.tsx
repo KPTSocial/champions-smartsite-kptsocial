@@ -1,24 +1,17 @@
-
 import React, { useRef } from 'react';
 import { BackgroundPaths } from "@/components/ui/background-paths";
-
 const AboutUs = () => {
   const jaredSectionRef = useRef<HTMLDivElement | null>(null);
-
   const handleHeroButtonClick = () => {
     if (jaredSectionRef.current) {
-      jaredSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+      jaredSectionRef.current.scrollIntoView({
+        behavior: 'smooth'
+      });
     }
   };
-
-  return (
-    <div className="bg-background">
+  return <div className="bg-background">
       {/* Hero with animated background paths */}
-      <BackgroundPaths
-        title="Meet the Champions Behind Champions"
-        buttonLabel="Discover Our Story"
-        onButtonClick={handleHeroButtonClick}
-      />
+      <BackgroundPaths title="Meet the Champions Behind Champions" buttonLabel="Discover Our Story" onButtonClick={handleHeroButtonClick} />
 
       {/* Existing About Us Content */}
       <div className="py-16 md:py-24">
@@ -30,11 +23,7 @@ const AboutUs = () => {
           </div>
 
           <div className="mt-16 grid grid-cols-1 gap-12 items-center">
-              <img 
-                src="/lovable-uploads/0b56b4f0-9ad3-4e31-b61a-272b24721a8e.png"
-                alt="Michelle and Jared, owners of Champions"
-                className="rounded-lg shadow-xl w-full max-w-3xl mx-auto"
-              />
+              <img src="/lovable-uploads/0b56b4f0-9ad3-4e31-b61a-272b24721a8e.png" alt="Michelle and Jared, owners of Champions" className="rounded-lg shadow-xl w-full max-w-3xl mx-auto" />
           </div>
 
           <div className="mt-24 space-y-16 max-w-4xl mx-auto">
@@ -54,7 +43,9 @@ const AboutUs = () => {
               </div>
             </div>
 
-            <div className="animate-fade-in" style={{ animationDelay: '200ms' }}>
+            <div className="animate-fade-in" style={{
+            animationDelay: '200ms'
+          }}>
               <h2 className="font-serif text-4xl font-semibold mb-2">Michelle Wales</h2>
               <p className="text-primary font-bold text-xl mb-4">The Heartbeat of Hospitality</p>
               <div className="text-muted-foreground text-lg space-y-4 leading-relaxed">
@@ -67,7 +58,9 @@ const AboutUs = () => {
               </div>
             </div>
 
-            <div className="animate-fade-in" style={{ animationDelay: '400ms' }}>
+            <div className="animate-fade-in" style={{
+            animationDelay: '400ms'
+          }}>
               <h2 className="font-serif text-4xl font-semibold mb-4">A Team with Purpose</h2>
               <div className="text-muted-foreground text-lg space-y-4 leading-relaxed">
                   <p>
@@ -79,7 +72,9 @@ const AboutUs = () => {
               </div>
             </div>
 
-            <div className="animate-fade-in bg-secondary/20 p-8 rounded-lg" style={{ animationDelay: '600ms' }}>
+            <div className="animate-fade-in bg-secondary/20 p-8 rounded-lg" style={{
+            animationDelay: '600ms'
+          }}>
                 <h2 className="font-serif text-4xl font-semibold mb-4 text-center">What Sets Jared & Michelle Apart</h2>
                 <ul className="list-disc list-inside text-muted-foreground text-lg space-y-2 max-w-2xl mx-auto">
                     <li><span className="font-semibold text-foreground">Rooted in Hillsboro:</span> Jared's story is Hillsboro's story—local boy, turned athlete, turned entrepreneur.</li>
@@ -88,26 +83,24 @@ const AboutUs = () => {
                 </ul>
             </div>
             
-            <blockquote className="animate-fade-in text-center text-2xl md:text-3xl font-serif italic text-foreground border-l-4 border-primary pl-6" style={{ animationDelay: '800ms' }}>
+            <blockquote className="animate-fade-in text-center text-2xl md:text-3xl font-serif italic text-foreground border-l-4 border-primary pl-6" style={{
+            animationDelay: '800ms'
+          }}>
                 "You'll come for the 20 beers on tap... but you'll stay for the atmosphere, the energy, and the people behind the bar who make this place feel like home."
             </blockquote>
           </div>
 
           <div className="mt-24 text-center">
-              <h2 className="text-4xl font-serif font-semibold">Our Commitment to Farm-to-Table</h2>
-              <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
-                  We believe great food starts with great ingredients. That's why we're proud to partner with local farmers and purveyors to bring you the freshest flavors of the season.
-              </p>
+              <h2 className="text-4xl font-serif font-semibold">Locally Sourced. Seasonally Inspired. Always from Scratch.</h2>
+              <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">Our ingredients shift with the seasons—because the best flavors come from right here, right now. Grown in Northwest soil and crafted in-house, every dish tells the story of where we live and what we stand for.</p>
           </div>
           <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              <img src="https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?q=80&w=2070&auto=format&fit=crop" alt="Fresh vegetables" className="rounded-lg object-cover aspect-square shadow-md"/>
-              <img src="/lovable-uploads/ee724b66-149b-4ba3-b850-c971d1f9832e.png" alt="Local farm landscape" className="rounded-lg object-cover aspect-square shadow-md"/>
-              <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1981&auto=format&fit=crop" alt="Finished pizza dish" className="rounded-lg object-cover aspect-square shadow-md"/>
+              <img src="https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?q=80&w=2070&auto=format&fit=crop" alt="Fresh vegetables" className="rounded-lg object-cover aspect-square shadow-md" />
+              <img src="/lovable-uploads/ee724b66-149b-4ba3-b850-c971d1f9832e.png" alt="Local farm landscape" className="rounded-lg object-cover aspect-square shadow-md" />
+              <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1981&auto=format&fit=crop" alt="Finished pizza dish" className="rounded-lg object-cover aspect-square shadow-md" />
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default AboutUs;
