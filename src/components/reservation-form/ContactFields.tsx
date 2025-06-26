@@ -57,7 +57,7 @@ export const ContactFields = () => {
           name="phoneNumber"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone Number <span className="text-muted-foreground">(Optional)</span></FormLabel>
+              <FormLabel>Phone Number <span className="text-destructive">*</span></FormLabel>
               <FormControl>
                 <Input placeholder="(555) 123-4567" {...field} />
               </FormControl>

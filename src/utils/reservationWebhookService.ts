@@ -11,6 +11,7 @@ interface ReservationWebhookPayload {
   specialEventReason?: string;
   eventId: string | null;
   eventType?: string;
+  requiresConfirmation?: boolean;
   timestamp: string;
   formattedDate: string;
 }

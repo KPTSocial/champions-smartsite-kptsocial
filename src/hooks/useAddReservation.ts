@@ -24,7 +24,10 @@ const addReservation = async (reservation: ReservationInsert) => {
   return data;
 };
 
-export const useAddReservation = (form: ReturnType<typeof useForm<ReservationFormData>>) => {
+export const useAddReservation = (
+  form: ReturnType<typeof useForm<ReservationFormData>>, 
+  onConfirmationNeeded?: (partySize: number, reservationType: string) => void
+) => {
     return useMutation({
         mutationFn: addReservation,
         onSuccess: (data, variables) => {
@@ -39,6 +42,7 @@ export const useAddReservation = (form: ReturnType<typeof useForm<ReservationFor
             reservationTime: variables.reservation_date ? new Date(variables.reservation_date).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
             notes: variables.notes || null,
             eventId: variables.event_id || null,
+            requiresConfirmation: variables.requires_confirmation || false,
             timestamp: new Date().toISOString(),
             formattedDate: variables.reservation_date ? formatDateForWebhook(new Date(variables.reservation_date)) : '',
           };
@@ -46,10 +50,18 @@ export const useAddReservation = (form: ReturnType<typeof useForm<ReservationFor
           // Send webhook (non-blocking)
           sendReservationWebhook(webhookPayload);
 
-          toast({
-            title: "Reservation Confirmed!",
-            description: "Your table has been booked. We look forward to seeing you!",
-          });
+          // Check if confirmation is needed
+          if (variables.requires_confirmation && onConfirmationNeeded) {
+            const reservationType = variables.reservation_type === 'Event' ? 
+              (variables.event_id ? 'trivia' : 'bingo') : 'table';
+            onConfirmationNeeded(variables.party_size || 0, reservationType);
+          } else {
+            toast({
+              title: "Reservation Confirmed!",
+              description: "Your table has been booked. We look forward to seeing you!",
+            });
+          }
+          
           form.reset();
         },
         onError: () => {

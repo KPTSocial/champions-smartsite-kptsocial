@@ -507,6 +507,7 @@ export type Database = {
           notes: string | null
           party_size: number
           phone_number: string | null
+          requires_confirmation: boolean | null
           reservation_date: string
           reservation_type: Database["public"]["Enums"]["reservation_type"]
         }
@@ -519,6 +520,7 @@ export type Database = {
           notes?: string | null
           party_size: number
           phone_number?: string | null
+          requires_confirmation?: boolean | null
           reservation_date: string
           reservation_type: Database["public"]["Enums"]["reservation_type"]
         }
@@ -531,6 +533,7 @@ export type Database = {
           notes?: string | null
           party_size?: number
           phone_number?: string | null
+          requires_confirmation?: boolean | null
           reservation_date?: string
           reservation_type?: Database["public"]["Enums"]["reservation_type"]
         }

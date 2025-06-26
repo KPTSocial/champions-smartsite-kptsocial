@@ -6,24 +6,23 @@ export const reservationSchema = z.object({
   firstName: z.string().min(1, "First name is required."),
   lastName: z.string().optional(),
   email: z.string().email("Please enter a valid email address."),
-  phoneNumber: z.string()
-    .optional()
-    .refine((val) => !val || /^[\+]?[1-9][\d]{0,15}$/.test(val.replace(/[\s\-\(\)]/g, '')), {
-      message: "Please enter a valid phone number"
-    }),
+  phoneNumber: z.string().min(1, "Phone number is required."),
   partySize: z.coerce.number().min(1, "Party size must be at least 1."),
   reservationDate: z.date({ required_error: "A date is required." }),
   reservationTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Please use HH:MM format (e.g., 19:00)."),
   notes: z.string().max(500, "Notes cannot exceed 500 characters.").optional(),
   specialEventReason: z.string().max(100, "Reason cannot exceed 100 characters.").optional(),
 }).superRefine((data, ctx) => {
-    if (data.reservationType === 'table' && data.partySize < 6) {
+    // Bingo reservations - maximum 4 people
+    if (data.reservationType === 'bingo' && data.partySize > 4) {
         ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: "Reservations for general dining are for parties of 6 or more.",
+            message: "Bingo Night reservations are limited to 4 people maximum.",
             path: ["partySize"],
         });
     }
+    
+    // Special event validation
     if (data.reservationType === 'special-event' && (!data.specialEventReason || data.specialEventReason.length < 2)) {
         ctx.addIssue({
             code: z.ZodIssueCode.custom,

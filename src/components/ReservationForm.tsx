@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
@@ -15,10 +15,14 @@ import { ReservationTypeSelect } from "./reservation-form/ReservationTypeSelect"
 import { SpecialEventField } from "./reservation-form/SpecialEventField";
 import { ContactFields } from "./reservation-form/ContactFields";
 import { BookingFields } from "./reservation-form/BookingFields";
+import { ConfirmationCallDialog } from "./reservation-form/ConfirmationCallDialog";
 
 type ReservationInsert = Database["public"]["Tables"]["reservations"]["Insert"];
 
 const ReservationForm = () => {
+  const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
+  const [confirmationDetails, setConfirmationDetails] = useState({ partySize: 0, reservationType: '' });
+
   const { data: events, isLoading: isLoadingEvents } = useQuery<Event[]>({
     queryKey: ["events"],
     queryFn: getEvents,
@@ -40,7 +44,12 @@ const ReservationForm = () => {
     },
   });
 
-  const mutation = useAddReservation(form);
+  const handleConfirmationNeeded = (partySize: number, reservationType: string) => {
+    setConfirmationDetails({ partySize, reservationType });
+    setShowConfirmationDialog(true);
+  };
+
+  const mutation = useAddReservation(form, handleConfirmationNeeded);
 
   const onSubmit = (data: ReservationFormData) => {
     const [hour, minute] = data.reservationTime.split(':').map(Number);
@@ -51,6 +60,11 @@ const ReservationForm = () => {
     const fullName = data.lastName 
       ? `${data.firstName.trim()} ${data.lastName.trim()}`
       : data.firstName.trim();
+
+    // Determine if confirmation is required
+    const requiresConfirmation = 
+      (data.reservationType === 'table' && data.partySize > 15) ||
+      (data.reservationType === 'trivia' && data.partySize >= 6);
 
     if (data.reservationType === 'bingo' || data.reservationType === 'trivia') {
         const eventType = data.reservationType === 'bingo' ? 'Bingo' : 'Trivia';
@@ -72,12 +86,13 @@ const ReservationForm = () => {
         const reservationData: ReservationInsert = {
           full_name: fullName,
           email: data.email,
-          phone_number: data.phoneNumber || null,
+          phone_number: data.phoneNumber,
           party_size: data.partySize,
           reservation_date: combinedDateTime.toISOString(),
           notes: data.notes,
           reservation_type: 'Event',
           event_id: matchingEvent.id,
+          requires_confirmation: requiresConfirmation,
         };
 
         // Send webhook with complete form data
@@ -92,6 +107,7 @@ const ReservationForm = () => {
           notes: data.notes || null,
           eventId: matchingEvent.id,
           eventType: eventType,
+          requiresConfirmation: requiresConfirmation,
           timestamp: new Date().toISOString(),
           formattedDate: formatDateForWebhook(combinedDateTime),
         };
@@ -109,12 +125,13 @@ const ReservationForm = () => {
         const reservationData: ReservationInsert = {
           full_name: fullName,
           email: data.email,
-          phone_number: data.phoneNumber || null,
+          phone_number: data.phoneNumber,
           party_size: data.partySize,
           reservation_date: combinedDateTime.toISOString(),
           notes: finalNotes || null,
           reservation_type: 'Table',
           event_id: null,
+          requires_confirmation: requiresConfirmation,
         };
 
         // Send webhook with complete form data
@@ -129,6 +146,7 @@ const ReservationForm = () => {
           notes: finalNotes || null,
           specialEventReason: data.specialEventReason || undefined,
           eventId: null,
+          requiresConfirmation: requiresConfirmation,
           timestamp: new Date().toISOString(),
           formattedDate: formatDateForWebhook(combinedDateTime),
         };
@@ -140,18 +158,27 @@ const ReservationForm = () => {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <ReservationTypeSelect />
-        <SpecialEventField />
-        <ContactFields />
-        <BookingFields />
-        
-        <Button type="submit" className="w-full" disabled={mutation.isPending || isLoadingEvents}>
-          {mutation.isPending ? 'Booking...' : 'Book Your Spot'}
-        </Button>
-      </form>
-    </Form>
+    <>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <ReservationTypeSelect />
+          <SpecialEventField />
+          <ContactFields />
+          <BookingFields />
+          
+          <Button type="submit" className="w-full" disabled={mutation.isPending || isLoadingEvents}>
+            {mutation.isPending ? 'Booking...' : 'Book Your Spot'}
+          </Button>
+        </form>
+      </Form>
+
+      <ConfirmationCallDialog 
+        open={showConfirmationDialog}
+        onOpenChange={setShowConfirmationDialog}
+        partySize={confirmationDetails.partySize}
+        reservationType={confirmationDetails.reservationType}
+      />
+    </>
   );
 };
 
