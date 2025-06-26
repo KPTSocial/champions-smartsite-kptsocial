@@ -2,6 +2,7 @@
 import React, { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Calendar } from '@/components/ui/calendar';
+import { CalendarWithEventSlots } from '@/components/ui/calendar-with-event-slots';
 import { getEvents, type Event as EventType } from '@/services/eventService';
 import { addDays } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -11,6 +12,7 @@ import WeeklyCalendarView from './WeeklyCalendarView';
 const EventCalendar = () => {
     const [displayDate, setDisplayDate] = useState(new Date());
     const [view, setView] = useState<'month' | 'week'>('month');
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
     const { data: dbEvents = [], isLoading } = useQuery<EventType[]>({
         queryKey: ['db-events'],
@@ -40,38 +42,19 @@ const EventCalendar = () => {
     const handlePrevWeek = () => {
         setDisplayDate(prev => addDays(prev, -7));
     }
+    
     const handleNextWeek = () => {
         setDisplayDate(prev => addDays(prev, 7));
     }
 
+    const handleAddEvent = () => {
+        // This could link to admin dashboard or open a modal
+        console.log('Add event clicked');
+    };
+
     return (
         <div className="w-full max-w-sm">
-            <style>{`
-                .day-with-event {
-                    position: relative;
-                }
-                /* Dot indicator for events */
-                .day-with-event::after {
-                    content: '';
-                    position: absolute;
-                    bottom: 6px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    width: 5px;
-                    height: 5px;
-                    border-radius: 50%;
-                    background-color: hsl(var(--primary));
-                }
-                /* Adjust dot color for today's date */
-                .day_today.day-with-event::after {
-                    background-color: hsl(var(--accent-foreground));
-                }
-                /* Adjust dot color for selected dates */
-                .day_selected.day-with-event::after {
-                    background-color: hsl(var(--primary-foreground));
-                }
-            `}</style>
-             <div className="flex justify-center gap-2 mb-4">
+            <div className="flex justify-center gap-2 mb-4">
                 <Button variant={view === 'month' ? 'default' : 'outline'} size="sm" onClick={() => setView('month')}>
                     Month
                 </Button>
@@ -80,12 +63,11 @@ const EventCalendar = () => {
                 </Button>
             </div>
             {view === 'month' ? (
-                 <Calendar
-                    month={displayDate}
-                    onMonthChange={setDisplayDate}
-                    modifiers={{ hasEvent: eventDaysForPicker }}
-                    modifiersClassNames={{ hasEvent: 'day-with-event' }}
-                    className="rounded-lg border bg-card text-card-foreground shadow-sm"
+                <CalendarWithEventSlots
+                    events={dbEvents}
+                    selectedDate={selectedDate}
+                    onDateSelect={setSelectedDate}
+                    onAddEvent={handleAddEvent}
                 />
             ) : (
                 <WeeklyCalendarView
