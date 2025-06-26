@@ -41,7 +41,7 @@ const Index = () => {
             <div className="text-center p-6 border border-border rounded-lg bg-card shadow-sm">
               <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=2070&auto=format&fit=crop" className="w-full h-48 object-cover rounded-md mb-4" alt="Farm to table salad" />
               <h3 className="text-2xl font-serif font-semibold">Scratch-Made Goodness</h3>
-              <p className="mt-2 text-muted-foreground">Savor the difference with fresh, locally-sourced ingredients in every dish.</p>
+              <p className="mt-2 text-muted-foreground">Taste the care in every bite—crafted with fresh, locally-sourced ingredients, made from scratch the way it should be.</p>
             </div>
             {/* Card 2: Every Game, Every Screen */}
             <div className="text-center p-6 border border-border rounded-lg bg-card shadow-sm">
