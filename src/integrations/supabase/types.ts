@@ -117,6 +117,33 @@ export type Database = {
         }
         Relationships: []
       }
+      header_media: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          title: string
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          title: string
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          title?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       loyalty_points: {
         Row: {
           created_at: string | null

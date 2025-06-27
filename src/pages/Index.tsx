@@ -1,11 +1,32 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useHeaderMedia } from "@/hooks/useHeaderMedia";
+import VideoHeader from "@/components/VideoHeader";
+
 const Index = () => {
-  return <div>
+  const { data: headerMedia, isLoading: isHeaderLoading } = useHeaderMedia();
+
+  return (
+    <div>
       {/* Hero Section */}
       <section className="relative h-[60vh] md:h-[80vh] w-full flex items-center justify-center text-center text-white">
         <div className="absolute inset-0 bg-black/50 z-10"></div>
-        <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=3000&auto=format&fit=crop" alt="Delicious food platter" className="absolute inset-0 w-full h-full object-cover" />
+        
+        {/* Video or fallback image */}
+        {headerMedia?.video_url && !isHeaderLoading ? (
+          <VideoHeader
+            videoUrl={headerMedia.video_url}
+            title={headerMedia.title}
+            description={headerMedia.description}
+          />
+        ) : (
+          <img 
+            src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=3000&auto=format&fit=crop" 
+            alt="Delicious food platter" 
+            className="absolute inset-0 w-full h-full object-cover" 
+          />
+        )}
+        
         <div className="relative z-20 container px-4">
           <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold drop-shadow-lg">
             Where Great Sports & Great Food Meet
@@ -71,6 +92,8 @@ const Index = () => {
           </div>
         </div>
       </section>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;
