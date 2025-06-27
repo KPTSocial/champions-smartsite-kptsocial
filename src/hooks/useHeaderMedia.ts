@@ -6,6 +6,8 @@ export const useHeaderMedia = () => {
   return useQuery({
     queryKey: ['header-media'],
     queryFn: async () => {
+      console.log('Fetching header media data...');
+      
       const { data, error } = await supabase
         .from('header_media')
         .select('*')
@@ -17,6 +19,7 @@ export const useHeaderMedia = () => {
         throw error;
       }
 
+      console.log('Header media data fetched:', data);
       return data;
     },
   });
