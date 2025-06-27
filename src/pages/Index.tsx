@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useHeaderMedia } from "@/hooks/useHeaderMedia";
@@ -19,7 +18,7 @@ const Index = () => {
         <div className="absolute inset-0 bg-black/50 z-10"></div>
         
         {/* Video or fallback image */}
-        {headerMedia?.video_url ? (
+        {headerMedia && headerMedia.video_url ? (
           <VideoHeader
             videoUrl={headerMedia.video_url}
             title={headerMedia.title}
@@ -53,7 +52,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="py-16 md:py-24 bg-background">
         <div className="container px-4">
           <div className="text-center">
