@@ -13,7 +13,7 @@ const VideoHeader = ({
   videoUrl, 
   title, 
   description, 
-  fallbackImageUrl = "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=3000&auto=format&fit=crop",
+  fallbackImageUrl,
   className = ""
 }: VideoHeaderProps) => {
   const [hasError, setHasError] = useState(false);
@@ -42,24 +42,18 @@ const VideoHeader = ({
   };
 
   if (hasError) {
-    console.log('Rendering fallback image due to video error');
+    console.log('Video failed to load, showing dark background');
     return (
-      <img 
-        src={fallbackImageUrl}
-        alt={title || "Header background"}
-        className={`absolute inset-0 w-full h-full object-cover ${className}`}
-      />
+      <div className={`absolute inset-0 w-full h-full bg-gray-900 ${className}`} />
     );
   }
 
   return (
     <>
       {isLoading && (
-        <img 
-          src={fallbackImageUrl}
-          alt={title || "Header background"}
-          className={`absolute inset-0 w-full h-full object-cover ${className}`}
-        />
+        <div className={`absolute inset-0 w-full h-full bg-gray-900 flex items-center justify-center ${className}`}>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+        </div>
       )}
       <video
         autoPlay

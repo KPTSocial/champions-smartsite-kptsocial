@@ -17,7 +17,7 @@ const Index = () => {
       <section className="relative h-[60vh] md:h-[80vh] w-full flex items-center justify-center text-center text-white">
         <div className="absolute inset-0 bg-black/50 z-10"></div>
         
-        {/* Video or fallback image */}
+        {/* Video or clean background */}
         {headerMedia && headerMedia.video_url ? (
           <VideoHeader
             videoUrl={headerMedia.video_url}
@@ -25,11 +25,7 @@ const Index = () => {
             description={headerMedia.description}
           />
         ) : (
-          <img 
-            src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=3000&auto=format&fit=crop" 
-            alt="Delicious food platter" 
-            className="absolute inset-0 w-full h-full object-cover" 
-          />
+          <div className="absolute inset-0 w-full h-full bg-gray-900" />
         )}
         
         <div className="relative z-20 container px-4">
