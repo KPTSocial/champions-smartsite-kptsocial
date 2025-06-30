@@ -1,3 +1,5 @@
+// This file is deprecated - webhook functionality moved to edge function
+// Keeping minimal exports for backward compatibility during transition
 
 interface ReservationWebhookPayload {
   fullName: string;
@@ -17,26 +19,9 @@ interface ReservationWebhookPayload {
 }
 
 export async function sendReservationWebhook(payload: ReservationWebhookPayload): Promise<void> {
-  const webhookUrl = "https://hook.us2.make.com/6mcr2iemqqk0yk8fly5p5uwt4jhhefa4";
-  
-  try {
-    const response = await fetch(webhookUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Webhook failed with status: ${response.status}`);
-    }
-
-    console.log('Reservation webhook sent successfully');
-  } catch (error) {
-    // Log error but don't throw - webhook failure shouldn't block reservation
-    console.error('Reservation webhook error (non-blocking):', error);
-  }
+  // Deprecated: This function is no longer used
+  // Webhook functionality has been moved to the edge function
+  console.log('sendReservationWebhook is deprecated - functionality moved to edge function');
 }
 
 export function formatDateForWebhook(date: Date): string {
