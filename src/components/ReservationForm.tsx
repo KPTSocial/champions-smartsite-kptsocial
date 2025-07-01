@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -92,11 +93,17 @@ const ReservationForm = () => {
           requires_confirmation: requiresConfirmation,
         };
 
+        // Store special event reason for webhook
+        (reservationData as any).specialEventReason = data.specialEventReason || '';
+
         mutation.mutate(reservationData);
 
     } else { // 'table' or 'special-event'
         let finalNotes = data.notes || '';
+        let specialEventReason = '';
+        
         if (data.reservationType === 'special-event' && data.specialEventReason) {
+          specialEventReason = data.specialEventReason;
           finalNotes = `Special Event: ${data.specialEventReason}\n\n${finalNotes}`.trim();
         }
 
@@ -111,6 +118,9 @@ const ReservationForm = () => {
           event_id: null,
           requires_confirmation: requiresConfirmation,
         };
+
+        // Store special event reason for webhook
+        (reservationData as any).specialEventReason = specialEventReason;
 
         mutation.mutate(reservationData);
     }

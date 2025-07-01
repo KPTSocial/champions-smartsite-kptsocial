@@ -55,7 +55,16 @@ export const useAddReservation = (
     return useMutation({
         mutationFn: addReservation,
         onSuccess: (data, variables) => {
-          // Prepare webhook payload
+          // Determine event type based on reservation type
+          let eventType = '';
+          if (variables.reservation_type === 'Event') {
+            // For event reservations, determine if it's bingo or trivia based on event_id
+            eventType = variables.event_id ? 'Event' : 'Table';
+          } else {
+            eventType = 'Table';
+          }
+
+          // Prepare comprehensive webhook payload
           const webhookPayload = {
             fullName: variables.full_name || '',
             email: variables.email || '',
@@ -65,7 +74,9 @@ export const useAddReservation = (
             reservationDate: variables.reservation_date || '',
             reservationTime: variables.reservation_date ? new Date(variables.reservation_date).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
             notes: variables.notes || null,
+            specialEventReason: '', // Will be populated from form if applicable
             eventId: variables.event_id || null,
+            eventType: eventType,
             requiresConfirmation: variables.requires_confirmation || false,
             timestamp: new Date().toISOString(),
             formattedDate: variables.reservation_date ? formatDateForWebhook(new Date(variables.reservation_date)) : '',

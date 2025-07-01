@@ -35,6 +35,16 @@ const handler = async (req: Request): Promise<Response> => {
     const payload: ReservationWebhookPayload = await req.json();
     console.log('Received reservation webhook payload:', payload);
 
+    // Determine proper event type based on reservation details
+    let eventType = payload.eventType || 'Table';
+    if (payload.reservationType === 'bingo') {
+      eventType = 'Bingo';
+    } else if (payload.reservationType === 'trivia') {
+      eventType = 'Trivia';
+    } else if (payload.reservationType === 'special-event') {
+      eventType = 'Special Event';
+    }
+
     // Prepare clean payload for Make
     const makePayload = {
       // Contact Information
@@ -59,7 +69,7 @@ const handler = async (req: Request): Promise<Response> => {
       // System Information
       timestamp: payload.timestamp,
       eventId: payload.eventId || '',
-      eventType: payload.eventType || '',
+      eventType: eventType,
       
       // Source tracking
       source: "Website Reservation Form",
