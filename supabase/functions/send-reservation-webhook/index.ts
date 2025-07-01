@@ -23,7 +23,7 @@ interface ReservationWebhookPayload {
   formattedDate: string;
 }
 
-const LEADCONNECTOR_WEBHOOK_URL = "https://services.leadconnectorhq.com/hooks/GP50eEHJorZpETpYfOVk/webhook-trigger/af3fe41a-c3dd-4fb0-8126-d8919e42b87f";
+const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/6mcr2iemqqk0yk8fly5p5uwt4jhhefa4";
 
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
@@ -35,54 +35,55 @@ const handler = async (req: Request): Promise<Response> => {
     const payload: ReservationWebhookPayload = await req.json();
     console.log('Received reservation webhook payload:', payload);
 
-    // Transform data for LeadConnector
-    const leadConnectorPayload = {
+    // Prepare clean payload for Make
+    const makePayload = {
       // Contact Information
-      first_name: payload.fullName.split(' ')[0] || '',
-      last_name: payload.fullName.split(' ').slice(1).join(' ') || '',
+      fullName: payload.fullName,
+      firstName: payload.fullName.split(' ')[0] || '',
+      lastName: payload.fullName.split(' ').slice(1).join(' ') || '',
       email: payload.email,
-      phone: payload.phoneNumber || '',
+      phoneNumber: payload.phoneNumber || '',
       
       // Reservation Details
-      party_size: payload.partySize,
-      reservation_type: payload.reservationType,
-      reservation_date: payload.formattedDate,
-      reservation_time: payload.reservationTime,
-      reservation_datetime: payload.reservationDate,
+      partySize: payload.partySize,
+      reservationType: payload.reservationType,
+      reservationDate: payload.formattedDate,
+      reservationTime: payload.reservationTime,
+      reservationDateTime: payload.reservationDate,
       
       // Additional Information
       notes: payload.notes || '',
-      special_event_reason: payload.specialEventReason || '',
-      requires_confirmation: payload.requiresConfirmation || false,
+      specialEventReason: payload.specialEventReason || '',
+      requiresConfirmation: payload.requiresConfirmation || false,
       
-      // Business Context
-      business_name: "Champions Sports Bar",
-      source: "Website Reservation Form",
+      // System Information
       timestamp: payload.timestamp,
+      eventId: payload.eventId || '',
+      eventType: payload.eventType || '',
       
-      // Event Information (if applicable)
-      event_type: payload.eventType || '',
-      event_id: payload.eventId || '',
+      // Source tracking
+      source: "Website Reservation Form",
+      businessName: "Champions Sports Bar"
     };
 
-    console.log('Sending to LeadConnector:', leadConnectorPayload);
+    console.log('Sending to Make webhook:', makePayload);
 
-    // Send to LeadConnector with retry logic
+    // Send to Make webhook with retry logic
     let attempts = 0;
     const maxAttempts = 3;
     
     while (attempts < maxAttempts) {
       try {
-        const response = await fetch(LEADCONNECTOR_WEBHOOK_URL, {
+        const response = await fetch(MAKE_WEBHOOK_URL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(leadConnectorPayload),
+          body: JSON.stringify(makePayload),
         });
 
         if (response.ok) {
-          console.log('Successfully sent reservation to LeadConnector');
+          console.log('Successfully sent reservation to Make webhook');
           return new Response(
             JSON.stringify({ success: true, message: 'Webhook sent successfully' }),
             {
@@ -91,7 +92,8 @@ const handler = async (req: Request): Promise<Response> => {
             }
           );
         } else {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          const responseText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${response.statusText} - ${responseText}`);
         }
       } catch (error) {
         attempts++;
