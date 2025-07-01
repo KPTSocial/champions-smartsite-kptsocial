@@ -1,4 +1,3 @@
-
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "@/components/ui/use-toast";
@@ -16,17 +15,35 @@ interface MutationData {
 }
 
 const addReservation = async (data: MutationData) => {
-  const { data: result, error } = await supabase
-    .from("reservations")
-    .insert(data.reservationData)
-    .select()
-    .single();
+  console.log("=== RESERVATION SUBMISSION START ===");
+  console.log("Full mutation data:", JSON.stringify(data, null, 2));
+  console.log("Reservation data being inserted:", JSON.stringify(data.reservationData, null, 2));
 
-  if (error) {
-    console.error("Supabase error:", error);
-    throw new Error("Failed to create reservation. " + error.message);
+  try {
+    const { data: result, error } = await supabase
+      .from("reservations")
+      .insert(data.reservationData)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("=== SUPABASE ERROR ===");
+      console.error("Error code:", error.code);
+      console.error("Error message:", error.message);
+      console.error("Error details:", error.details);
+      console.error("Error hint:", error.hint);
+      console.error("Full error object:", JSON.stringify(error, null, 2));
+      throw new Error(`Failed to create reservation: ${error.message}`);
+    }
+
+    console.log("=== RESERVATION SUCCESS ===");
+    console.log("Created reservation:", JSON.stringify(result, null, 2));
+    return { result, formData: data.formData, specialEventReason: data.specialEventReason };
+  } catch (error) {
+    console.error("=== RESERVATION CREATION FAILED ===");
+    console.error("Caught error:", error);
+    throw error;
   }
-  return { result, formData: data.formData, specialEventReason: data.specialEventReason };
 };
 
 const sendReservationWebhook = async (payload: any) => {
@@ -61,6 +78,7 @@ export const useAddReservation = (
     return useMutation({
         mutationFn: addReservation,
         onSuccess: (data) => {
+          console.log("=== MUTATION SUCCESS ===");
           const { result: variables, formData, specialEventReason } = data;
           
           // Determine reservation type for webhook
@@ -118,10 +136,25 @@ export const useAddReservation = (
           
           form.reset();
         },
-        onError: () => {
+        onError: (error) => {
+          console.error("=== MUTATION ERROR ===");
+          console.error("Full error:", error);
+          console.error("Error message:", error.message);
+          
+          let errorMessage = "There was a problem with your reservation. Please try again.";
+          
+          // Provide more specific error messages based on the error
+          if (error.message.includes("row-level security")) {
+            errorMessage = "Permission denied. Please refresh the page and try again.";
+          } else if (error.message.includes("duplicate key")) {
+            errorMessage = "A reservation with these details already exists.";
+          } else if (error.message.includes("foreign key")) {
+            errorMessage = "Selected event is no longer available.";
+          }
+          
           toast({
             title: "Uh oh! Something went wrong.",
-            description: "There was a problem with your reservation. Please try again.",
+            description: errorMessage,
             variant: "destructive",
           });
         },
