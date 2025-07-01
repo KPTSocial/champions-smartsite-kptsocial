@@ -93,11 +93,11 @@ const ReservationForm = () => {
           requires_confirmation: requiresConfirmation,
         };
 
-        // Pass special event reason separately for webhook
-        mutation.mutate(reservationData, {
-          onSuccess: () => {
-            // Special event reason will be handled in the mutation success callback
-          }
+        // Pass data with context for webhook
+        mutation.mutate({
+          reservationData,
+          formData: data,
+          specialEventReason: data.specialEventReason
         });
 
     } else { // 'table' or 'special-event'
@@ -120,12 +120,11 @@ const ReservationForm = () => {
           requires_confirmation: requiresConfirmation,
         };
 
-        // Pass the form data along with reservation data for webhook
-        mutation.mutate(reservationData, {
-          context: {
-            formData: data,
-            specialEventReason: specialEventReason
-          }
+        // Pass data with context for webhook
+        mutation.mutate({
+          reservationData,
+          formData: data,
+          specialEventReason: specialEventReason
         });
     }
   };

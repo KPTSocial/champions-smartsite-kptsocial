@@ -9,10 +9,16 @@ import { ReservationFormData } from "@/lib/validations/reservation";
 
 type ReservationInsert = Database["public"]["Tables"]["reservations"]["Insert"];
 
-const addReservation = async (reservation: ReservationInsert) => {
-  const { data, error } = await supabase
+interface MutationData {
+  reservationData: ReservationInsert;
+  formData?: ReservationFormData;
+  specialEventReason?: string;
+}
+
+const addReservation = async (data: MutationData) => {
+  const { data: result, error } = await supabase
     .from("reservations")
-    .insert(reservation)
+    .insert(data.reservationData)
     .select()
     .single();
 
@@ -20,7 +26,7 @@ const addReservation = async (reservation: ReservationInsert) => {
     console.error("Supabase error:", error);
     throw new Error("Failed to create reservation. " + error.message);
   }
-  return data;
+  return { result, formData: data.formData, specialEventReason: data.specialEventReason };
 };
 
 const sendReservationWebhook = async (payload: any) => {
@@ -54,7 +60,9 @@ export const useAddReservation = (
 ) => {
     return useMutation({
         mutationFn: addReservation,
-        onSuccess: (data, variables, context: any) => {
+        onSuccess: (data) => {
+          const { result: variables, formData, specialEventReason } = data;
+          
           // Determine reservation type for webhook
           let reservationType = 'table';
           let eventType = 'Table';
@@ -64,10 +72,6 @@ export const useAddReservation = (
             reservationType = variables.event_id ? 'bingo' : 'table'; // This would need proper event lookup
             eventType = variables.event_id ? 'Event' : 'Table';
           }
-
-          // Get special event reason from context if available
-          const specialEventReason = context?.specialEventReason || '';
-          const formData = context?.formData;
 
           // If we have form data, use it to determine correct reservation type
           if (formData?.reservationType) {
@@ -91,7 +95,7 @@ export const useAddReservation = (
             reservationDate: variables.reservation_date || '',
             reservationTime: variables.reservation_date ? new Date(variables.reservation_date).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
             notes: variables.notes || null,
-            specialEventReason: specialEventReason,
+            specialEventReason: specialEventReason || '',
             eventId: variables.event_id || null,
             eventType: eventType,
             requiresConfirmation: variables.requires_confirmation || false,
