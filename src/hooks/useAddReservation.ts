@@ -54,14 +54,31 @@ export const useAddReservation = (
 ) => {
     return useMutation({
         mutationFn: addReservation,
-        onSuccess: (data, variables) => {
-          // Determine event type based on reservation type
-          let eventType = '';
+        onSuccess: (data, variables, context: any) => {
+          // Determine reservation type for webhook
+          let reservationType = 'table';
+          let eventType = 'Table';
+          
           if (variables.reservation_type === 'Event') {
-            // For event reservations, determine if it's bingo or trivia based on event_id
+            // Determine if it's bingo or trivia based on context or event details
+            reservationType = variables.event_id ? 'bingo' : 'table'; // This would need proper event lookup
             eventType = variables.event_id ? 'Event' : 'Table';
-          } else {
-            eventType = 'Table';
+          }
+
+          // Get special event reason from context if available
+          const specialEventReason = context?.specialEventReason || '';
+          const formData = context?.formData;
+
+          // If we have form data, use it to determine correct reservation type
+          if (formData?.reservationType) {
+            reservationType = formData.reservationType;
+            if (formData.reservationType === 'bingo') {
+              eventType = 'Bingo';
+            } else if (formData.reservationType === 'trivia') {
+              eventType = 'Trivia';
+            } else if (formData.reservationType === 'special-event') {
+              eventType = 'Special Event';
+            }
           }
 
           // Prepare comprehensive webhook payload
@@ -70,11 +87,11 @@ export const useAddReservation = (
             email: variables.email || '',
             phoneNumber: variables.phone_number || undefined,
             partySize: variables.party_size || 0,
-            reservationType: variables.reservation_type || '',
+            reservationType: reservationType,
             reservationDate: variables.reservation_date || '',
             reservationTime: variables.reservation_date ? new Date(variables.reservation_date).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
             notes: variables.notes || null,
-            specialEventReason: '', // Will be populated from form if applicable
+            specialEventReason: specialEventReason,
             eventId: variables.event_id || null,
             eventType: eventType,
             requiresConfirmation: variables.requires_confirmation || false,
@@ -87,8 +104,6 @@ export const useAddReservation = (
 
           // Check if confirmation is needed (only for trivia 6+ now)
           if (variables.requires_confirmation && onConfirmationNeeded) {
-            const reservationType = variables.reservation_type === 'Event' ? 
-              (variables.event_id ? 'trivia' : 'bingo') : 'table';
             onConfirmationNeeded(variables.party_size || 0, reservationType);
           } else {
             toast({
