@@ -75,7 +75,7 @@ const ReservationForm = () => {
 
     if (data.reservationType === 'bingo' || data.reservationType === 'trivia') {
         console.log("Processing event reservation...");
-        const eventType = data.reservationType === 'bingo' ? 'Bingo' : 'Trivia';
+        const eventTypeName = data.reservationType === 'bingo' ? 'Bingo' : 'Trivia';
         const selectedDate = new Date(data.reservationDate);
         selectedDate.setHours(0, 0, 0, 0);
 
@@ -83,14 +83,21 @@ const ReservationForm = () => {
             if (!event.event_date) return false;
             const eventDate = new Date(event.event_date);
             eventDate.setHours(0, 0, 0, 0);
-            return String(event.event_type) === eventType && eventDate.getTime() === selectedDate.getTime();
+            
+            // Both bingo and trivia are Game Night events, check title for specific type
+            return event.event_type === 'Game Night' && 
+                   eventDate.getTime() === selectedDate.getTime() &&
+                   event.event_title?.toLowerCase().includes(eventTypeName.toLowerCase());
         });
 
         console.log("Matching event found:", matchingEvent);
 
         if (!matchingEvent) {
             console.log("No matching event found for date/type");
-            form.setError('reservationDate', { type: 'manual', message: `No ${eventType} Night is scheduled for this date.` });
+            form.setError('reservationDate', { 
+                type: 'manual', 
+                message: `No ${eventTypeName} Night is scheduled for this date. Please select a date with available events.` 
+            });
             return;
         }
 

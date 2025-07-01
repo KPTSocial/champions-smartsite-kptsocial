@@ -16,26 +16,12 @@ interface MutationData {
 
 const addReservation = async (data: MutationData) => {
   console.log("=== RESERVATION SUBMISSION START ===");
-  console.log("Supabase client:", supabase);
-  console.log("Auth user:", await supabase.auth.getUser());
-  console.log("Full mutation data:", JSON.stringify(data, null, 2));
-  console.log("Reservation data being inserted:", JSON.stringify(data.reservationData, null, 2));
-  
-  // Test with minimal data first
-  const minimalData = {
-    full_name: data.reservationData.full_name,
-    email: data.reservationData.email,
-    party_size: data.reservationData.party_size,
-    reservation_date: data.reservationData.reservation_date,
-    reservation_type: data.reservationData.reservation_type,
-  };
-  
-  console.log("Testing with minimal data:", JSON.stringify(minimalData, null, 2));
+  console.log("Full reservation data:", JSON.stringify(data.reservationData, null, 2));
 
   try {
     const { data: result, error } = await supabase
       .from("reservations")
-      .insert(minimalData)
+      .insert(data.reservationData)
       .select()
       .single();
 
