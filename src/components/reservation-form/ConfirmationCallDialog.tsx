@@ -14,9 +14,6 @@ export const ConfirmationCallDialog = ({ open, onOpenChange, partySize, reservat
   const restaurantPhone = "(555) 123-4567"; // Replace with actual restaurant phone number
   
   const getConfirmationReason = () => {
-    if (reservationType === 'table' && partySize > 15) {
-      return `parties of ${partySize} people`;
-    }
     if (reservationType === 'trivia' && partySize >= 6) {
       return `Trivia Night parties of ${partySize} people`;
     }

@@ -25,9 +25,9 @@ export const BookingFields = () => {
               name="partySize"
               render={({ field }) => (
                   <FormItem>
-                  <FormLabel>Party Size {reservationType === 'table' ? '(6+)' : ''}</FormLabel>
+                  <FormLabel>Party Size</FormLabel>
                   <FormControl>
-                      <Input type="number" min={reservationType === 'table' ? 6 : 1} {...field} />
+                      <Input type="number" min={1} {...field} />
                   </FormControl>
                   <FormMessage />
                   </FormItem>

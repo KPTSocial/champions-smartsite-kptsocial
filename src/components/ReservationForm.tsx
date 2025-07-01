@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -60,9 +59,8 @@ const ReservationForm = () => {
       ? `${data.firstName.trim()} ${data.lastName.trim()}`
       : data.firstName.trim();
 
-    // Determine if confirmation is required
+    // Only trivia reservations with 6+ people require confirmation now
     const requiresConfirmation = 
-      (data.reservationType === 'table' && data.partySize > 15) ||
       (data.reservationType === 'trivia' && data.partySize >= 6);
 
     if (data.reservationType === 'bingo' || data.reservationType === 'trivia') {

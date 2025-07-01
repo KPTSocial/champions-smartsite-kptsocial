@@ -74,7 +74,7 @@ export const useAddReservation = (
           // Send webhook via edge function (non-blocking)
           sendReservationWebhook(webhookPayload);
 
-          // Check if confirmation is needed
+          // Check if confirmation is needed (only for trivia 6+ now)
           if (variables.requires_confirmation && onConfirmationNeeded) {
             const reservationType = variables.reservation_type === 'Event' ? 
               (variables.event_id ? 'trivia' : 'bingo') : 'table';
