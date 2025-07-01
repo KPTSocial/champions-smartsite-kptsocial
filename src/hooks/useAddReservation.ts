@@ -94,11 +94,57 @@ export const useAddReservation = (
           console.log("=== MUTATION SUCCESS ===");
           const { result: variables, formData, specialEventReason } = data;
           
-          // Skip webhook for now - just confirm success
-          toast({
-            title: "Reservation Confirmed!",
-            description: "Your table has been booked successfully!",
-          });
+          // Determine reservation type for webhook
+          let reservationType = 'table';
+          let eventType = 'Table';
+          
+          if (variables.reservation_type === 'Event') {
+            reservationType = formData?.reservationType || 'event';
+            eventType = 'Event';
+          }
+
+          // If we have form data, use it to determine correct reservation type
+          if (formData?.reservationType) {
+            reservationType = formData.reservationType;
+            if (formData.reservationType === 'bingo') {
+              eventType = 'Bingo';
+            } else if (formData.reservationType === 'trivia') {
+              eventType = 'Trivia';
+            } else if (formData.reservationType === 'special-event') {
+              eventType = 'Special Event';
+            }
+          }
+
+          // Prepare webhook payload
+          const webhookPayload = {
+            fullName: variables.full_name || '',
+            email: variables.email || '',
+            phoneNumber: variables.phone_number || undefined,
+            partySize: variables.party_size || 0,
+            reservationType: reservationType,
+            reservationDate: variables.reservation_date || '',
+            reservationTime: variables.reservation_date ? new Date(variables.reservation_date).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
+            notes: variables.notes || null,
+            specialEventReason: specialEventReason || '',
+            eventId: variables.event_id || null,
+            eventType: eventType,
+            requiresConfirmation: variables.requires_confirmation || false,
+            timestamp: new Date().toISOString(),
+            formattedDate: variables.reservation_date ? formatDateForWebhook(new Date(variables.reservation_date)) : '',
+          };
+
+          // Send webhook via edge function (non-blocking)
+          sendReservationWebhook(webhookPayload);
+
+          // Check if confirmation is needed (only for trivia 6+ now)
+          if (variables.requires_confirmation && onConfirmationNeeded) {
+            onConfirmationNeeded(variables.party_size || 0, reservationType);
+          } else {
+            toast({
+              title: "Reservation Confirmed!",
+              description: "Your table has been booked. We look forward to seeing you!",
+            });
+          }
           
           form.reset();
         },
