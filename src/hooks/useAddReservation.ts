@@ -19,25 +19,30 @@ const addReservation = async (data: MutationData) => {
   console.log("Full reservation data:", JSON.stringify(data.reservationData, null, 2));
 
   try {
-    const { data: result, error } = await supabase
-      .from("reservations")
-      .insert(data.reservationData)
-      .select()
-      .single();
+    // Use edge function instead of direct database insert to bypass RLS issues
+    const { data: result, error } = await supabase.functions.invoke('create-reservation', {
+      body: {
+        ...data.reservationData,
+        formData: data.formData,
+        specialEventReason: data.specialEventReason
+      }
+    });
 
     if (error) {
-      console.error("=== SUPABASE ERROR ===");
-      console.error("Error code:", error.code);
-      console.error("Error message:", error.message);
-      console.error("Error details:", error.details);
-      console.error("Error hint:", error.hint);
-      console.error("Full error object:", JSON.stringify(error, null, 2));
+      console.error("=== EDGE FUNCTION ERROR ===");
+      console.error("Error:", error);
       throw new Error(`Failed to create reservation: ${error.message}`);
     }
 
+    if (!result.success) {
+      console.error("=== RESERVATION CREATION FAILED ===");
+      console.error("Result:", result);
+      throw new Error(result.details || 'Unknown error occurred');
+    }
+
     console.log("=== RESERVATION SUCCESS ===");
-    console.log("Created reservation:", JSON.stringify(result, null, 2));
-    return { result, formData: data.formData, specialEventReason: data.specialEventReason };
+    console.log("Created reservation:", JSON.stringify(result.reservation, null, 2));
+    return { result: result.reservation, formData: data.formData, specialEventReason: data.specialEventReason };
   } catch (error) {
     console.error("=== RESERVATION CREATION FAILED ===");
     console.error("Caught error:", error);
@@ -80,47 +85,12 @@ export const useAddReservation = (
           console.log("=== MUTATION SUCCESS ===");
           const { result: variables, formData, specialEventReason } = data;
           
-          // Determine reservation type for webhook
+          // Determine reservation type from form data
           let reservationType = 'table';
-          let eventType = 'Table';
           
-          if (variables.reservation_type === 'Event') {
-            reservationType = formData?.reservationType || 'event';
-            eventType = 'Event';
-          }
-
-          // If we have form data, use it to determine correct reservation type
           if (formData?.reservationType) {
             reservationType = formData.reservationType;
-            if (formData.reservationType === 'bingo') {
-              eventType = 'Bingo';
-            } else if (formData.reservationType === 'trivia') {
-              eventType = 'Trivia';
-            } else if (formData.reservationType === 'special-event') {
-              eventType = 'Special Event';
-            }
           }
-
-          // Prepare webhook payload
-          const webhookPayload = {
-            fullName: variables.full_name || '',
-            email: variables.email || '',
-            phoneNumber: variables.phone_number || undefined,
-            partySize: variables.party_size || 0,
-            reservationType: reservationType,
-            reservationDate: variables.reservation_date || '',
-            reservationTime: variables.reservation_date ? new Date(variables.reservation_date).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
-            notes: variables.notes || null,
-            specialEventReason: specialEventReason || '',
-            eventId: variables.event_id || null,
-            eventType: eventType,
-            requiresConfirmation: variables.requires_confirmation || false,
-            timestamp: new Date().toISOString(),
-            formattedDate: variables.reservation_date ? formatDateForWebhook(new Date(variables.reservation_date)) : '',
-          };
-
-          // Send webhook via edge function (non-blocking)
-          sendReservationWebhook(webhookPayload);
 
           // Check if confirmation is needed (only for trivia 6+ now)
           if (variables.requires_confirmation && onConfirmationNeeded) {
