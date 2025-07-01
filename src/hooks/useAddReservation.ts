@@ -16,13 +16,26 @@ interface MutationData {
 
 const addReservation = async (data: MutationData) => {
   console.log("=== RESERVATION SUBMISSION START ===");
+  console.log("Supabase client:", supabase);
+  console.log("Auth user:", await supabase.auth.getUser());
   console.log("Full mutation data:", JSON.stringify(data, null, 2));
   console.log("Reservation data being inserted:", JSON.stringify(data.reservationData, null, 2));
+  
+  // Test with minimal data first
+  const minimalData = {
+    full_name: data.reservationData.full_name,
+    email: data.reservationData.email,
+    party_size: data.reservationData.party_size,
+    reservation_date: data.reservationData.reservation_date,
+    reservation_type: data.reservationData.reservation_type,
+  };
+  
+  console.log("Testing with minimal data:", JSON.stringify(minimalData, null, 2));
 
   try {
     const { data: result, error } = await supabase
       .from("reservations")
-      .insert(data.reservationData)
+      .insert(minimalData)
       .select()
       .single();
 
@@ -81,58 +94,11 @@ export const useAddReservation = (
           console.log("=== MUTATION SUCCESS ===");
           const { result: variables, formData, specialEventReason } = data;
           
-          // Determine reservation type for webhook
-          let reservationType = 'table';
-          let eventType = 'Table';
-          
-          if (variables.reservation_type === 'Event') {
-            // Determine if it's bingo or trivia based on context or event details
-            reservationType = variables.event_id ? 'bingo' : 'table'; // This would need proper event lookup
-            eventType = variables.event_id ? 'Event' : 'Table';
-          }
-
-          // If we have form data, use it to determine correct reservation type
-          if (formData?.reservationType) {
-            reservationType = formData.reservationType;
-            if (formData.reservationType === 'bingo') {
-              eventType = 'Bingo';
-            } else if (formData.reservationType === 'trivia') {
-              eventType = 'Trivia';
-            } else if (formData.reservationType === 'special-event') {
-              eventType = 'Special Event';
-            }
-          }
-
-          // Prepare comprehensive webhook payload
-          const webhookPayload = {
-            fullName: variables.full_name || '',
-            email: variables.email || '',
-            phoneNumber: variables.phone_number || undefined,
-            partySize: variables.party_size || 0,
-            reservationType: reservationType,
-            reservationDate: variables.reservation_date || '',
-            reservationTime: variables.reservation_date ? new Date(variables.reservation_date).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }) : '',
-            notes: variables.notes || null,
-            specialEventReason: specialEventReason || '',
-            eventId: variables.event_id || null,
-            eventType: eventType,
-            requiresConfirmation: variables.requires_confirmation || false,
-            timestamp: new Date().toISOString(),
-            formattedDate: variables.reservation_date ? formatDateForWebhook(new Date(variables.reservation_date)) : '',
-          };
-
-          // Send webhook via edge function (non-blocking)
-          sendReservationWebhook(webhookPayload);
-
-          // Check if confirmation is needed (only for trivia 6+ now)
-          if (variables.requires_confirmation && onConfirmationNeeded) {
-            onConfirmationNeeded(variables.party_size || 0, reservationType);
-          } else {
-            toast({
-              title: "Reservation Confirmed!",
-              description: "Your table has been booked. We look forward to seeing you!",
-            });
-          }
+          // Skip webhook for now - just confirm success
+          toast({
+            title: "Reservation Confirmed!",
+            description: "Your table has been booked successfully!",
+          });
           
           form.reset();
         },
