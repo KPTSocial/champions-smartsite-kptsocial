@@ -2,7 +2,6 @@
 import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MenuSection, MenuCategory } from '@/types/menu';
-import { ChevronDown } from 'lucide-react';
 
 interface MobileMenuNavigationProps {
   menuData: MenuSection[];
@@ -57,7 +56,6 @@ const MobileMenuNavigation = ({
         <Select value={selectedMenuType || ''} onValueChange={onMenuTypeChange}>
           <SelectTrigger className="h-12 text-base font-medium bg-card border-2 hover:border-primary/20 transition-colors">
             <SelectValue placeholder="Choose Menu Type" />
-            <ChevronDown className="h-4 w-4 opacity-50" />
           </SelectTrigger>
           <SelectContent className="bg-card border-2">
             {foodSections.length > 0 && (
@@ -80,7 +78,6 @@ const MobileMenuNavigation = ({
           <Select value={selectedCategory || ''} onValueChange={onCategoryChange}>
             <SelectTrigger className="h-12 text-base font-medium bg-card border-2 hover:border-primary/20 transition-colors">
               <SelectValue placeholder="Choose Category" />
-              <ChevronDown className="h-4 w-4 opacity-50" />
             </SelectTrigger>
             <SelectContent className="bg-card border-2">
               {availableCategories.map(category => (
