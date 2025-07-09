@@ -2,43 +2,32 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useHeaderMedia } from "@/hooks/useHeaderMedia";
 import VideoHeader from "@/components/VideoHeader";
-
 const Index = () => {
-  const { data: headerMedia, isLoading: isHeaderLoading, error } = useHeaderMedia();
+  const {
+    data: headerMedia,
+    isLoading: isHeaderLoading,
+    error
+  } = useHeaderMedia();
 
   // Debug logging to track data loading
   console.log('Header media data:', headerMedia);
   console.log('Is loading:', isHeaderLoading);
   console.log('Error:', error);
-
-  return (
-    <div>
+  return <div>
       {/* Hero Section */}
       <section className="relative h-[60vh] md:h-[80vh] w-full flex items-center justify-center text-center text-white">
         <div className="absolute inset-0 bg-black/50 z-10"></div>
         
         {/* Video or clean background */}
-        {isHeaderLoading ? (
-          <div className="absolute inset-0 w-full h-full bg-gray-900 flex items-center justify-center">
+        {isHeaderLoading ? <div className="absolute inset-0 w-full h-full bg-gray-900 flex items-center justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
-          </div>
-        ) : headerMedia && headerMedia.video_url ? (
-          <VideoHeader
-            videoUrl={headerMedia.video_url}
-            title={headerMedia.title}
-            description={headerMedia.description}
-          />
-        ) : (
-          <div className="absolute inset-0 w-full h-full bg-gray-900" />
-        )}
+          </div> : headerMedia && headerMedia.video_url ? <VideoHeader videoUrl={headerMedia.video_url} title={headerMedia.title} description={headerMedia.description} /> : <div className="absolute inset-0 w-full h-full bg-gray-900" />}
         
         <div className="relative z-20 container px-4">
           <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold drop-shadow-lg">
             Where Great Sports & Great Food Meet
           </h1>
-          <p className="mt-4 text-lg md:text-xl max-w-3xl mx-auto drop-shadow-md">
-            Experience the thrill of the game and the taste of locally-sourced, farm-to-table cuisine. Welcome to your new favorite spot.
-          </p>
+          <p className="mt-4 text-lg md:text-xl max-w-3xl mx-auto drop-shadow-md">Experience the thrill of the game and the taste of locally-sourced, PNW cuisine. Welcome to your new favorite spot.</p>
           <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
             <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
               <Link to="/menu">View The Menu</Link>
@@ -96,8 +85,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
