@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const useHeaderMedia = () => {
   return useQuery({
-    queryKey: ['header-media'],
+    queryKey: ['header-media', Date.now()], // Add timestamp to force fresh query
     queryFn: async () => {
       console.log('Fetching header media data...');
       
