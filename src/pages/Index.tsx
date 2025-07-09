@@ -18,7 +18,11 @@ const Index = () => {
         <div className="absolute inset-0 bg-black/50 z-10"></div>
         
         {/* Video or clean background */}
-        {headerMedia && headerMedia.video_url ? (
+        {isHeaderLoading ? (
+          <div className="absolute inset-0 w-full h-full bg-gray-900 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+          </div>
+        ) : headerMedia && headerMedia.video_url ? (
           <VideoHeader
             videoUrl={headerMedia.video_url}
             title={headerMedia.title}
