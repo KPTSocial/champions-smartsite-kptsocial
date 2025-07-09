@@ -12,11 +12,16 @@ export const useHeaderMedia = () => {
         .from('header_media')
         .select('*')
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching header media:', error);
-        // Return a default video object if no data is found
+        throw error;
+      }
+
+      // If no data is found, return default video
+      if (!data) {
+        console.log('No header media found, using default video');
         return {
           id: 'default',
           title: 'Champions Header Video',
