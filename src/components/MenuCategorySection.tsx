@@ -1,6 +1,7 @@
 
 import { MenuCategory } from '@/types/menu';
 import MenuItemCard from './MenuItemCard';
+import MenuSectionDisclaimer from './MenuSectionDisclaimer';
 
 const MenuCategorySection = ({ category }: { category: MenuCategory }) => {
   if (!category.items || category.items.length === 0) {
@@ -16,6 +17,7 @@ const MenuCategorySection = ({ category }: { category: MenuCategory }) => {
           <MenuItemCard key={item.id} item={item} />
         ))}
       </div>
+      <MenuSectionDisclaimer />
     </section>
   );
 };
