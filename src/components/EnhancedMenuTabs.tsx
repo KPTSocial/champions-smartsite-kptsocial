@@ -19,13 +19,24 @@ const EnhancedMenuTabs: React.FC<EnhancedMenuTabsProps> = ({
 
   const updateHighlight = () => {
     if (activeTabRef.current && tabsRef.current) {
-      const tabRect = activeTabRef.current.getBoundingClientRect();
-      const containerRect = tabsRef.current.getBoundingClientRect();
+      // Use offsetLeft/offsetTop for more reliable positioning
+      const tabElement = activeTabRef.current;
+      const containerElement = tabsRef.current;
+      
+      // Calculate position relative to container
+      let left = tabElement.offsetLeft;
+      let parent = tabElement.offsetParent;
+      
+      // Walk up the DOM tree to find the relative position to the container
+      while (parent && parent !== containerElement) {
+        left += (parent as HTMLElement).offsetLeft;
+        parent = (parent as HTMLElement).offsetParent;
+      }
       
       setHighlightStyle({
-        width: `${tabRect.width}px`,
-        height: `${tabRect.height}px`,
-        transform: `translateX(${tabRect.left - containerRect.left}px)`,
+        width: `${tabElement.offsetWidth}px`,
+        height: `${tabElement.offsetHeight}px`,
+        transform: `translateX(${left}px)`,
       });
     }
   };
