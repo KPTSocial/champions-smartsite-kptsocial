@@ -11,12 +11,14 @@ import MobileMenuNavigation from '@/components/MobileMenuNavigation';
 import DesktopMenuNavigation from '@/components/DesktopMenuNavigation';
 import EnhancedMenuTabs from '@/components/EnhancedMenuTabs';
 import EnhancedMenuCategorySection from '@/components/EnhancedMenuCategorySection';
+import EnhancedFoodSection from '@/components/EnhancedFoodSection';
 import menuBackground from '@/assets/menu-background.jpg';
 
 const Menu = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMenuType, setSelectedMenuType] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedFoodCategory, setSelectedFoodCategory] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<string>('');
   const isMobile = useIsMobile();
 
@@ -117,6 +119,23 @@ const Menu = () => {
   const handleSectionChange = (sectionId: string) => {
     setActiveSection(sectionId);
     setSelectedCategory(null);
+    setSelectedFoodCategory(null); // Reset food category when switching sections
+  };
+
+  const handleFoodCategoryChange = (categoryId: string | null) => {
+    setSelectedFoodCategory(categoryId);
+  };
+
+  // Helper function to check if a section is a food section
+  const isFoodSection = (section: MenuSection) => {
+    const sectionName = section.name.toLowerCase();
+    return sectionName.includes('food') || 
+           sectionName.includes('appetizer') || 
+           sectionName.includes('entree') || 
+           sectionName.includes('main') ||
+           sectionName.includes('dessert') ||
+           sectionName.includes('salad') ||
+           sectionName.includes('soup');
   };
 
   // Set initial active section when data loads
@@ -222,16 +241,25 @@ const Menu = () => {
               {filteredMenuData
                 .filter(section => !activeSection || section.id === activeSection)
                 .map(section => (
-                <section key={section.id} id={section.name.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-20">
-                  <h2 className="text-4xl font-serif font-bold mb-4 text-center text-secondary">{section.name}</h2>
-                  {section.description && <p className="text-muted-foreground mb-12 max-w-3xl mx-auto text-center">{section.description}</p>}
-                  <div className="space-y-16">
-                    {section.categories.map(category => (
-                      <EnhancedMenuCategorySection key={category.id} category={category} />
-                    ))}
-                  </div>
-                </section>
-              ))}
+                  isFoodSection(section) ? (
+                    <EnhancedFoodSection
+                      key={section.id}
+                      section={section}
+                      selectedCategory={selectedFoodCategory}
+                      onCategorySelect={handleFoodCategoryChange}
+                    />
+                  ) : (
+                    <section key={section.id} id={section.name.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-20">
+                      <h2 className="text-4xl font-serif font-bold mb-4 text-center text-secondary">{section.name}</h2>
+                      {section.description && <p className="text-muted-foreground mb-12 max-w-3xl mx-auto text-center">{section.description}</p>}
+                      <div className="space-y-16">
+                        {section.categories.map(category => (
+                          <EnhancedMenuCategorySection key={category.id} category={category} />
+                        ))}
+                      </div>
+                    </section>
+                  )
+                ))}
             </div>
           ) : (
             <div className="text-center py-16">
