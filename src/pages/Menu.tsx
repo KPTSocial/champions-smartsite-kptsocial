@@ -9,11 +9,15 @@ import { Link } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import MobileMenuNavigation from '@/components/MobileMenuNavigation';
 import DesktopMenuNavigation from '@/components/DesktopMenuNavigation';
+import EnhancedMenuTabs from '@/components/EnhancedMenuTabs';
+import EnhancedMenuCategorySection from '@/components/EnhancedMenuCategorySection';
+import menuBackground from '@/assets/menu-background.jpg';
 
 const Menu = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMenuType, setSelectedMenuType] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<string>('');
   const isMobile = useIsMobile();
 
   const { data: menuData, isLoading, isError, error } = useQuery<MenuSection[], Error>({
@@ -110,6 +114,18 @@ const Menu = () => {
     setSelectedCategory(categoryId);
   };
 
+  const handleSectionChange = (sectionId: string) => {
+    setActiveSection(sectionId);
+    setSelectedCategory(null);
+  };
+
+  // Set initial active section when data loads
+  useMemo(() => {
+    if (menuData && menuData.length > 0 && !activeSection) {
+      setActiveSection(menuData[0].id);
+    }
+  }, [menuData, activeSection]);
+
   if (isLoading) {
     return (
       <div className="container py-16 md:py-24 text-center">
@@ -160,78 +176,84 @@ const Menu = () => {
   }
 
   return (
-    <div className="container py-16 md:py-24">
-      <div className="text-center">
-        <h1 className="text-5xl font-bold mb-4">Our Menu</h1>
-        <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-          Farm-fresh ingredients, bold flavors. Explore our selection of hand-crafted dishes.
-        </p>
-      </div>
+    <div 
+      className="min-h-screen"
+      style={{
+        backgroundImage: `url(${menuBackground})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      <div className="container py-16 md:py-24">
+        <div className="menu-section rounded-lg p-8 mb-8">
+          <div className="text-center">
+            <h1 className="text-5xl font-bold mb-4">Our Menu</h1>
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Farm-fresh ingredients, bold flavors. Explore our selection of hand-crafted dishes.
+            </p>
+          </div>
+        </div>
 
-      {/* Responsive Navigation */}
-      {menuData && (
-        <>
-          {isMobile ? (
-            <MobileMenuNavigation
-              menuData={menuData}
-              selectedMenuType={selectedMenuType}
-              selectedCategory={selectedCategory}
-              onMenuTypeChange={handleMenuTypeChange}
-              onCategoryChange={handleCategoryChange}
-            />
-          ) : (
-            <DesktopMenuNavigation
-              menuData={menuData}
-              selectedCategory={selectedCategory}
-              onCategoryChange={handleCategoryChange}
+        {/* Enhanced Tab Navigation */}
+        <div className="menu-section rounded-lg p-8 mb-8">
+          {menuData && (
+            <EnhancedMenuTabs
+              sections={menuData}
+              activeSection={activeSection}
+              onSectionChange={handleSectionChange}
             />
           )}
-        </>
-      )}
-      
-      <div className="mb-12 max-w-lg mx-auto">
-        <Input
-          type="text"
-          placeholder="Search for a dish, category, or section..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="text-lg p-6"
-        />
-      </div>
-
-      {filteredMenuData && filteredMenuData.length > 0 ? (
-        <div className="space-y-20">
-          {filteredMenuData.map(section => (
-            <section key={section.id} id={section.name.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-20">
-              <h2 className="text-5xl font-serif font-bold mb-4 text-center text-primary">{section.name}</h2>
-              {section.description && <p className="text-muted-foreground mb-12 max-w-3xl mx-auto text-center">{section.description}</p>}
-              <div className="space-y-16">
-                {section.categories.map(category => (
-                  <MenuCategorySection key={category.id} category={category} />
-                ))}
-              </div>
-            </section>
-          ))}
+          
+          <div className="mb-8 max-w-lg mx-auto">
+            <Input
+              type="text"
+              placeholder="Search for a dish, category, or section..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="text-lg p-6 bg-background/80 backdrop-blur-sm"
+            />
+          </div>
         </div>
-      ) : (
-        <div className="text-center py-16">
-          {searchTerm ? (
-            <>
-              <p className="text-2xl text-muted-foreground">No dishes found for "{searchTerm}".</p>
-              <p className="text-muted-foreground mt-2">Try a different search term or clear your search.</p>
-            </>
-          ) : selectedCategory ? (
-            <>
-              <p className="text-2xl text-muted-foreground">No items available in this category.</p>
-              <p className="text-muted-foreground mt-2">Please select a different category.</p>
-            </>
+        {/* Enhanced Menu Content */}
+        <div className="menu-section rounded-lg p-8">
+          {filteredMenuData && filteredMenuData.length > 0 ? (
+            <div className="space-y-20">
+              {filteredMenuData
+                .filter(section => !activeSection || section.id === activeSection)
+                .map(section => (
+                <section key={section.id} id={section.name.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-20">
+                  <h2 className="text-4xl font-serif font-bold mb-4 text-center text-secondary">{section.name}</h2>
+                  {section.description && <p className="text-muted-foreground mb-12 max-w-3xl mx-auto text-center">{section.description}</p>}
+                  <div className="space-y-16">
+                    {section.categories.map(category => (
+                      <EnhancedMenuCategorySection key={category.id} category={category} />
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
           ) : (
-            <>
-              <p className="text-2xl text-muted-foreground">Please select a menu type and category to view items.</p>
-            </>
+            <div className="text-center py-16">
+              {searchTerm ? (
+                <>
+                  <p className="text-2xl text-muted-foreground">No dishes found for "{searchTerm}".</p>
+                  <p className="text-muted-foreground mt-2">Try a different search term or clear your search.</p>
+                </>
+              ) : selectedCategory ? (
+                <>
+                  <p className="text-2xl text-muted-foreground">No items available in this category.</p>
+                  <p className="text-muted-foreground mt-2">Please select a different category.</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-2xl text-muted-foreground">Please select a menu type and category to view items.</p>
+                </>
+              )}
+            </div>
           )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

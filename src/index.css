@@ -70,3 +70,19 @@
     @apply font-serif;
   }
 }
+
+@layer components {
+  .menu-wood-background {
+    background-image: url('/src/assets/menu-background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+  
+  .menu-section {
+    background: rgba(245, 243, 239, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+}
