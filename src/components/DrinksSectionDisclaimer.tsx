@@ -27,6 +27,10 @@ const DrinksSectionDisclaimer = ({ categoryDescription }: DrinksSectionDisclaime
         <p>
           Alcohol content may vary by drink
         </p>
+        
+        <p>
+          Some may contain raw ingredients like egg whites*
+        </p>
       </div>
     </div>
   );
