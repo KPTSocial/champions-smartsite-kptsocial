@@ -19,9 +19,6 @@ const EnhancedMenuCategorySection: React.FC<EnhancedMenuCategorySectionProps> = 
   return (
     <section id={category.name.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-28">
       <h3 className="text-3xl font-serif font-bold mb-2 text-secondary">{category.name}</h3>
-      {category.description && (
-        <p className="text-muted-foreground mb-8 max-w-2xl">{category.description}</p>
-      )}
       <Accordion type="single" collapsible className="space-y-4">
         {category.items.map((item) => (
           <MenuItemAccordion key={item.id} item={item} />
@@ -29,8 +26,8 @@ const EnhancedMenuCategorySection: React.FC<EnhancedMenuCategorySectionProps> = 
       </Accordion>
       {showDisclaimer && (
         sectionName?.toLowerCase().includes('drink') || sectionName?.toLowerCase().includes('beverage') || sectionName?.toLowerCase().includes('bar') ? 
-          <DrinksSectionDisclaimer /> : 
-          <FoodSectionDisclaimer />
+          <DrinksSectionDisclaimer categoryDescription={category.description} /> : 
+          <FoodSectionDisclaimer categoryDescription={category.description} />
       )}
     </section>
   );

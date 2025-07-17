@@ -1,6 +1,13 @@
-const DrinksSectionDisclaimer = () => {
+interface DrinksSectionDisclaimerProps {
+  categoryDescription?: string;
+}
+
+const DrinksSectionDisclaimer = ({ categoryDescription }: DrinksSectionDisclaimerProps) => {
   return (
     <div className="mt-8 pt-6 border-t border-border">
+      {categoryDescription && (
+        <p className="text-muted-foreground mb-4 max-w-2xl">{categoryDescription}</p>
+      )}
       <div className="space-y-3 text-sm text-muted-foreground">
         {/* Icon placeholders with text */}
         <div className="flex items-center gap-2">
