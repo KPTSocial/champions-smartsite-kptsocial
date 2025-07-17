@@ -3,7 +3,7 @@ import { MenuCategory } from '@/types/menu';
 import MenuItemCard from './MenuItemCard';
 import MenuSectionDisclaimer from './MenuSectionDisclaimer';
 
-const MenuCategorySection = ({ category }: { category: MenuCategory }) => {
+const MenuCategorySection = ({ category, showDisclaimer = false }: { category: MenuCategory; showDisclaimer?: boolean }) => {
   if (!category.items || category.items.length === 0) {
     return null;
   }
@@ -17,7 +17,7 @@ const MenuCategorySection = ({ category }: { category: MenuCategory }) => {
           <MenuItemCard key={item.id} item={item} />
         ))}
       </div>
-      <MenuSectionDisclaimer />
+      {showDisclaimer && <MenuSectionDisclaimer />}
     </section>
   );
 };

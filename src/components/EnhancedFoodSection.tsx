@@ -34,8 +34,12 @@ const EnhancedFoodSection: React.FC<EnhancedFoodSectionProps> = ({
 
       <div className="space-y-16">
         {displayCategories.length > 0 ? (
-          displayCategories.map(category => (
-            <EnhancedMenuCategorySection key={category.id} category={category} />
+          displayCategories.map((category, index) => (
+            <EnhancedMenuCategorySection 
+              key={category.id} 
+              category={category} 
+              showDisclaimer={index === displayCategories.length - 1}
+            />
           ))
         ) : (
           <div className="text-center py-16">

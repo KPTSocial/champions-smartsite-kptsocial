@@ -6,9 +6,10 @@ import MenuSectionDisclaimer from './MenuSectionDisclaimer';
 
 interface EnhancedMenuCategorySectionProps {
   category: MenuCategory;
+  showDisclaimer?: boolean;
 }
 
-const EnhancedMenuCategorySection: React.FC<EnhancedMenuCategorySectionProps> = ({ category }) => {
+const EnhancedMenuCategorySection: React.FC<EnhancedMenuCategorySectionProps> = ({ category, showDisclaimer = false }) => {
   if (!category.items || category.items.length === 0) {
     return null;
   }
@@ -24,7 +25,7 @@ const EnhancedMenuCategorySection: React.FC<EnhancedMenuCategorySectionProps> = 
           <MenuItemAccordion key={item.id} item={item} />
         ))}
       </Accordion>
-      <MenuSectionDisclaimer />
+      {showDisclaimer && <MenuSectionDisclaimer />}
     </section>
   );
 };

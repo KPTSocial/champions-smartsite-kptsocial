@@ -12,6 +12,7 @@ import DesktopMenuNavigation from '@/components/DesktopMenuNavigation';
 import EnhancedMenuTabs from '@/components/EnhancedMenuTabs';
 import EnhancedMenuCategorySection from '@/components/EnhancedMenuCategorySection';
 import EnhancedFoodSection from '@/components/EnhancedFoodSection';
+import MenuSectionDisclaimer from '@/components/MenuSectionDisclaimer';
 import menuBackground from '@/assets/menu-background.jpg';
 
 const Menu = () => {
@@ -253,13 +254,23 @@ const Menu = () => {
                       <h2 className="text-4xl font-serif font-bold mb-4 text-center text-secondary">{section.name}</h2>
                       {section.description && <p className="text-muted-foreground mb-12 max-w-3xl mx-auto text-center">{section.description}</p>}
                       <div className="space-y-16">
-                        {section.categories.map(category => (
-                          <EnhancedMenuCategorySection key={category.id} category={category} />
+                        {section.categories.map((category, index) => (
+                          <EnhancedMenuCategorySection 
+                            key={category.id} 
+                            category={category} 
+                            showDisclaimer={index === section.categories.length - 1}
+                          />
                         ))}
                       </div>
                     </section>
                   )
                 ))}
+              {/* Show global disclaimer when viewing all sections */}
+              {!activeSection && filteredMenuData.length > 1 && (
+                <div className="mt-16">
+                  <MenuSectionDisclaimer />
+                </div>
+              )}
             </div>
           ) : (
             <div className="text-center py-16">
