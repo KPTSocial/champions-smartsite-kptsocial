@@ -1,9 +1,10 @@
 
 import { MenuCategory } from '@/types/menu';
 import MenuItemCard from './MenuItemCard';
-import MenuSectionDisclaimer from './MenuSectionDisclaimer';
+import FoodSectionDisclaimer from './FoodSectionDisclaimer';
+import DrinksSectionDisclaimer from './DrinksSectionDisclaimer';
 
-const MenuCategorySection = ({ category, showDisclaimer = false }: { category: MenuCategory; showDisclaimer?: boolean }) => {
+const MenuCategorySection = ({ category, showDisclaimer = false, sectionName }: { category: MenuCategory; showDisclaimer?: boolean; sectionName?: string }) => {
   if (!category.items || category.items.length === 0) {
     return null;
   }
@@ -17,7 +18,11 @@ const MenuCategorySection = ({ category, showDisclaimer = false }: { category: M
           <MenuItemCard key={item.id} item={item} />
         ))}
       </div>
-      {showDisclaimer && <MenuSectionDisclaimer />}
+      {showDisclaimer && (
+        sectionName?.toLowerCase().includes('drink') || sectionName?.toLowerCase().includes('beverage') || sectionName?.toLowerCase().includes('bar') ? 
+          <DrinksSectionDisclaimer /> : 
+          <FoodSectionDisclaimer />
+      )}
     </section>
   );
 };

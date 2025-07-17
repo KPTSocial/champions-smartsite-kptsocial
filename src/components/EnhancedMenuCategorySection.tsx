@@ -2,14 +2,16 @@ import React from 'react';
 import { MenuCategory } from '@/types/menu';
 import { Accordion } from '@/components/ui/accordion';
 import MenuItemAccordion from './MenuItemAccordion';
-import MenuSectionDisclaimer from './MenuSectionDisclaimer';
+import FoodSectionDisclaimer from './FoodSectionDisclaimer';
+import DrinksSectionDisclaimer from './DrinksSectionDisclaimer';
 
 interface EnhancedMenuCategorySectionProps {
   category: MenuCategory;
   showDisclaimer?: boolean;
+  sectionName?: string;
 }
 
-const EnhancedMenuCategorySection: React.FC<EnhancedMenuCategorySectionProps> = ({ category, showDisclaimer = false }) => {
+const EnhancedMenuCategorySection: React.FC<EnhancedMenuCategorySectionProps> = ({ category, showDisclaimer = false, sectionName }) => {
   if (!category.items || category.items.length === 0) {
     return null;
   }
@@ -25,7 +27,11 @@ const EnhancedMenuCategorySection: React.FC<EnhancedMenuCategorySectionProps> = 
           <MenuItemAccordion key={item.id} item={item} />
         ))}
       </Accordion>
-      {showDisclaimer && <MenuSectionDisclaimer />}
+      {showDisclaimer && (
+        sectionName?.toLowerCase().includes('drink') || sectionName?.toLowerCase().includes('beverage') || sectionName?.toLowerCase().includes('bar') ? 
+          <DrinksSectionDisclaimer /> : 
+          <FoodSectionDisclaimer />
+      )}
     </section>
   );
 };

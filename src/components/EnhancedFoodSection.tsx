@@ -39,6 +39,7 @@ const EnhancedFoodSection: React.FC<EnhancedFoodSectionProps> = ({
               key={category.id} 
               category={category} 
               showDisclaimer={index === displayCategories.length - 1}
+              sectionName={section.name}
             />
           ))
         ) : (

@@ -12,7 +12,8 @@ import DesktopMenuNavigation from '@/components/DesktopMenuNavigation';
 import EnhancedMenuTabs from '@/components/EnhancedMenuTabs';
 import EnhancedMenuCategorySection from '@/components/EnhancedMenuCategorySection';
 import EnhancedFoodSection from '@/components/EnhancedFoodSection';
-import MenuSectionDisclaimer from '@/components/MenuSectionDisclaimer';
+import FoodSectionDisclaimer from '@/components/FoodSectionDisclaimer';
+import DrinksSectionDisclaimer from '@/components/DrinksSectionDisclaimer';
 import menuBackground from '@/assets/menu-background.jpg';
 
 const Menu = () => {
@@ -259,6 +260,7 @@ const Menu = () => {
                             key={category.id} 
                             category={category} 
                             showDisclaimer={index === section.categories.length - 1}
+                            sectionName={section.name}
                           />
                         ))}
                       </div>
@@ -268,7 +270,7 @@ const Menu = () => {
               {/* Show global disclaimer when viewing all sections */}
               {!activeSection && filteredMenuData.length > 1 && (
                 <div className="mt-16">
-                  <MenuSectionDisclaimer />
+                  <FoodSectionDisclaimer />
                 </div>
               )}
             </div>
