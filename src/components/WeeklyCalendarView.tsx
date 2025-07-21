@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { format, startOfWeek, addDays, isToday, endOfWeek } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 import { type Event } from '@/services/eventService';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -23,7 +24,8 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({ events, current
   const eventsByDate = new Map<string, Event[]>();
   events.forEach(event => {
     if(event.event_date) {
-        const dateKey = event.event_date.split('T')[0];
+        // Convert UTC event date to Pacific Time and get the date part
+        const dateKey = formatInTimeZone(new Date(event.event_date), 'America/Los_Angeles', 'yyyy-MM-dd');
         if (!eventsByDate.has(dateKey)) {
             eventsByDate.set(dateKey, []);
         }

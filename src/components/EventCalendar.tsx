@@ -5,6 +5,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { CalendarWithEventSlots } from '@/components/ui/calendar-with-event-slots';
 import { getEvents, type Event as EventType } from '@/services/eventService';
 import { addDays } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import WeeklyCalendarView from './WeeklyCalendarView';
@@ -24,15 +25,9 @@ const EventCalendar = () => {
         if (dbEvents.length > 0) {
             dbEvents.forEach(event => {
                 if (event.event_date) {
-                    // Convert UTC event date to local Pacific Time
-                    const eventDate = new Date(event.event_date);
-                    const year = eventDate.getFullYear();
-                    const month = eventDate.getMonth();
-                    const day = eventDate.getDate();
-                    
-                    // Create date string in YYYY-MM-DD format using local date components
-                    const localDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    eventDates.add(localDateStr);
+                    // Convert UTC event date to Pacific Time and get the date part
+                    const eventDatePT = formatInTimeZone(new Date(event.event_date), 'America/Los_Angeles', 'yyyy-MM-dd');
+                    eventDates.add(eventDatePT);
                 }
             });
         }

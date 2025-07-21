@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { PlusIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -39,11 +40,10 @@ export function CalendarWithEventSlots({
     return events.filter(event => {
       if (!event.event_date) return false;
       
-      // Convert UTC event date to local Pacific Time
-      const eventDate = new Date(event.event_date);
-      const eventLocalDateStr = format(eventDate, 'yyyy-MM-dd');
+      // Convert UTC event date to Pacific Time and get the date part
+      const eventDatePT = formatInTimeZone(new Date(event.event_date), 'America/Los_Angeles', 'yyyy-MM-dd');
       
-      return eventLocalDateStr === selectedDateStr;
+      return eventDatePT === selectedDateStr;
     });
   }, [events, date]);
 
@@ -52,15 +52,9 @@ export function CalendarWithEventSlots({
     const eventDates = new Set<string>();
     events.forEach(event => {
       if (event.event_date) {
-        // Convert UTC event date to local Pacific Time
-        const eventDate = new Date(event.event_date);
-        const year = eventDate.getFullYear();
-        const month = eventDate.getMonth();
-        const day = eventDate.getDate();
-        
-        // Create date string in YYYY-MM-DD format using local date components
-        const localDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        eventDates.add(localDateStr);
+        // Convert UTC event date to Pacific Time and get the date part
+        const eventDatePT = formatInTimeZone(new Date(event.event_date), 'America/Los_Angeles', 'yyyy-MM-dd');
+        eventDates.add(eventDatePT);
       }
     });
     
@@ -73,9 +67,8 @@ export function CalendarWithEventSlots({
 
   const formatEventTime = (eventDate: string) => {
     try {
-      // Convert UTC to local Pacific Time and format
-      const date = new Date(eventDate);
-      return format(date, 'h:mm a');
+      // Convert UTC to Pacific Time and format with PT indicator
+      return formatInTimeZone(new Date(eventDate), 'America/Los_Angeles', 'h:mm a') + ' PT';
     } catch {
       return '';
     }
