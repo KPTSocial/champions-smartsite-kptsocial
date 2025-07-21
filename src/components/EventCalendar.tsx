@@ -45,7 +45,7 @@ const EventCalendar = () => {
     }, [dbEvents]);
 
     if (isLoading) {
-        return <Skeleton className="h-[430px] w-full max-w-sm rounded-lg" />;
+        return <Skeleton className="h-[430px] w-full max-w-lg rounded-lg mx-auto" />;
     }
     
     const handlePrevWeek = () => {
@@ -62,12 +62,22 @@ const EventCalendar = () => {
     };
 
     return (
-        <div className="w-full max-w-sm">
-            <div className="flex justify-center gap-2 mb-4">
-                <Button variant={view === 'month' ? 'default' : 'outline'} size="sm" onClick={() => setView('month')}>
+        <div className="w-full max-w-lg mx-auto">
+            <div className="flex justify-center gap-3 mb-6">
+                <Button 
+                    variant={view === 'month' ? 'default' : 'outline'} 
+                    size="sm" 
+                    onClick={() => setView('month')}
+                    className="px-6"
+                >
                     Month
                 </Button>
-                <Button variant={view === 'week' ? 'default' : 'outline'} size="sm" onClick={() => setView('week')}>
+                <Button 
+                    variant={view === 'week' ? 'default' : 'outline'} 
+                    size="sm" 
+                    onClick={() => setView('week')}
+                    className="px-6"
+                >
                     Week
                 </Button>
             </div>
