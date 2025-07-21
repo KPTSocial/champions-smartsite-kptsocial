@@ -211,18 +211,7 @@ export function CalendarWithEventSlots({
               year: "numeric",
             })}
           </div>
-          {onAddEvent && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-6"
-              title="Add Event"
-              onClick={onAddEvent}
-            >
-              <PlusIcon />
-              <span className="sr-only">Add Event</span>
-            </Button>
-          )}
+          {/* Add Event button hidden for public view */}
         </div>
         <div className="flex w-full flex-col gap-2">
           {eventsForSelectedDate.length === 0 ? (
