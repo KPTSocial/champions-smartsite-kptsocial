@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -85,7 +86,7 @@ const Happenings = () => {
               <Card 
                 key={event.title} 
                 className={`flex flex-col border-border/60 hover:border-primary/80 transition-all duration-300 hover:shadow-lg relative overflow-hidden ${
-                  event.title === "Taco Tuesdays" ? "bg-cover bg-center bg-no-repeat" : ""
+                  event.title === "Taco Tuesdays" || event.title === "Bingo Night" ? "bg-cover bg-center bg-no-repeat" : ""
                 }`}
                 style={
                   event.title === "Taco Tuesdays" 
@@ -93,10 +94,15 @@ const Happenings = () => {
                         backgroundImage: `url(https://res.cloudinary.com/de3djsvlk/image/upload/v1753117392/taco_tuesday_card_gyrc53.jpg)`,
                         filter: 'grayscale(50%)',
                       }
+                    : event.title === "Bingo Night"
+                    ? {
+                        backgroundImage: `url(https://res.cloudinary.com/de3djsvlk/image/upload/v1753118240/A7305176_vrkjug.jpg)`,
+                        filter: 'grayscale(50%)',
+                      }
                     : {}
                 }
               >
-                {event.title === "Taco Tuesdays" && (
+                {(event.title === "Taco Tuesdays" || event.title === "Bingo Night") && (
                   <div className="absolute inset-0 bg-background/75 backdrop-blur-[1px]" />
                 )}
                 <CardHeader className="relative z-10">
