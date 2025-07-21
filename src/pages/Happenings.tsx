@@ -63,7 +63,7 @@ const Happenings = () => {
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold font-serif">Champions Happenings</h1>
           <p className="mt-4 text-lg md:text-xl text-muted-foreground">
-            We keep the fun rolling at Champions with weekly and seasonal events that bring the community together. Here’s what’s live right now:
+            We keep the fun rolling at Champions with weekly and seasonal events that bring the community together. Here's what's live right now:
           </p>
         </div>
 
@@ -82,14 +82,30 @@ const Happenings = () => {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {recurringEvents.map((event) => (
-              <Card key={event.title} className="flex flex-col border-border/60 hover:border-primary/80 transition-all duration-300 hover:shadow-lg">
-                <CardHeader>
+              <Card 
+                key={event.title} 
+                className={`flex flex-col border-border/60 hover:border-primary/80 transition-all duration-300 hover:shadow-lg relative overflow-hidden ${
+                  event.title === "Taco Tuesdays" ? "bg-cover bg-center bg-no-repeat" : ""
+                }`}
+                style={
+                  event.title === "Taco Tuesdays" 
+                    ? {
+                        backgroundImage: `url(https://res.cloudinary.com/de3djsvlk/image/upload/v1753117392/taco_tuesday_card_gyrc53.jpg)`,
+                        filter: 'grayscale(70%)',
+                      }
+                    : {}
+                }
+              >
+                {event.title === "Taco Tuesdays" && (
+                  <div className="absolute inset-0 bg-background/75 backdrop-blur-[1px]" />
+                )}
+                <CardHeader className="relative z-10">
                   <CardTitle className="flex items-center gap-4 text-2xl">
                     <span className="text-4xl">{event.emoji}</span>
                     {event.title}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="flex-grow flex flex-col">
+                <CardContent className="flex-grow flex flex-col relative z-10">
                     <p className="text-muted-foreground flex-grow">{event.description}</p>
                     {event.details && (
                         <div className="mt-4 space-y-2">
