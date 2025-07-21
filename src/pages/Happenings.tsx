@@ -91,7 +91,7 @@ const Happenings = () => {
                   event.title === "Taco Tuesdays" 
                     ? {
                         backgroundImage: `url(https://res.cloudinary.com/de3djsvlk/image/upload/v1753117392/taco_tuesday_card_gyrc53.jpg)`,
-                        filter: 'grayscale(70%)',
+                        filter: 'grayscale(50%)',
                       }
                     : {}
                 }
