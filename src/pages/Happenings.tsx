@@ -158,13 +158,13 @@ const Happenings = () => {
               <Card 
                 key={event.title} 
                 className={`flex flex-col border-border/60 hover:border-primary/80 transition-all duration-300 hover:shadow-lg max-w-3xl w-full relative overflow-hidden ${
-                  event.title === "Summer Cornhole League" ? "bg-cover bg-center bg-no-repeat" : ""
+                  event.title === "Summer Cornhole League" ? "bg-cover bg-no-repeat" : ""
                 }`}
                 style={
                   event.title === "Summer Cornhole League" 
                     ? {
                         backgroundImage: `url(https://res.cloudinary.com/de3djsvlk/image/upload/v1753120007/summer_cornhole_xbikfm.jpg)`,
-                        backgroundPosition: 'center top',
+                        backgroundPosition: 'center 20%',
                         filter: 'grayscale(50%)',
                       }
                     : {}
