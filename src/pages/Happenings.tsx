@@ -164,6 +164,7 @@ const Happenings = () => {
                   event.title === "Summer Cornhole League" 
                     ? {
                         backgroundImage: `url(https://res.cloudinary.com/de3djsvlk/image/upload/v1753120007/summer_cornhole_xbikfm.jpg)`,
+                        backgroundPosition: 'center top',
                         filter: 'grayscale(50%)',
                       }
                     : {}
