@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -60,8 +58,18 @@ const seasonalEvents = [
 
 const Happenings = () => {
   return (
-    <div className="bg-background py-16 md:py-24">
-      <div className="container">
+    <div 
+      className="py-16 md:py-24 relative"
+      style={{
+        backgroundImage: `url(https://res.cloudinary.com/de3djsvlk/image/upload/v1753119005/A7304962_psfeqt.jpg)`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        filter: 'grayscale(10%)',
+      }}
+    >
+      <div className="absolute inset-0 bg-background/40 backdrop-blur-sm" />
+      <div className="container relative z-10">
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold font-serif">Champions Happenings</h1>
           <p className="mt-4 text-lg md:text-xl text-muted-foreground">
