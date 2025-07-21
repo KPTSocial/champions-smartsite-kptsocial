@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -83,13 +82,13 @@ export function CalendarWithEventSlots({
   };
 
   return (
-    <Card className="w-fit py-4">
+    <Card className="w-full py-4">
       <CardContent className="px-4">
         <Calendar
           mode="single"
           selected={date}
           onSelect={handleDateSelect}
-          className="bg-transparent p-0 pointer-events-auto"
+          className="bg-transparent p-0 pointer-events-auto w-full"
           modifiers={{ hasEvent: eventDays }}
           modifiersClassNames={{ hasEvent: 'day-with-event' }}
           required
@@ -101,11 +100,11 @@ export function CalendarWithEventSlots({
           .day-with-event::after {
             content: '';
             position: absolute;
-            bottom: 6px;
+            bottom: 4px;
             left: 50%;
             transform: translateX(-50%);
-            width: 5px;
-            height: 5px;
+            width: 4px;
+            height: 4px;
             border-radius: 50%;
             background-color: hsl(var(--primary));
           }
@@ -114,6 +113,94 @@ export function CalendarWithEventSlots({
           }
           .day_selected.day-with-event::after {
             background-color: hsl(var(--primary-foreground));
+          }
+          
+          /* Full width responsive calendar styling */
+          .react-flow__node-calendar .react-flow__calendar {
+            width: 100% !important;
+          }
+          
+          .react-flow__node-calendar table {
+            width: 100% !important;
+            table-layout: fixed;
+          }
+          
+          .react-flow__node-calendar .react-flow__head_row,
+          .react-flow__node-calendar .react-flow__row {
+            display: grid !important;
+            grid-template-columns: repeat(7, 1fr) !important;
+            gap: 1px;
+            width: 100%;
+          }
+          
+          .react-flow__node-calendar .react-flow__head_cell,
+          .react-flow__node-calendar .react-flow__cell {
+            width: 100% !important;
+            height: auto !important;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+          }
+          
+          .react-flow__node-calendar .react-flow__day {
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 36px;
+            border-radius: 6px;
+            font-size: 14px;
+          }
+          
+          /* Mobile responsiveness */
+          @media (max-width: 640px) {
+            .react-flow__node-calendar .react-flow__head_cell,
+            .react-flow__node-calendar .react-flow__cell {
+              min-height: 32px;
+            }
+            
+            .react-flow__node-calendar .react-flow__day {
+              min-height: 32px;
+              font-size: 13px;
+            }
+            
+            .day-with-event::after {
+              width: 3px;
+              height: 3px;
+              bottom: 3px;
+            }
+          }
+          
+          /* Tablet responsiveness */
+          @media (min-width: 641px) and (max-width: 1024px) {
+            .react-flow__node-calendar .react-flow__head_cell,
+            .react-flow__node-calendar .react-flow__cell {
+              min-height: 40px;
+            }
+            
+            .react-flow__node-calendar .react-flow__day {
+              min-height: 40px;
+              font-size: 15px;
+            }
+          }
+          
+          /* Desktop */
+          @media (min-width: 1025px) {
+            .react-flow__node-calendar .react-flow__head_cell,
+            .react-flow__node-calendar .react-flow__cell {
+              min-height: 44px;
+            }
+            
+            .react-flow__node-calendar .react-flow__day {
+              min-height: 44px;
+              font-size: 16px;
+            }
+            
+            .day-with-event::after {
+              width: 5px;
+              height: 5px;
+              bottom: 5px;
+            }
           }
         `}</style>
       </CardContent>
