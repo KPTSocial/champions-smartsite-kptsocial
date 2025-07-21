@@ -65,8 +65,13 @@ export function CalendarWithEventSlots({
     });
   }, [events]);
 
-  const formatEventTime = (eventDate: string) => {
+  const formatEventTime = (eventDate: string, eventTitle?: string) => {
     try {
+      // Special handling for Taco Tuesday - show full business hours
+      if (eventTitle && eventTitle.toLowerCase().includes('taco tuesday')) {
+        return '11:00 AM - 10:00 PM PT';
+      }
+      
       // Convert UTC to Pacific Time and format with PT indicator
       return formatInTimeZone(new Date(eventDate), 'America/Los_Angeles', 'h:mm a') + ' PT';
     } catch {
@@ -232,7 +237,7 @@ export function CalendarWithEventSlots({
               >
                 <div className="font-medium">{event.event_title}</div>
                 <div className="text-muted-foreground text-xs">
-                  {event.event_date && formatEventTime(event.event_date)}
+                  {event.event_date && formatEventTime(event.event_date, event.event_title)}
                   {event.event_type && ` • ${event.event_type}`}
                 </div>
                 {event.description && (
