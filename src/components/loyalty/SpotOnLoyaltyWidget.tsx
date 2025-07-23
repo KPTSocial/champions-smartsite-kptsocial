@@ -114,7 +114,7 @@ const SpotOnLoyaltyWidget = () => {
       {/* Floating Button */}
       <div
         onClick={() => setIsModalOpen(true)}
-        className="fixed bottom-8 left-11 z-[99] flex items-center cursor-pointer rounded-3xl p-2 max-w-[187px] w-full shadow-lg"
+        className="fixed bottom-8 right-11 z-[99] flex items-center cursor-pointer rounded-3xl p-2 max-w-[187px] w-full shadow-lg"
         style={{
           backgroundColor: '#1254cc',
           boxShadow: '0 6px 12px rgba(53, 63, 94, 0.1)'
