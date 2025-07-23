@@ -55,7 +55,11 @@ export type Database = {
           id: string
           image_url: string | null
           is_featured: boolean
+          location: string | null
+          parent_event_id: string | null
+          recurring_pattern: string | null
           rsvp_link: string | null
+          status: string | null
         }
         Insert: {
           allow_rsvp?: boolean
@@ -67,7 +71,11 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_featured?: boolean
+          location?: string | null
+          parent_event_id?: string | null
+          recurring_pattern?: string | null
           rsvp_link?: string | null
+          status?: string | null
         }
         Update: {
           allow_rsvp?: boolean
@@ -79,9 +87,21 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_featured?: boolean
+          location?: string | null
+          parent_event_id?: string | null
+          recurring_pattern?: string | null
           rsvp_link?: string | null
+          status?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "events_parent_event_id_fkey"
+            columns: ["parent_event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       guest_feedback: {
         Row: {
