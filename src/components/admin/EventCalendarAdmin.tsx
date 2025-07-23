@@ -127,15 +127,14 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
       <div className="space-y-6">
         <Card>
           <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Calendar className="h-5 w-5" />
+            <CardTitle className="text-lg">
               {format(selectedDate, 'EEEE, MMMM d, yyyy')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {eventsForSelectedDate.length === 0 ? (
               <div className="text-center py-12">
-                <Calendar className="h-16 w-16 mx-auto text-muted-foreground mb-6" />
+                <Plus className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground mb-6 text-base">No events scheduled for this date</p>
                 <Button
                   variant="outline"
