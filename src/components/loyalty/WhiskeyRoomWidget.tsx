@@ -44,13 +44,22 @@ export function WhiskeyRoomWidget() {
 
   if (loading) {
     return (
-      <Card className="mb-6">
-        <CardHeader>
+      <Card 
+        className="mb-6 relative overflow-hidden"
+        style={{
+          backgroundImage: `url(https://res.cloudinary.com/de3djsvlk/image/upload/v1753312990/whiskey_room_t5j5o0.jpg)`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'top right',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
+        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+        <CardHeader className="relative z-10">
           <CardTitle className="flex items-center gap-3">
             <GlassWater className="text-primary" /> Whiskey Room
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative z-10">
           <Loader2 className="animate-spin mr-2 inline" /> Loading...
         </CardContent>
       </Card>
@@ -60,13 +69,22 @@ export function WhiskeyRoomWidget() {
   if (!member) {
     // Not a member (stub: joining logic not shown), demo messaging only.
     return (
-      <Card className="mb-6">
-        <CardHeader>
+      <Card 
+        className="mb-6 relative overflow-hidden"
+        style={{
+          backgroundImage: `url(https://res.cloudinary.com/de3djsvlk/image/upload/v1753312990/whiskey_room_t5j5o0.jpg)`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'top right',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
+        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+        <CardHeader className="relative z-10">
           <CardTitle className="flex items-center gap-3">
             <GlassWater className="text-primary" /> Whiskey Room
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative z-10">
           <div className="font-semibold mb-2">Unlock the Whiskey Room: Elite Spirits, Private Access</div>
           <ul className="list-disc ml-5 mb-3 text-muted-foreground text-sm">
             <li>Curated rare whiskeys</li>
@@ -84,13 +102,22 @@ export function WhiskeyRoomWidget() {
 
   // Show member info
   return (
-    <Card className="mb-6">
-      <CardHeader>
+    <Card 
+      className="mb-6 relative overflow-hidden"
+      style={{
+        backgroundImage: `url(https://res.cloudinary.com/de3djsvlk/image/upload/v1753312990/whiskey_room_t5j5o0.jpg)`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'top right',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
+      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+      <CardHeader className="relative z-10">
         <CardTitle className="flex items-center gap-3">
           <CheckSquare className="text-green-700" /> Whiskey Room Member
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative z-10">
         <div className="mb-2">
           <strong>Member Since:</strong> {new Date(member.joined_date).toLocaleDateString()}
         </div>
