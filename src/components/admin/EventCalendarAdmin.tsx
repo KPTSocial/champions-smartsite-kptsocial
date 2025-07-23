@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Event } from '@/services/eventService';
 import { Calendar } from '@/components/ui/calendar';
-import { ChevronLeft, ChevronRight, Plus, Edit, Trash2, Eye, MapPin, Clock } from 'lucide-react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths } from 'date-fns';
+import { Plus, Edit, Trash2, Eye, MapPin, Clock } from 'lucide-react';
+import { format, isSameDay } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import {
   AlertDialog,
@@ -26,15 +26,14 @@ interface EventCalendarAdminProps {
   onCreateEvent: () => void;
 }
 
-const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
-  events,
-  onEditEvent,
-  onDeleteEvent,
-  onPublishEvent,
-  onCreateEvent
+const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({ 
+  events, 
+  onEditEvent, 
+  onDeleteEvent, 
+  onPublishEvent, 
+  onCreateEvent 
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
 
   // Get events for the selected date
@@ -94,36 +93,13 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
       <div className="lg:col-span-2">
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Events Calendar</CardTitle>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <span className="font-medium min-w-32 text-center">
-                  {format(currentMonth, 'MMMM yyyy')}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+            <CardTitle>Events Calendar</CardTitle>
           </CardHeader>
           <CardContent>
             <Calendar
               mode="single"
               selected={selectedDate}
               onSelect={(date) => date && setSelectedDate(date)}
-              month={currentMonth}
-              onMonthChange={setCurrentMonth}
               modifiers={{
                 hasEvents: eventDays
               }}
