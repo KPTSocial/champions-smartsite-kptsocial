@@ -53,7 +53,7 @@ export function WhiskeyRoomWidget() {
           backgroundRepeat: 'no-repeat',
         }}
       >
-        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-background/40" />
         <CardHeader className="relative z-10">
           <CardTitle className="flex items-center gap-3">
             <GlassWater className="text-primary" /> Whiskey Room
@@ -78,7 +78,7 @@ export function WhiskeyRoomWidget() {
           backgroundRepeat: 'no-repeat',
         }}
       >
-        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+        <div className="absolute inset-0 bg-background/40" />
         <CardHeader className="relative z-10">
           <CardTitle className="flex items-center gap-3">
             <GlassWater className="text-primary" /> Whiskey Room
@@ -111,7 +111,7 @@ export function WhiskeyRoomWidget() {
         backgroundRepeat: 'no-repeat',
       }}
     >
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-background/40" />
       <CardHeader className="relative z-10">
         <CardTitle className="flex items-center gap-3">
           <CheckSquare className="text-green-700" /> Whiskey Room Member
