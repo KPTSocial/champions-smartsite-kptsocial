@@ -147,84 +147,86 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
                 </Button>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {eventsForSelectedDate.map((event) => (
-                  <Card key={event.id} className="hover:shadow-sm transition-shadow">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          <CardTitle className="text-base font-semibold mb-3">{event.event_title}</CardTitle>
-                          <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-2">
-                              <Clock className="h-4 w-4" />
-                              <span>{formatEventTime(event.event_date)}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <MapPin className="h-4 w-4" />
-                              <span className="capitalize">{event.location || 'on-site'}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <Badge variant={getStatusVariant(event.status || 'published')} className="shrink-0">
-                          {(event.status || 'published').charAt(0).toUpperCase() + (event.status || 'published').slice(1)}
+                  <div 
+                    key={event.id} 
+                    className="p-4 border rounded-lg hover:bg-muted/20 transition-colors"
+                  >
+                    {/* Header with title and status */}
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <h3 className="font-medium text-foreground leading-tight">
+                        {event.event_title}
+                      </h3>
+                      <Badge variant={getStatusVariant(event.status || 'published')} className="shrink-0">
+                        {(event.status || 'published').charAt(0).toUpperCase() + (event.status || 'published').slice(1)}
+                      </Badge>
+                    </div>
+
+                    {/* Event details */}
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5" />
+                        <span>{formatEventTime(event.event_date)}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <MapPin className="h-3.5 w-3.5" />
+                        <span className="capitalize">{event.location || 'on-site'}</span>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    {event.description && (
+                      <p className="text-sm text-muted-foreground mb-3 leading-relaxed">
+                        {event.description}
+                      </p>
+                    )}
+
+                    {/* Sub-event indicator */}
+                    {event.parent_event_id && (
+                      <div className="flex items-center gap-2 mb-3">
+                        <Badge variant="outline" className="text-xs">
+                          Related Event
                         </Badge>
+                        <span className="text-xs text-muted-foreground">Auto-generated from recurring event</span>
                       </div>
-                    </CardHeader>
-                    
-                    <CardContent className="space-y-4">
-                      {/* Description */}
-                      {event.description && (
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {event.description}
-                        </p>
-                      )}
+                    )}
 
-                      {/* Sub-event indicator */}
-                      {event.parent_event_id && (
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs font-normal">
-                            Related Event
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">Auto-generated from recurring event</span>
-                        </div>
+                    {/* Action buttons */}
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onEditEvent(event)}
+                        className="h-8"
+                      >
+                        <Edit className="h-3.5 w-3.5 mr-1.5" />
+                        Edit
+                      </Button>
+                      
+                      {event.status === 'draft' && (
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => onPublishEvent(event.id)}
+                          className="h-8"
+                        >
+                          <Eye className="h-3.5 w-3.5 mr-1.5" />
+                          Publish
+                        </Button>
                       )}
-
-                      {/* Action buttons */}
-                      <div className="flex items-center gap-2 pt-2 border-t">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onEditEvent(event)}
-                          className="gap-2 h-8"
-                        >
-                          <Edit className="h-4 w-4" />
-                          Edit
-                        </Button>
-                        
-                        {event.status === 'draft' && (
-                          <Button
-                            variant="default"
-                            size="sm"
-                            onClick={() => onPublishEvent(event.id)}
-                            className="gap-2 h-8"
-                          >
-                            <Eye className="h-4 w-4" />
-                            Publish
-                          </Button>
-                        )}
-                        
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDeleteClick(event.id)}
-                          className="gap-2 h-8 ml-auto"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          Delete
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteClick(event.id)}
+                        className="h-8 ml-auto"
+                      >
+                        <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
