@@ -15,6 +15,7 @@ import EnhancedFoodSection from '@/components/EnhancedFoodSection';
 import FoodSectionDisclaimer from '@/components/FoodSectionDisclaimer';
 import DrinksSectionDisclaimer from '@/components/DrinksSectionDisclaimer';
 import menuBackground from '@/assets/menu-background.jpg';
+import { createBackgroundStyle } from '@/lib/background-utils';
 
 const Menu = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -200,9 +201,7 @@ const Menu = () => {
     <div 
       className="min-h-screen"
       style={{
-        backgroundImage: `url(${menuBackground})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        ...createBackgroundStyle(menuBackground),
         backgroundAttachment: 'fixed'
       }}
     >
