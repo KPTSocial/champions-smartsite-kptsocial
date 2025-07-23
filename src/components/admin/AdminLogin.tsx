@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ArrowLeft } from 'lucide-react';
 
 const AdminLogin: React.FC = () => {
   const { isAdmin, loading, signIn } = useAdminAuth();
@@ -55,7 +56,15 @@ const AdminLogin: React.FC = () => {
         
         <Card>
           <CardHeader>
-            <CardTitle>Sign In</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>Sign In</CardTitle>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground">
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to Home
+                </Link>
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
