@@ -2,8 +2,18 @@ import React from 'react';
 import ReservationForm from '@/components/ReservationForm';
 import { GuestFeedbackForm } from "@/components/feedback/GuestFeedbackForm";
 const Reservations = () => {
-  return <div className="bg-background py-16 md:py-24">
-      <div className="container">
+  return <div 
+      className="relative min-h-screen py-16 md:py-24"
+      style={{
+        backgroundImage: 'url(https://res.cloudinary.com/de3djsvlk/image/upload/v1753308641/A7305076_rdlcc6.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        filter: 'grayscale(10%)'
+      }}
+    >
+      <div className="absolute inset-0 bg-background/40 backdrop-blur-sm" />
+      <div className="container relative z-10">
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold font-serif">Make a Reservation</h1>
           <p className="mt-4 text-lg md:text-xl text-muted-foreground">
