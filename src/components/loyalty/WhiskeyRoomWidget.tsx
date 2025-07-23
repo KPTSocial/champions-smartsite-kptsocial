@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { GlassWater, Loader2, CheckSquare } from "lucide-react";
 
 type WhiskeyRoomMember = {
@@ -72,7 +73,10 @@ export function WhiskeyRoomWidget() {
             <li>Special tasting events</li>
             <li>Personal locker for your bottles</li>
           </ul>
-          <div className="text-muted-foreground text-xs">See staff for details about joining.</div>
+          <Button variant="default" size="sm" onClick={() => console.log('Whiskey Room interest captured')} className="mt-2">
+            <GlassWater className="w-4 h-4 mr-2" />
+            Join the Whiskey List
+          </Button>
         </CardContent>
       </Card>
     );

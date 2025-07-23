@@ -73,8 +73,9 @@ export function MugClubWidget() {
             <li>Tap alerts when your favorite keg is on</li>
             <li>Exclusive events & early-access perks</li>
           </ul>
-          <Button variant="secondary" size="sm" disabled>
-            Membership Full (Demo Only)
+          <Button variant="default" size="sm" onClick={() => console.log('Mug Club interest captured')}>
+            <Beer className="w-4 h-4 mr-2" />
+            Join the Waitlist
           </Button>
         </CardContent>
       </Card>
