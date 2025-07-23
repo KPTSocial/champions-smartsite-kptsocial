@@ -22,8 +22,18 @@ const PhotoBooth = () => {
   }, [isInstallable, isInstalled]);
 
   return (
-    <div className="container py-8 md:py-16 lg:py-24 px-4 md:px-6">
-      <NetworkStatus />
+    <div 
+      className="relative min-h-screen py-8 md:py-16 lg:py-24"
+      style={{
+        backgroundImage: 'url(https://res.cloudinary.com/de3djsvlk/image/upload/v1753309320/Untitled_design_pruvpx.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="absolute inset-0 bg-background/40 backdrop-blur-sm" />
+      <div className="container px-4 md:px-6 relative z-10">
+        <NetworkStatus />
       
       <div className="text-center">
         <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold font-serif leading-tight">
@@ -44,6 +54,7 @@ const PhotoBooth = () => {
       {showInstallPrompt && (
         <InstallPrompt onDismiss={() => setShowInstallPrompt(false)} />
       )}
+      </div>
     </div>
   );
 };
