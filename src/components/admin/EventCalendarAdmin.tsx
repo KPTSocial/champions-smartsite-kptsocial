@@ -172,12 +172,11 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
             ) : (
               <div className="space-y-4">
                 {eventsForSelectedDate.map((event) => (
-                  <div key={event.id} className="border rounded-lg p-5 bg-card hover:shadow-sm transition-shadow">
-                    <div className="space-y-4">
-                      {/* Header with title and status */}
+                  <Card key={event.id} className="hover:shadow-sm transition-shadow">
+                    <CardHeader className="pb-3">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-base text-foreground mb-2">{event.event_title}</h3>
+                          <CardTitle className="text-base font-semibold mb-3">{event.event_title}</CardTitle>
                           <div className="flex items-center gap-6 text-sm text-muted-foreground">
                             <div className="flex items-center gap-2">
                               <Clock className="h-4 w-4" />
@@ -193,7 +192,9 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
                           {(event.status || 'published').charAt(0).toUpperCase() + (event.status || 'published').slice(1)}
                         </Badge>
                       </div>
-
+                    </CardHeader>
+                    
+                    <CardContent className="space-y-4">
                       {/* Description */}
                       {event.description && (
                         <p className="text-sm text-muted-foreground leading-relaxed">
@@ -212,12 +213,12 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
                       )}
 
                       {/* Action buttons */}
-                      <div className="flex items-center gap-2 pt-2">
+                      <div className="flex items-center gap-2 pt-2 border-t">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => onEditEvent(event)}
-                          className="gap-2"
+                          className="gap-2 h-8"
                         >
                           <Edit className="h-4 w-4" />
                           Edit
@@ -228,7 +229,7 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
                             variant="default"
                             size="sm"
                             onClick={() => onPublishEvent(event.id)}
-                            className="gap-2"
+                            className="gap-2 h-8"
                           >
                             <Eye className="h-4 w-4" />
                             Publish
@@ -239,14 +240,14 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
                           variant="destructive"
                           size="sm"
                           onClick={() => handleDeleteClick(event.id)}
-                          className="gap-2 ml-auto"
+                          className="gap-2 h-8 ml-auto"
                         >
                           <Trash2 className="h-4 w-4" />
                           Delete
                         </Button>
                       </div>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             )}
