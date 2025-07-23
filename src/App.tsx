@@ -11,7 +11,7 @@ import Index from "./pages/Index";
 import AboutUs from "./pages/AboutUs";
 import PhotoBooth from "./pages/PhotoBooth";
 import Menu from "./pages/Menu";
-import MemberDashboard from "./pages/MemberDashboard";
+import LoyaltyPage from "./pages/LoyaltyPage";
 import Happenings from "./pages/Happenings";
 import Reservations from "./pages/Reservations";
 import NotFound from "./pages/NotFound";
@@ -36,7 +36,7 @@ const App = () => (
           <Route path="/happenings" element={<Layout><Happenings /></Layout>} />
           <Route path="/photo-booth" element={<Layout><PhotoBooth /></Layout>} />
           <Route path="/menu" element={<Layout><Menu /></Layout>} />
-          <Route path="/member-dashboard" element={<Layout><MemberDashboard /></Layout>} />
+          <Route path="/loyalty" element={<Layout><LoyaltyPage /></Layout>} />
           <Route path="/reservations" element={<Layout><Reservations /></Layout>} />
           
           {/* Admin routes without public layout */}
