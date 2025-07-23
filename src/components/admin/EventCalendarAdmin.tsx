@@ -62,18 +62,18 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
       case 'published':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'default';
       case 'draft':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return 'secondary';
       case 'cancelled':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'destructive';
       case 'archived':
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'outline';
       default:
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'outline';
     }
   };
 
@@ -147,126 +147,139 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
       </div>
 
       {/* Events for Selected Date */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Calendar className="h-5 w-5" />
               {format(selectedDate, 'EEEE, MMMM d, yyyy')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {eventsForSelectedDate.length === 0 ? (
-              <div className="text-center py-8">
-                <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground mb-4">No events scheduled for this date</p>
+              <div className="text-center py-12">
+                <Calendar className="h-16 w-16 mx-auto text-muted-foreground mb-6" />
+                <p className="text-muted-foreground mb-6 text-base">No events scheduled for this date</p>
                 <Button
                   variant="outline"
-                  size="sm"
                   onClick={onCreateEvent}
                   className="gap-2"
                 >
-                  <Plus className="h-3 w-3" />
+                  <Plus className="h-4 w-4" />
                   Add Event
                 </Button>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {eventsForSelectedDate.map((event) => (
-                  <Card key={event.id} className="relative">
-                    <CardContent className="p-4">
-                      <div className="space-y-3">
-                        <div className="flex items-start justify-between">
-                          <div className="space-y-1">
-                            <h3 className="font-semibold text-sm">{event.event_title}</h3>
-                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
-                                {formatEventTime(event.event_date)}
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <MapPin className="h-3 w-3" />
-                                {event.location}
-                              </div>
+                  <div key={event.id} className="border rounded-lg p-5 bg-card hover:shadow-sm transition-shadow">
+                    <div className="space-y-4">
+                      {/* Header with title and status */}
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-base text-foreground mb-2">{event.event_title}</h3>
+                          <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                            <div className="flex items-center gap-2">
+                              <Clock className="h-4 w-4" />
+                              <span>{formatEventTime(event.event_date)}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <MapPin className="h-4 w-4" />
+                              <span className="capitalize">{event.location || 'on-site'}</span>
                             </div>
                           </div>
-                          <Badge className={`text-xs ${getStatusColor(event.status || 'published')}`}>
-                            {event.status || 'published'}
-                          </Badge>
                         </div>
-
-                        {event.description && (
-                          <p className="text-xs text-muted-foreground line-clamp-2">
-                            {event.description}
-                          </p>
-                        )}
-
-                        <div className="flex items-center gap-1">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onEditEvent(event)}
-                            className="h-7 px-2 gap-1"
-                          >
-                            <Edit className="h-3 w-3" />
-                            Edit
-                          </Button>
-                          
-                          {event.status === 'draft' && (
-                            <Button
-                              variant="default"
-                              size="sm"
-                              onClick={() => onPublishEvent(event.id)}
-                              className="h-7 px-2 gap-1"
-                            >
-                              <Eye className="h-3 w-3" />
-                              Publish
-                            </Button>
-                          )}
-                          
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDeleteClick(event.id)}
-                            className="h-7 px-2 gap-1 text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                            Delete
-                          </Button>
-                        </div>
-
-                        {event.parent_event_id && (
-                          <div className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                            🔗 Sub-event of main event
-                          </div>
-                        )}
+                        <Badge variant={getStatusVariant(event.status || 'published')} className="shrink-0">
+                          {(event.status || 'published').charAt(0).toUpperCase() + (event.status || 'published').slice(1)}
+                        </Badge>
                       </div>
-                    </CardContent>
-                  </Card>
+
+                      {/* Description */}
+                      {event.description && (
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {event.description}
+                        </p>
+                      )}
+
+                      {/* Sub-event indicator */}
+                      {event.parent_event_id && (
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="text-xs font-normal">
+                            Related Event
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">Auto-generated from recurring event</span>
+                        </div>
+                      )}
+
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-2 pt-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onEditEvent(event)}
+                          className="gap-2"
+                        >
+                          <Edit className="h-4 w-4" />
+                          Edit
+                        </Button>
+                        
+                        {event.status === 'draft' && (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => onPublishEvent(event.id)}
+                            className="gap-2"
+                          >
+                            <Eye className="h-4 w-4" />
+                            Publish
+                          </Button>
+                        )}
+                        
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteClick(event.id)}
+                          className="gap-2 ml-auto"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Legend */}
+        {/* Enhanced Legend */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Legend</CardTitle>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Status Guide</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="flex items-center gap-2 text-xs">
-              <div className="w-3 h-3 rounded bg-primary/20 border border-primary/30"></div>
-              <span>Days with events</span>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-4 h-4 rounded-full bg-primary/20 border-2 border-primary/40"></div>
+              <span className="text-sm text-muted-foreground">Calendar days with scheduled events</span>
             </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-xs">
-                <Badge className={`text-xs ${getStatusColor('published')}`}>Published</Badge>
-                <span>Live on public calendar</span>
+            
+            <div className="space-y-3 pt-2 border-t">
+              <div className="flex items-center gap-3">
+                <Badge variant="default">Published</Badge>
+                <span className="text-sm text-muted-foreground">Visible on public calendar</span>
               </div>
-              <div className="flex items-center gap-2 text-xs">
-                <Badge className={`text-xs ${getStatusColor('draft')}`}>Draft</Badge>
-                <span>Not yet published</span>
+              <div className="flex items-center gap-3">
+                <Badge variant="secondary">Draft</Badge>
+                <span className="text-sm text-muted-foreground">Saved but not yet published</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Badge variant="destructive">Cancelled</Badge>
+                <span className="text-sm text-muted-foreground">Event cancelled</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Badge variant="outline">Related Event</Badge>
+                <span className="text-sm text-muted-foreground">Auto-generated from recurring events</span>
               </div>
             </div>
           </CardContent>
