@@ -45,13 +45,22 @@ export function MugClubWidget() {
 
   if (loading) {
     return (
-      <Card className="mb-6">
-        <CardHeader>
+      <Card 
+        className="mb-6 relative overflow-hidden"
+        style={{
+          backgroundImage: 'url(https://res.cloudinary.com/de3djsvlk/image/upload/v1753369798/mug_club_card_bwhh8y.jpg)',
+          backgroundPosition: 'top left',
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        <div className="absolute inset-0 bg-background/30" />
+        <CardHeader className="relative z-10">
           <CardTitle className="flex items-center gap-3">
             <Beer className="text-primary" /> Mug Club Portal
           </CardTitle>
         </CardHeader>
-        <CardContent><Loader2 className="animate-spin mr-2 inline" /> Loading...</CardContent>
+        <CardContent className="relative z-10"><Loader2 className="animate-spin mr-2 inline" /> Loading...</CardContent>
       </Card>
     );
   }
@@ -59,13 +68,22 @@ export function MugClubWidget() {
   if (!member) {
     // Not a member, show join option (NO payment logic yet, just stub)
     return (
-      <Card className="mb-6">
-        <CardHeader>
+      <Card 
+        className="mb-6 relative overflow-hidden"
+        style={{
+          backgroundImage: 'url(https://res.cloudinary.com/de3djsvlk/image/upload/v1753369798/mug_club_card_bwhh8y.jpg)',
+          backgroundPosition: 'top left',
+          backgroundSize: 'cover',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        <div className="absolute inset-0 bg-background/30" />
+        <CardHeader className="relative z-10">
           <CardTitle className="flex items-center gap-3">
             <Beer className="text-primary" /> Mug Club Portal
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative z-10">
           <div className="mb-2 font-semibold">Join the Mug Club: Your Name. Your Mug. Your Tap.</div>
           <ul className="list-disc ml-5 mb-4 text-muted-foreground text-sm">
             <li>Engraved mug behind the bar</li>
@@ -84,13 +102,22 @@ export function MugClubWidget() {
 
   // Show member info
   return (
-    <Card className="mb-6">
-      <CardHeader>
+    <Card 
+      className="mb-6 relative overflow-hidden"
+      style={{
+        backgroundImage: 'url(https://res.cloudinary.com/de3djsvlk/image/upload/v1753369798/mug_club_card_bwhh8y.jpg)',
+        backgroundPosition: 'top left',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className="absolute inset-0 bg-background/30" />
+      <CardHeader className="relative z-10">
         <CardTitle className="flex items-center gap-3">
           <BadgeCheck className="text-green-600" /> Mug Club Member Status
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative z-10">
         <div className="mb-2">
           <strong>Engraved Name:</strong> {member.engraved_name}
         </div>
