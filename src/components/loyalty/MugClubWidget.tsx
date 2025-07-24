@@ -84,7 +84,7 @@ export function MugClubWidget() {
           </CardTitle>
         </CardHeader>
         <CardContent className="relative z-10">
-          <div className="mb-2 font-semibold">Join the Mug Club: Your Name. Your Mug. Your Tap.</div>
+          <div className="mb-2 font-semibold">Join the Mug Club: Your Name. Your Mug.</div>
           <ul className="list-disc ml-5 mb-4 text-muted-foreground text-sm">
             <li>Engraved mug behind the bar</li>
             <li>Discounted draft pours, all the time</li>
