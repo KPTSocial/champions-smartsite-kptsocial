@@ -71,7 +71,7 @@ const Index = () => {
                 content.section_name === 'qr_codes' ? (
                   <div key={content.id} className="text-center p-6 border border-border rounded-lg bg-card shadow-sm flex flex-col">
                     <h3 className="text-2xl md:text-3xl font-serif font-semibold mb-2">{content.title}</h3>
-                    <p className="mt-2 text-muted-foreground mb-4">{content.description}</p>
+                    <p className="mt-2 text-muted-foreground mb-4">Scan OR Press QR code for draft and bottle list.</p>
                     <div className="w-full flex-1 flex flex-col justify-center">
                       <div className="grid grid-cols-2 gap-4 md:flex md:gap-8 justify-center items-start">
                         {/* Draft List QR */}
