@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { CalendarWithEventSlots } from '@/components/ui/calendar-with-event-slots';
 import { getEvents, type Event as EventType } from '@/services/eventService';
 import { Skeleton } from '@/components/ui/skeleton';
+// Simplified calendar view - removed week view toggle
 
 const EventCalendar = () => {
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
