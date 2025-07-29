@@ -14,11 +14,18 @@ const recurringEvents = [{
   title: "Trivia Night",
   emoji: "🧠",
   description: "Flex those brain muscles every Tuesday at 6 PM—hosted by Last Call Trivia. Gather your crew and show off your smarts!",
-  cta: {
-    text: "Learn More",
-    href: "https://www.lastcalltrivia.com/",
-    external: true
-  },
+  ctas: [
+    {
+      text: "Learn More",
+      href: "https://www.lastcalltrivia.com/",
+      external: true
+    },
+    {
+      text: "Reserve a Spot",
+      href: "/reservations",
+      external: false
+    }
+  ],
   backgroundImage: "https://res.cloudinary.com/de3djsvlk/image/upload/v1753118533/trivia_night_image_r6s7vy.jpg"
 }, {
   title: "Bingo Night",
@@ -36,7 +43,7 @@ export function RecurringEventsSection() {
   return <section className="mt-16">
       <h2 className="text-3xl md:text-4xl font-bold font-serif text-center mb-12">Recurring Events</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {recurringEvents.map(event => <EventCard key={event.title} title={event.title} emoji={event.emoji} description={event.description} details={event.details} cta={event.cta} backgroundImage={event.backgroundImage} />)}
+        {recurringEvents.map(event => <EventCard key={event.title} title={event.title} emoji={event.emoji} description={event.description} details={event.details} cta={event.cta} ctas={event.ctas} backgroundImage={event.backgroundImage} />)}
       </div>
     </section>;
 }

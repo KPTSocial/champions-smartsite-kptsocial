@@ -17,6 +17,7 @@ interface EventCardProps {
   description: string;
   details?: string[];
   cta?: EventCta;
+  ctas?: EventCta[];
   backgroundImage?: string;
   className?: string;
   style?: React.CSSProperties;
@@ -28,6 +29,7 @@ export function EventCard({
   description,
   details,
   cta,
+  ctas,
   backgroundImage,
   className = "",
   style = {}
@@ -81,7 +83,25 @@ export function EventCard({
             )}
           </div>
         )}
-        {cta && (
+        {ctas ? (
+          <div className="grid grid-cols-2 gap-3 mt-6">
+            {ctas.map((ctaItem, index) => (
+              <Button key={index} asChild className="w-full">
+                {ctaItem.external ? (
+                  <a href={ctaItem.href} target="_blank" rel="noopener noreferrer">
+                    {ctaItem.icon && <ctaItem.icon className="mr-2 h-4 w-4" />}
+                    {ctaItem.text}
+                  </a>
+                ) : (
+                  <Link to={ctaItem.href}>
+                    {ctaItem.icon && <ctaItem.icon className="mr-2 h-4 w-4" />}
+                    {ctaItem.text}
+                  </Link>
+                )}
+              </Button>
+            ))}
+          </div>
+        ) : cta && (
           <Button asChild className="mt-6 w-full">
             {cta.external ? (
               <a href={cta.href} target="_blank" rel="noopener noreferrer">
