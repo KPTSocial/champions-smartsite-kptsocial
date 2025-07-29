@@ -3,7 +3,7 @@ import { EventCard } from './EventCard';
 const recurringEvents = [{
   title: "Taco Tuesdays",
   emoji: "🌮",
-  description: "All-day tacos & Mexican beer specials. Choose from ground beef, shredded chicken, carnitas, or mahi mahi, and pair with a cold one. Every Tuesday.",
+  description: "All-day tacos & Mexican beer specials. Choose from ground beef or shredded chicken, and pair with a cold one. Every Tuesday.",
   cta: {
     text: "View Menu",
     href: "/menu",
