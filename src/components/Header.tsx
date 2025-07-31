@@ -37,11 +37,6 @@ const Header = () => {
               {item.name}
             </NavLink>)}
         </nav>
-        <div className="hidden lg:flex">
-          <Button asChild>
-            <Link to="/reservations">Reservations</Link>
-          </Button>
-        </div>
         
         <div className="lg:hidden">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -65,13 +60,6 @@ const Header = () => {
                     </NavLink>)}
                 </nav>
                 
-                <div className="mt-8 px-4">
-                  <Button asChild className="w-full h-12 text-base font-medium">
-                    <Link to="/reservations" onClick={() => setIsOpen(false)}>
-                      Make Reservation
-                    </Link>
-                  </Button>
-                </div>
               </div>
             </SheetContent>
           </Sheet>

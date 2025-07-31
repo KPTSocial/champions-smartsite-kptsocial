@@ -35,7 +35,7 @@ const Index = () => {
             Where Great Sports & Great Food Meet
           </h1>
           <p className="mt-4 text-lg md:text-xl max-w-3xl mx-auto drop-shadow-md">Experience the thrill of the game and the taste of locally-sourced, PNW cuisine. Welcome to your new favorite spot.</p>
-          <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+          <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto">
             <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
               <Link to="/menu">View The Menu</Link>
             </Button>
@@ -43,6 +43,9 @@ const Index = () => {
               <a href="https://championssportbar.shop.securetree.com/" target="_blank" rel="noopener noreferrer">
                 Gift Cards
               </a>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-black">
+              <Link to="/reservations">Reservations</Link>
             </Button>
           </div>
         </div>
