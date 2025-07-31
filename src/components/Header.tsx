@@ -27,7 +27,7 @@ const Header = () => {
   return <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container h-20 flex items-center justify-between">
         <Link to="/" className="flex items-center">
-          <img alt="Champions Sports Bar & Grill Logo" src="https://res.cloudinary.com/de3djsvlk/image/upload/v1752102164/Champions_logo_charcoal_b4caoh.png" className="h-12 w-auto object-scale-down" />
+          <img alt="Champions Sports Bar & Grill Logo" src="https://res.cloudinary.com/de3djsvlk/image/upload/v1752102164/Champions_logo_charcoal_b4caoh.png" className="h-12 lg:h-16 w-auto object-scale-down" />
         </Link>
         
         <nav className="hidden lg:flex items-center gap-6">
