@@ -44,7 +44,7 @@ const Index = () => {
                 Gift Cards
               </a>
             </Button>
-            <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-black">
+            <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
               <Link to="/reservations">Reservations</Link>
             </Button>
           </div>
