@@ -10,7 +10,9 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import MobileMenuNavigation from '@/components/MobileMenuNavigation';
 import DesktopMenuNavigation from '@/components/DesktopMenuNavigation';
 import EnhancedMenuTabs from '@/components/EnhancedMenuTabs';
+import MobileMenuSectionDropdown from '@/components/MobileMenuSectionDropdown';
 import EnhancedFoodSection from '@/components/EnhancedFoodSection';
+import MobileFoodCategorySelector from '@/components/MobileFoodCategorySelector';
 import MenuCategoryCard from '@/components/MenuCategoryCard';
 import FoodSectionDisclaimer from '@/components/FoodSectionDisclaimer';
 import DrinksSectionDisclaimer from '@/components/DrinksSectionDisclaimer';
@@ -215,25 +217,35 @@ const Menu = () => {
           </div>
         </div>
 
-        {/* Enhanced Tab Navigation */}
+        {/* Navigation */}
         <div className="menu-section rounded-lg p-8 mb-8">
           {menuData && (
-            <EnhancedMenuTabs
-              sections={menuData}
-              activeSection={activeSection}
-              onSectionChange={handleSectionChange}
-            />
+            isMobile ? (
+              <MobileMenuSectionDropdown
+                sections={menuData}
+                activeSection={activeSection}
+                onSectionChange={handleSectionChange}
+              />
+            ) : (
+              <EnhancedMenuTabs
+                sections={menuData}
+                activeSection={activeSection}
+                onSectionChange={handleSectionChange}
+              />
+            )
           )}
           
-          <div className="mb-8 max-w-lg mx-auto">
-            <Input
-              type="text"
-              placeholder="Search for a dish, category, or section..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="text-lg p-6 bg-background/80 backdrop-blur-sm"
-            />
-          </div>
+          {!isMobile && (
+            <div className="mb-8 max-w-lg mx-auto">
+              <Input
+                type="text"
+                placeholder="Search for a dish, category, or section..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="text-lg p-6 bg-background/80 backdrop-blur-sm"
+              />
+            </div>
+          )}
         </div>
         {/* Enhanced Menu Content */}
         <div className="menu-section rounded-lg p-8">
@@ -243,17 +255,53 @@ const Menu = () => {
                 .filter(section => !activeSection || section.id === activeSection)
                 .map(section => (
                   isFoodSection(section) ? (
-                    <EnhancedFoodSection
-                      key={section.id}
-                      section={section}
-                      selectedCategory={selectedFoodCategory}
-                      onCategorySelect={handleFoodCategoryChange}
-                    />
+                    isMobile ? (
+                      <section key={section.id} id={section.name.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-20">
+                        <h2 className="text-3xl font-serif font-bold mb-4 text-center text-secondary">{section.name}</h2>
+                        {section.description && <p className="text-muted-foreground mb-6 max-w-3xl mx-auto text-center text-sm">{section.description}</p>}
+                        
+                        <MobileFoodCategorySelector
+                          categories={section.categories}
+                          selectedCategory={selectedFoodCategory}
+                          onCategorySelect={handleFoodCategoryChange}
+                        />
+                        
+                        <div className="space-y-4">
+                          {(selectedFoodCategory 
+                            ? section.categories.filter(cat => cat.id === selectedFoodCategory)
+                            : section.categories
+                          ).map((category) => (
+                            <MenuCategoryCard 
+                              key={category.id} 
+                              category={category} 
+                              sectionName={section.name}
+                            />
+                          ))}
+                        </div>
+                        
+                        {section.categories.length > 0 && (
+                          <FoodSectionDisclaimer categoryDescription={section.description} />
+                        )}
+                      </section>
+                    ) : (
+                      <EnhancedFoodSection
+                        key={section.id}
+                        section={section}
+                        selectedCategory={selectedFoodCategory}
+                        onCategorySelect={handleFoodCategoryChange}
+                      />
+                    )
                   ) : (
                     <section key={section.id} id={section.name.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-20">
-                      <h2 className="text-4xl font-serif font-bold mb-4 text-center text-secondary">{section.name}</h2>
-                      {section.description && <p className="text-muted-foreground mb-12 max-w-3xl mx-auto text-center">{section.description}</p>}
-                      <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+                      <h2 className={`font-serif font-bold mb-4 text-center text-secondary ${isMobile ? "text-3xl" : "text-4xl"}`}>
+                        {section.name}
+                      </h2>
+                      {section.description && (
+                        <p className={`text-muted-foreground max-w-3xl mx-auto text-center ${isMobile ? "text-sm mb-6" : "mb-12"}`}>
+                          {section.description}
+                        </p>
+                      )}
+                      <div className={`grid gap-6 ${isMobile ? "grid-cols-1" : "sm:grid-cols-1 lg:grid-cols-2"}`}>
                         {section.categories.map((category) => (
                           <MenuCategoryCard 
                             key={category.id} 
