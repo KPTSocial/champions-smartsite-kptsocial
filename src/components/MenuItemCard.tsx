@@ -11,10 +11,8 @@ const MenuItemCard = ({ item }: { item: MenuItem }) => {
       </CardHeader>
       <CardContent className="flex-grow">
         <CardDescription>{item.description}</CardDescription>
+        <p className="text-sm text-muted-foreground mt-2">{formatCurrency(item.price)}</p>
       </CardContent>
-      <CardFooter>
-        <p className="font-semibold text-lg text-primary">{formatCurrency(item.price)}</p>
-      </CardFooter>
     </Card>
   );
 };
