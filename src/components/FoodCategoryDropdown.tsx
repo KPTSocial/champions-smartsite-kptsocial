@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MenuCategory } from '@/types/menu';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
@@ -14,15 +14,28 @@ const FoodCategoryDropdown: React.FC<FoodCategoryDropdownProps> = ({
   selectedCategory, 
   onCategorySelect 
 }) => {
+  const [accordionValue, setAccordionValue] = useState<string | undefined>(undefined);
+
   if (!categories || categories.length === 0) {
     return null;
   }
 
   const selectedCategoryData = categories.find(cat => cat.id === selectedCategory);
 
+  const handleCategorySelect = (categoryId: string | null) => {
+    onCategorySelect(categoryId);
+    setAccordionValue(undefined); // Close accordion
+  };
+
   return (
     <div className="mb-8">
-      <Accordion type="single" collapsible className="w-full">
+      <Accordion 
+        type="single" 
+        collapsible 
+        className="w-full"
+        value={accordionValue}
+        onValueChange={setAccordionValue}
+      >
         <AccordionItem value="food-categories" className="bg-background/70 backdrop-blur-sm rounded-lg border border-border/50">
           <AccordionTrigger className="px-6 py-4 hover:no-underline">
             <div className="flex items-center gap-3">
@@ -39,7 +52,7 @@ const FoodCategoryDropdown: React.FC<FoodCategoryDropdownProps> = ({
           <AccordionContent className="px-6 pb-4">
             <div className="space-y-4">
               <button
-                onClick={() => onCategorySelect(null)}
+                onClick={() => handleCategorySelect(null)}
                 className={`w-full text-left p-3 rounded-lg transition-colors ${
                   !selectedCategory 
                     ? 'bg-primary/20 text-primary border border-primary/30' 
@@ -61,7 +74,7 @@ const FoodCategoryDropdown: React.FC<FoodCategoryDropdownProps> = ({
                   {categories.slice(0, 3).map((category) => (
                     <button
                       key={category.id}
-                      onClick={() => onCategorySelect(category.id)}
+                       onClick={() => handleCategorySelect(category.id)}
                       className={`p-3 rounded-lg transition-colors text-center ${
                         selectedCategory === category.id 
                           ? 'bg-primary/20 text-primary border border-primary/30' 
@@ -81,7 +94,7 @@ const FoodCategoryDropdown: React.FC<FoodCategoryDropdownProps> = ({
                   {categories.slice(3, 6).map((category) => (
                     <button
                       key={category.id}
-                      onClick={() => onCategorySelect(category.id)}
+                       onClick={() => handleCategorySelect(category.id)}
                       className={`p-3 rounded-lg transition-colors text-center ${
                         selectedCategory === category.id 
                           ? 'bg-primary/20 text-primary border border-primary/30' 
@@ -101,7 +114,7 @@ const FoodCategoryDropdown: React.FC<FoodCategoryDropdownProps> = ({
                   {categories.slice(6, 9).map((category) => (
                     <button
                       key={category.id}
-                      onClick={() => onCategorySelect(category.id)}
+                       onClick={() => handleCategorySelect(category.id)}
                       className={`p-3 rounded-lg transition-colors text-center ${
                         selectedCategory === category.id 
                           ? 'bg-primary/20 text-primary border border-primary/30' 
@@ -122,7 +135,7 @@ const FoodCategoryDropdown: React.FC<FoodCategoryDropdownProps> = ({
                     {categories.slice(9).map((category) => (
                       <button
                         key={category.id}
-                        onClick={() => onCategorySelect(category.id)}
+                        onClick={() => handleCategorySelect(category.id)}
                         className={`p-3 rounded-lg transition-colors text-center ${
                           selectedCategory === category.id 
                             ? 'bg-primary/20 text-primary border border-primary/30' 
