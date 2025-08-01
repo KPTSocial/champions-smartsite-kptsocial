@@ -14,7 +14,7 @@ const FoodCategoryDropdown: React.FC<FoodCategoryDropdownProps> = ({
   selectedCategory, 
   onCategorySelect 
 }) => {
-  const [accordionValue, setAccordionValue] = useState<string | undefined>(undefined);
+  const [resetKey, setResetKey] = useState(0);
 
   if (!categories || categories.length === 0) {
     return null;
@@ -24,17 +24,16 @@ const FoodCategoryDropdown: React.FC<FoodCategoryDropdownProps> = ({
 
   const handleCategorySelect = (categoryId: string | null) => {
     onCategorySelect(categoryId);
-    setAccordionValue(undefined); // Close accordion
+    setResetKey(prev => prev + 1); // Force accordion to reset/close
   };
 
   return (
     <div className="mb-8">
       <Accordion 
+        key={resetKey}
         type="single" 
         collapsible 
         className="w-full"
-        value={accordionValue}
-        onValueChange={setAccordionValue}
       >
         <AccordionItem value="food-categories" className="bg-background/70 backdrop-blur-sm rounded-lg border border-border/50">
           <AccordionTrigger className="px-6 py-4 hover:no-underline">
