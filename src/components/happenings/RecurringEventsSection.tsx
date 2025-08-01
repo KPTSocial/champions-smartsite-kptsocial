@@ -13,7 +13,7 @@ const recurringEvents = [{
 }, {
   title: "Trivia Night",
   emoji: "🧠",
-  description: "Flex those brain muscles every Tuesday at 6 PM—hosted by Last Call Trivia. Gather your crew and show off your smarts!",
+  description: "Flex those brain muscles every Tuesday at 6 PM—hosted by Last Call Trivia. Gather your crew and show off your smarts! Call ahead for groups of 5+.",
   ctas: [
     {
       text: "Learn More",
