@@ -1,8 +1,6 @@
 import React from 'react';
 import { MenuSection } from '@/types/menu';
-import { useIsMobile } from '@/hooks/use-mobile';
 import FoodCategoryDropdown from './FoodCategoryDropdown';
-import DesktopFoodCategoryGrid from './DesktopFoodCategoryGrid';
 import EnhancedMenuCategorySection from './EnhancedMenuCategorySection';
 
 interface EnhancedFoodSectionProps {
@@ -16,8 +14,6 @@ const EnhancedFoodSection: React.FC<EnhancedFoodSectionProps> = ({
   selectedCategory, 
   onCategorySelect 
 }) => {
-  const isMobile = useIsMobile();
-  
   // Filter categories based on selection
   const displayCategories = selectedCategory 
     ? section.categories.filter(cat => cat.id === selectedCategory)
@@ -28,14 +24,6 @@ const EnhancedFoodSection: React.FC<EnhancedFoodSectionProps> = ({
       <h2 className="text-4xl font-serif font-bold mb-4 text-center text-secondary">{section.name}</h2>
       {section.description && (
         <p className="text-muted-foreground mb-12 max-w-3xl mx-auto text-center">{section.description}</p>
-      )}
-      
-      {!isMobile && (
-        <DesktopFoodCategoryGrid
-          categories={section.categories}
-          selectedCategory={selectedCategory}
-          onCategorySelect={onCategorySelect}
-        />
       )}
       
       <FoodCategoryDropdown
