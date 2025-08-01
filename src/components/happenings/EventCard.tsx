@@ -61,7 +61,17 @@ export function EventCard({
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-grow flex flex-col relative z-10">
-        <p className="text-muted-foreground flex-grow">{description}</p>
+        <p className="text-muted-foreground flex-grow">
+          {description.includes("Call ahead for groups of 5+") ? (
+            <>
+              {description.split("Call ahead for groups of 5+")[0]}
+              <strong>Call ahead for groups of 5+</strong>
+              {description.split("Call ahead for groups of 5+")[1]}
+            </>
+          ) : (
+            description
+          )}
+        </p>
         {details && (
           <div className="mt-4 space-y-2">
             {title.includes("Cornhole") ? (
