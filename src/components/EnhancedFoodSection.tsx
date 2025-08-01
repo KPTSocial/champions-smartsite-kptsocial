@@ -1,7 +1,9 @@
 import React from 'react';
 import { MenuSection } from '@/types/menu';
 import FoodCategoryDropdown from './FoodCategoryDropdown';
-import EnhancedMenuCategorySection from './EnhancedMenuCategorySection';
+import MenuCategoryCard from './MenuCategoryCard';
+import FoodSectionDisclaimer from './FoodSectionDisclaimer';
+import DrinksSectionDisclaimer from './DrinksSectionDisclaimer';
 
 interface EnhancedFoodSectionProps {
   section: MenuSection;
@@ -32,23 +34,29 @@ const EnhancedFoodSection: React.FC<EnhancedFoodSectionProps> = ({
         onCategorySelect={onCategorySelect}
       />
 
-      <div className="space-y-16">
+      <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
         {displayCategories.length > 0 ? (
-          displayCategories.map((category, index) => (
-            <EnhancedMenuCategorySection 
+          displayCategories.map((category) => (
+            <MenuCategoryCard 
               key={category.id} 
               category={category} 
-              showDisclaimer={index === displayCategories.length - 1}
               sectionName={section.name}
             />
           ))
         ) : (
-          <div className="text-center py-16">
+          <div className="col-span-full text-center py-16">
             <p className="text-2xl text-muted-foreground">No items available in this category.</p>
             <p className="text-muted-foreground mt-2">Please select a different category.</p>
           </div>
         )}
       </div>
+      
+      {/* Show disclaimer after the cards */}
+      {displayCategories.length > 0 && (
+        section.name?.toLowerCase().includes('drink') || section.name?.toLowerCase().includes('beverage') || section.name?.toLowerCase().includes('bar') ? 
+          <DrinksSectionDisclaimer categoryDescription={section.description} /> : 
+          <FoodSectionDisclaimer categoryDescription={section.description} />
+      )}
     </section>
   );
 };

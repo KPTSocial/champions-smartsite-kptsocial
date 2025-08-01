@@ -10,8 +10,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import MobileMenuNavigation from '@/components/MobileMenuNavigation';
 import DesktopMenuNavigation from '@/components/DesktopMenuNavigation';
 import EnhancedMenuTabs from '@/components/EnhancedMenuTabs';
-import EnhancedMenuCategorySection from '@/components/EnhancedMenuCategorySection';
 import EnhancedFoodSection from '@/components/EnhancedFoodSection';
+import MenuCategoryCard from '@/components/MenuCategoryCard';
 import FoodSectionDisclaimer from '@/components/FoodSectionDisclaimer';
 import DrinksSectionDisclaimer from '@/components/DrinksSectionDisclaimer';
 import menuBackground from '@/assets/menu-background.jpg';
@@ -253,16 +253,21 @@ const Menu = () => {
                     <section key={section.id} id={section.name.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-20">
                       <h2 className="text-4xl font-serif font-bold mb-4 text-center text-secondary">{section.name}</h2>
                       {section.description && <p className="text-muted-foreground mb-12 max-w-3xl mx-auto text-center">{section.description}</p>}
-                      <div className="space-y-16">
-                        {section.categories.map((category, index) => (
-                          <EnhancedMenuCategorySection 
+                      <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+                        {section.categories.map((category) => (
+                          <MenuCategoryCard 
                             key={category.id} 
                             category={category} 
-                            showDisclaimer={index === section.categories.length - 1}
                             sectionName={section.name}
                           />
                         ))}
                       </div>
+                      {/* Show disclaimer after the cards */}
+                      {section.categories.length > 0 && (
+                        section.name?.toLowerCase().includes('drink') || section.name?.toLowerCase().includes('beverage') || section.name?.toLowerCase().includes('bar') ? 
+                          <DrinksSectionDisclaimer categoryDescription={section.description} /> : 
+                          <FoodSectionDisclaimer categoryDescription={section.description} />
+                      )}
                     </section>
                   )
                 ))}
