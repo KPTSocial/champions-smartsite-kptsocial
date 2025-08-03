@@ -13,7 +13,7 @@ const MenuItemAccordion: React.FC<MenuItemAccordionProps> = ({ item }) => {
       <AccordionTrigger className="px-6 py-4 hover:no-underline">
         <span className="font-semibold text-left flex items-center gap-2">
           {item.tags?.includes('CF') && (
-            <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/fav_jvg2qc.jpg" alt="Champ's Favorite" className="w-4 h-4" />
+            <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/fav_jvg2qc.jpg" alt="Champ's Favorite" className="w-5 h-5" />
           )}
           {item.name}
         </span>
