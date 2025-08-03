@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getMenuData } from '@/services/menuService';
 import { Input } from '@/components/ui/input';
 import { MenuSection, MenuCategory } from '@/types/menu';
@@ -16,6 +16,7 @@ import FoodSectionDisclaimer from '@/components/FoodSectionDisclaimer';
 import DrinksSectionDisclaimer from '@/components/DrinksSectionDisclaimer';
 import menuBackground from '@/assets/menu-background.jpg';
 import { createBackgroundStyle } from '@/lib/background-utils';
+import { supabase } from '@/integrations/supabase/client';
 
 const Menu = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,12 +25,51 @@ const Menu = () => {
   const [selectedFoodCategory, setSelectedFoodCategory] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<string>('');
   const isMobile = useIsMobile();
+  const queryClient = useQueryClient();
 
   const { data: menuData, isLoading, isError, error } = useQuery<MenuSection[], Error>({
     queryKey: ['menuData'],
     queryFn: getMenuData,
     retry: false,
   });
+
+  // Set up real-time listeners for menu changes
+  useEffect(() => {
+    const channels = [
+      supabase
+        .channel('menu_sections_changes')
+        .on('postgres_changes', 
+          { event: '*', schema: 'public', table: 'menu_sections' },
+          () => queryClient.invalidateQueries({ queryKey: ['menuData'] })
+        ),
+      supabase
+        .channel('menu_categories_changes')
+        .on('postgres_changes',
+          { event: '*', schema: 'public', table: 'menu_categories' },
+          () => queryClient.invalidateQueries({ queryKey: ['menuData'] })
+        ),
+      supabase
+        .channel('menu_items_changes')
+        .on('postgres_changes',
+          { event: '*', schema: 'public', table: 'menu_items' },
+          () => queryClient.invalidateQueries({ queryKey: ['menuData'] })
+        ),
+      supabase
+        .channel('menu_item_variants_changes')
+        .on('postgres_changes',
+          { event: '*', schema: 'public', table: 'menu_item_variants' },
+          () => queryClient.invalidateQueries({ queryKey: ['menuData'] })
+        )
+    ];
+
+    // Subscribe to all channels
+    channels.forEach(channel => channel.subscribe());
+
+    // Cleanup function
+    return () => {
+      channels.forEach(channel => supabase.removeChannel(channel));
+    };
+  }, [queryClient]);
 
   const filteredMenuData = useMemo(() => {
     if (!menuData) return [];

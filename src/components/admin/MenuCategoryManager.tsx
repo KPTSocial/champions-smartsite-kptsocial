@@ -83,6 +83,7 @@ const MenuCategoryManager: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['menu-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['menuData'] });
       toast.success('Category created successfully');
       setIsDialogOpen(false);
       resetForm();
@@ -106,6 +107,7 @@ const MenuCategoryManager: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['menu-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['menuData'] });
       toast.success('Category updated successfully');
       setIsDialogOpen(false);
       resetForm();
@@ -126,6 +128,7 @@ const MenuCategoryManager: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['menu-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['menuData'] });
       toast.success('Category deleted successfully');
     },
     onError: (error: any) => {

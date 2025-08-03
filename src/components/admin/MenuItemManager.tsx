@@ -116,6 +116,7 @@ const MenuItemManager: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['menu-items'] });
+      queryClient.invalidateQueries({ queryKey: ['menuData'] });
       toast.success('Menu item created successfully');
       setIsDialogOpen(false);
       resetForm();
@@ -139,6 +140,7 @@ const MenuItemManager: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['menu-items'] });
+      queryClient.invalidateQueries({ queryKey: ['menuData'] });
       toast.success('Menu item updated successfully');
       setIsDialogOpen(false);
       resetForm();
@@ -159,6 +161,7 @@ const MenuItemManager: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['menu-items'] });
+      queryClient.invalidateQueries({ queryKey: ['menuData'] });
       toast.success('Menu item deleted successfully');
     },
     onError: (error: any) => {

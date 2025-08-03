@@ -55,6 +55,7 @@ const MenuSectionManager: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['menu-sections'] });
+      queryClient.invalidateQueries({ queryKey: ['menuData'] });
       toast.success('Section created successfully');
       setIsDialogOpen(false);
       resetForm();
@@ -78,6 +79,7 @@ const MenuSectionManager: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['menu-sections'] });
+      queryClient.invalidateQueries({ queryKey: ['menuData'] });
       toast.success('Section updated successfully');
       setIsDialogOpen(false);
       resetForm();
@@ -98,6 +100,7 @@ const MenuSectionManager: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['menu-sections'] });
+      queryClient.invalidateQueries({ queryKey: ['menuData'] });
       toast.success('Section deleted successfully');
     },
     onError: (error: any) => {
