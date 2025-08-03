@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import MenuSectionManager from './MenuSectionManager';
 import MenuCategoryManager from './MenuCategoryManager';
 import MenuItemManager from './MenuItemManager';
+import MonthlySpecialsManager from './MonthlySpecialsManager';
 import MenuStats from './MenuStats';
 
 const MenuDashboard: React.FC = () => {
@@ -20,8 +21,9 @@ const MenuDashboard: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="monthly-specials">Monthly Specials</TabsTrigger>
           <TabsTrigger value="sections">Sections</TabsTrigger>
           <TabsTrigger value="categories">Categories</TabsTrigger>
           <TabsTrigger value="items">Menu Items</TabsTrigger>
@@ -29,6 +31,10 @@ const MenuDashboard: React.FC = () => {
 
         <TabsContent value="overview" className="space-y-6">
           <MenuStats />
+        </TabsContent>
+
+        <TabsContent value="monthly-specials">
+          <MonthlySpecialsManager />
         </TabsContent>
 
         <TabsContent value="sections">
