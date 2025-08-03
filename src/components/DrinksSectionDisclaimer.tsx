@@ -11,7 +11,7 @@ const DrinksSectionDisclaimer = ({ categoryDescription }: DrinksSectionDisclaime
       <div className="space-y-3 text-sm text-muted-foreground">
         {/* Icon placeholders with text */}
         <div className="flex items-center gap-2">
-          <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/fav_jvg2qc.jpg" alt="Staff Favorite Icon" className="w-5 h-5" />
+          <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/fav_jvg2qc.jpg" alt="Staff Favorite Icon" className="w-6 h-6" />
           <span>Champ's Staff Favorite</span>
         </div>
         

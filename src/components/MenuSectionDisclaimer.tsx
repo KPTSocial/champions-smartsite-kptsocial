@@ -4,17 +4,17 @@ const MenuSectionDisclaimer = () => {
       <div className="space-y-3 text-sm text-muted-foreground">
         {/* Icon placeholders with text */}
         <div className="flex items-center gap-2">
-          <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/fav_jvg2qc.jpg" alt="Staff Favorite Icon" className="w-5 h-5" />
+          <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/fav_jvg2qc.jpg" alt="Staff Favorite Icon" className="w-6 h-6" />
           <span>Champ's Staff Favorite</span>
         </div>
         
         <div className="flex items-center gap-2">
-          <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/gf_tmnou5.jpg" alt="Gluten Sensitivity Icon" className="w-5 h-5" />
+          <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/gf_tmnou5.jpg" alt="Gluten Sensitivity Icon" className="w-6 h-6" />
           <span>We will do our best to accommodate gluten sensitivity, but cross-contamination may occur</span>
         </div>
         
         <div className="flex items-center gap-2">
-          <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/veg_fbwf0q.jpg" alt="Vegetarian Option Icon" className="w-5 h-5" />
+          <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/veg_fbwf0q.jpg" alt="Vegetarian Option Icon" className="w-6 h-6" />
           <span>Vegetarian Option</span>
         </div>
         
