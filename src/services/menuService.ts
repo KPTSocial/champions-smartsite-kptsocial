@@ -34,8 +34,7 @@ export async function getMenuData(): Promise<MenuSection[]> {
       )
     `)
     .order('sort_order', { ascending: true })
-    .order('sort_order', { foreignTable: 'menu_categories', ascending: true })
-    .order('sort_order', { foreignTable: 'menu_items', ascending: true });
+    .order('sort_order', { foreignTable: 'menu_categories', ascending: true });
 
 
   if (error) {
