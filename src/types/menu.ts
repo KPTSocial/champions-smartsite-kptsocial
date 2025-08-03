@@ -1,10 +1,17 @@
 
+export interface MenuItemVariant {
+  id: string;
+  name: string;
+  price: number;
+}
+
 export interface MenuItem {
   id: string;
   name: string;
   description: string | null;
   price: number;
   image_url: string | null;
+  variants?: MenuItemVariant[];
 }
 
 export interface MenuCategory {

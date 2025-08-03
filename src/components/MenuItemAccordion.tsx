@@ -15,7 +15,17 @@ const MenuItemAccordion: React.FC<MenuItemAccordionProps> = ({ item }) => {
       </AccordionTrigger>
       <AccordionContent className="px-6 pb-4">
         <p className="text-muted-foreground leading-relaxed">{item.description}</p>
-        <p className="text-muted-foreground leading-relaxed mt-2">{formatCurrency(item.price)}</p>
+        {item.variants && item.variants.length > 0 ? (
+          <div className="mt-2">
+            {item.variants.map((variant) => (
+              <p key={variant.id} className="text-muted-foreground leading-relaxed">
+                {variant.name} {formatCurrency(variant.price)}
+              </p>
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted-foreground leading-relaxed mt-2">{formatCurrency(item.price)}</p>
+        )}
       </AccordionContent>
     </AccordionItem>
   );
