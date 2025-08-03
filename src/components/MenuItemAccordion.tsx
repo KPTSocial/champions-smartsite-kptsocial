@@ -15,6 +15,12 @@ const MenuItemAccordion: React.FC<MenuItemAccordionProps> = ({ item }) => {
           {item.tags?.includes('CF') && (
             <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/fav_jvg2qc.jpg" alt="Champ's Favorite" className="w-5 h-5" />
           )}
+          {item.tags?.includes('GF') && (
+            <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/gf_tmnou5.jpg" alt="Gluten Friendly" className="w-5 h-5" />
+          )}
+          {item.tags?.includes('V') && (
+            <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/veg_fbwf0q.jpg" alt="Vegetarian" className="w-5 h-5" />
+          )}
           {item.name}
         </span>
       </AccordionTrigger>

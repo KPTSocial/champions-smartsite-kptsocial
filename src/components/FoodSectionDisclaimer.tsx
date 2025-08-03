@@ -14,12 +14,12 @@ const FoodSectionDisclaimer = ({
         </div>
         
         <div className="flex items-center gap-2">
-          <img src="/placeholder-icon-2.png" alt="Gluten Sensitivity Icon" className="w-4 h-4" />
+          <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/gf_tmnou5.jpg" alt="Gluten Sensitivity Icon" className="w-5 h-5" />
           <span>We will do our best to accommodate gluten sensitivity, but cross-contamination may occur</span>
         </div>
         
         <div className="flex items-center gap-2">
-          <img src="/placeholder-icon-3.png" alt="Vegetarian Option Icon" className="w-4 h-4" />
+          <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/veg_fbwf0q.jpg" alt="Vegetarian Option Icon" className="w-5 h-5" />
           <span>Vegetarian Option</span>
         </div>
         
