@@ -1,13 +1,11 @@
 interface FoodSectionDisclaimerProps {
   categoryDescription?: string;
 }
-
-const FoodSectionDisclaimer = ({ categoryDescription }: FoodSectionDisclaimerProps) => {
-  return (
-    <div className="mt-8 pt-6 border-t border-border">
-      {categoryDescription && (
-        <p className="text-muted-foreground mb-4 max-w-2xl">{categoryDescription}</p>
-      )}
+const FoodSectionDisclaimer = ({
+  categoryDescription
+}: FoodSectionDisclaimerProps) => {
+  return <div className="mt-8 pt-6 border-t border-border">
+      {categoryDescription && <p className="text-muted-foreground mb-4 max-w-2xl">{categoryDescription}</p>}
       <div className="space-y-3 text-sm text-muted-foreground">
         {/* Icon placeholders with text */}
         <div className="flex items-center gap-2">
@@ -30,12 +28,8 @@ const FoodSectionDisclaimer = ({ categoryDescription }: FoodSectionDisclaimerPro
           *Consuming raw or undercooked meats or eggs may increase your risk of foodborne illness.
         </p>
         
-        <p>
-          Plates are served with a complimentary dipping sauce — any additional house-made sauce is $0.25
-        </p>
+        
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default FoodSectionDisclaimer;
