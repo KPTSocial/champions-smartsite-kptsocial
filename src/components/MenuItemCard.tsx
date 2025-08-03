@@ -9,7 +9,7 @@ const MenuItemCard = ({ item }: { item: MenuItem }) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           {item.tags?.includes('CF') && (
-            <img src="/lovable-uploads/09615d0b-1415-472e-b4e0-3b034815d7a0.png" alt="Champ's Favorite" className="w-4 h-4" />
+            <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/fav_jvg2qc.jpg" alt="Champ's Favorite" className="w-4 h-4" />
           )}
           {item.name}
         </CardTitle>
