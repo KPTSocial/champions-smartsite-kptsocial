@@ -9,7 +9,7 @@ const FoodSectionDisclaimer = ({
       <div className="space-y-3 text-sm text-muted-foreground">
         {/* Icon placeholders with text */}
         <div className="flex items-center gap-2">
-          <img src="/placeholder-icon-1.png" alt="Staff Favorite Icon" className="w-4 h-4" />
+          <img src="/lovable-uploads/09615d0b-1415-472e-b4e0-3b034815d7a0.png" alt="Staff Favorite Icon" className="w-4 h-4" />
           <span>Champ's Staff Favorite</span>
         </div>
         

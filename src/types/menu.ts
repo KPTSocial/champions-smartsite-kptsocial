@@ -11,6 +11,7 @@ export interface MenuItem {
   description: string | null;
   price: number;
   image_url: string | null;
+  tags?: string[];
   variants?: MenuItemVariant[];
 }
 
