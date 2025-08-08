@@ -17,11 +17,18 @@ import { format } from 'date-fns';
 
 const eventFormSchema = z.object({
   event_title: z.string().min(1, 'Event title is required'),
-  event_date: z.string().min(1, 'Event date is required'),
+  event_date: z.string().min(1, 'Event date is required').refine((dateStr) => {
+    try {
+      const date = new Date(dateStr);
+      return !isNaN(date.getTime());
+    } catch {
+      return false;
+    }
+  }, 'Please enter a valid date and time'),
   event_type: z.enum(['Live Music', 'Game Night', 'Specials']),
   description: z.string().optional(),
   location: z.enum(['on-site', 'off-site', 'virtual']).default('on-site'),
-  image_url: z.string().optional(),
+  image_url: z.string().url().optional().or(z.literal('')),
   is_featured: z.boolean().default(false),
   allow_rsvp: z.boolean().default(false),
   rsvp_link: z.string().optional(),
@@ -60,29 +67,59 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
   // Populate form if editing existing event
   useEffect(() => {
     if (event) {
-      form.reset({
-        event_title: event.event_title,
-        event_date: format(new Date(event.event_date), "yyyy-MM-dd'T'HH:mm"),
-        event_type: event.event_type as 'Live Music' | 'Game Night' | 'Specials',
-        description: event.description || '',
-        location: (event.location || 'on-site') as 'on-site' | 'off-site' | 'virtual',
-        image_url: event.image_url || '',
-        is_featured: event.is_featured,
-        allow_rsvp: event.allow_rsvp,
-        rsvp_link: event.rsvp_link || '',
-        recurring_pattern: (event.recurring_pattern || 'none') as 'none' | 'weekly' | 'monthly',
-        status: (event.status || 'published') as 'draft' | 'published'
-      });
+      try {
+        const eventDate = new Date(event.event_date);
+        const formattedDate = format(eventDate, "yyyy-MM-dd'T'HH:mm");
+        
+        form.reset({
+          event_title: event.event_title,
+          event_date: formattedDate,
+          event_type: event.event_type as 'Live Music' | 'Game Night' | 'Specials',
+          description: event.description || '',
+          location: (event.location || 'on-site') as 'on-site' | 'off-site' | 'virtual',
+          image_url: event.image_url || '',
+          is_featured: event.is_featured,
+          allow_rsvp: event.allow_rsvp,
+          rsvp_link: event.rsvp_link || '',
+          recurring_pattern: (event.recurring_pattern || 'none') as 'none' | 'weekly' | 'monthly',
+          status: (event.status || 'published') as 'draft' | 'published'
+        });
+      } catch (error) {
+        console.error('Error formatting event date:', error);
+        toast({
+          title: "Date formatting error",
+          description: "There was an issue loading the event date. Please check the time field.",
+          variant: "destructive",
+        });
+      }
     }
-  }, [event, form]);
+  }, [event, form, toast]);
 
   const onSubmit = async (data: EventFormData) => {
     setIsSubmitting(true);
     
     try {
+      // Validate and format the date
+      let eventDate: string;
+      try {
+        const date = new Date(data.event_date);
+        if (isNaN(date.getTime())) {
+          throw new Error('Invalid date');
+        }
+        eventDate = date.toISOString();
+      } catch (dateError) {
+        toast({
+          title: "Invalid date",
+          description: "Please enter a valid date and time.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       const eventData = {
         event_title: data.event_title,
-        event_date: new Date(data.event_date).toISOString(),
+        event_date: eventDate,
         event_type: data.event_type,
         description: data.description || null,
         location: data.location,
@@ -126,9 +163,22 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
       onClose();
     } catch (error) {
       console.error('Error saving event:', error);
+      
+      // Provide more specific error messages
+      let errorMessage = "Failed to save the event. Please try again.";
+      if (error instanceof Error) {
+        if (error.message.includes('date')) {
+          errorMessage = "There was an issue with the event date. Please check the date and time format.";
+        } else if (error.message.includes('validation')) {
+          errorMessage = "Please check all required fields and try again.";
+        } else if (error.message.includes('network')) {
+          errorMessage = "Network error. Please check your connection and try again.";
+        }
+      }
+      
       toast({
-        title: "Error",
-        description: "Failed to save the event. Please try again.",
+        title: "Error saving event",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
