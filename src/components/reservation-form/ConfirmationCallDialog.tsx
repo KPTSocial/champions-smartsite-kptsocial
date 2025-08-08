@@ -14,8 +14,9 @@ export const ConfirmationCallDialog = ({ open, onOpenChange, partySize, reservat
   const restaurantPhone = "(503) 747-6063";
   
   const getConfirmationReason = () => {
-    if (reservationType === 'trivia' && partySize >= 6) {
-      return `Trivia Night parties of ${partySize} people`;
+    if ((reservationType === 'trivia' || reservationType === 'bingo') && partySize >= 5) {
+      const eventName = reservationType === 'trivia' ? 'Trivia Night' : 'Bingo Night';
+      return `${eventName} parties of ${partySize} people`;
     }
     return `large parties`;
   };

@@ -67,9 +67,8 @@ const ReservationForm = () => {
 
     console.log("Full name:", fullName);
 
-    // Only trivia reservations with 6+ people require confirmation now
-    const requiresConfirmation = 
-      (data.reservationType === 'trivia' && data.partySize >= 6);
+    // Determine if confirmation is required
+    const requiresConfirmation = (data.reservationType === 'trivia' || data.reservationType === 'bingo') && data.partySize >= 5;
 
     console.log("Requires confirmation:", requiresConfirmation);
 
