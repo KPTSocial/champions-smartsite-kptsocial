@@ -7,7 +7,7 @@ import { Event } from '@/services/eventService';
 import { Calendar } from '@/components/ui/calendar';
 import { Plus, Edit, Trash2, Eye, MapPin, Clock } from 'lucide-react';
 import { format, isSameDay } from 'date-fns';
-import { formatInTimeZone } from 'date-fns-tz/formatInTimeZone';
+import { formatInTimeZone } from 'date-fns-tz';
 import {
   AlertDialog,
   AlertDialogAction,
