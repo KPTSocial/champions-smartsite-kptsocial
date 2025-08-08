@@ -15,10 +15,11 @@ export async function getMenuData(): Promise<MenuSection[]> {
       id,
       name,
       description,
-      categories:menu_categories (
+      categories:menu_categories!inner (
         id,
         name,
         description,
+        is_visible,
         items:menu_items (
           id,
           name,
@@ -33,6 +34,7 @@ export async function getMenuData(): Promise<MenuSection[]> {
         )
       )
     `)
+    .eq('menu_categories.is_visible', true)
     .order('sort_order', { ascending: true })
     .order('sort_order', { foreignTable: 'menu_categories', ascending: true });
 

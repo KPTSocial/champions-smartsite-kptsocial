@@ -239,6 +239,7 @@ export type Database = {
         Row: {
           description: string | null
           id: string
+          is_visible: boolean
           name: string
           section_id: string
           sort_order: number
@@ -246,6 +247,7 @@ export type Database = {
         Insert: {
           description?: string | null
           id?: string
+          is_visible?: boolean
           name: string
           section_id: string
           sort_order: number
@@ -253,6 +255,7 @@ export type Database = {
         Update: {
           description?: string | null
           id?: string
+          is_visible?: boolean
           name?: string
           section_id?: string
           sort_order?: number
