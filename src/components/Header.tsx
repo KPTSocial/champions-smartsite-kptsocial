@@ -18,9 +18,6 @@ const navItems = [{
 }, {
   name: 'Menu',
   path: '/menu'
-}, {
-  name: 'Loyalty',
-  path: '/loyalty'
 }];
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);

@@ -36,7 +36,7 @@ const App = () => (
           <Route path="/happenings" element={<Layout><Happenings /></Layout>} />
           <Route path="/photo-booth" element={<Layout><PhotoBooth /></Layout>} />
           <Route path="/menu" element={<Layout><Menu /></Layout>} />
-          <Route path="/loyalty" element={<Layout><LoyaltyPage /></Layout>} />
+          {/* <Route path="/loyalty" element={<Layout><LoyaltyPage /></Layout>} /> */}
           <Route path="/reservations" element={<Layout><Reservations /></Layout>} />
           
           {/* Admin routes without public layout */}
