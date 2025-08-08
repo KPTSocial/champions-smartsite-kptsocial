@@ -12,7 +12,7 @@ const fallbackImages = [
   { src: "https://res.cloudinary.com/de3djsvlk/image/upload/v1754685671/A7305134_tppl0j.jpg", alt: "Champions Sports Bar photo", name: "champions-photo.jpg" },
   { src: "https://res.cloudinary.com/de3djsvlk/image/upload/v1754685671/A7305134_tppl0j.jpg", alt: "Champions Sports Bar event photo", name: "champions-event.jpg" },
   { src: "https://res.cloudinary.com/de3djsvlk/image/upload/v1754685671/A7305134_tppl0j.jpg", alt: "Champions Sports Bar dining area", name: "champions-dining.jpg" },
-  { src: "https://images.unsplash.com/photo-1522881451255-f5f69c5fdfd7?q=80&w=1974&auto=format&fit=crop", alt: "Friends having fun at a bar", name: "fallback-4.jpg" },
+  { src: "https://res.cloudinary.com/de3djsvlk/image/upload/v1754685671/A7305134_tppl0j.jpg", alt: "Champions Sports Bar atmosphere", name: "champions-atmosphere.jpg" },
   { src: "https://images.unsplash.com/photo-1529156069898-fac51a492240?q=80&w=2070&auto=format&fit=crop", alt: "Group of friends laughing", name: "fallback-5.jpg" },
   { src: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1974&auto=format=fit=crop", alt: "Interior of a vibrant bar", name: "fallback-6.jpg" },
 ];
