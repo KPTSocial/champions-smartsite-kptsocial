@@ -795,7 +795,7 @@ export type Database = {
     }
     Enums: {
       admin_role: "super_admin" | "admin" | "moderator"
-      event_type: "Live Music" | "Game Night" | "Specials"
+      event_type: "Live Music" | "Game Night" | "Specials" | "NCAA FB"
       reservation_type: "Event" | "Table"
     }
     CompositeTypes: {
@@ -925,7 +925,7 @@ export const Constants = {
   public: {
     Enums: {
       admin_role: ["super_admin", "admin", "moderator"],
-      event_type: ["Live Music", "Game Night", "Specials"],
+      event_type: ["Live Music", "Game Night", "Specials", "NCAA FB"],
       reservation_type: ["Event", "Table"],
     },
   },
