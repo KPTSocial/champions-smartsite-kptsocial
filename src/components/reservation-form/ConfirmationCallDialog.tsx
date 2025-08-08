@@ -39,14 +39,14 @@ export const ConfirmationCallDialog = ({ open, onOpenChange, partySize, reservat
         <AlertDialogFooter className="flex flex-col gap-2">
           <AlertDialogAction 
             onClick={handleCallClick}
-            className="h-11 bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2"
+            className="w-full h-12 px-4 bg-green-600 hover:bg-green-700 text-white flex items-center justify-center gap-2"
           >
             <Phone size={18} />
             Call {restaurantPhone}
           </AlertDialogAction>
           <AlertDialogAction 
             onClick={() => onOpenChange(false)}
-            className="h-11 border border-input bg-accent text-accent-foreground hover:bg-accent/90 flex items-center justify-center"
+            className="w-full h-12 px-4 border border-input bg-accent text-accent-foreground hover:bg-accent/90 flex items-center justify-center"
           >
             I'll Call Later
           </AlertDialogAction>
