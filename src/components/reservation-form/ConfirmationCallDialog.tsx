@@ -11,7 +11,7 @@ interface ConfirmationCallDialogProps {
 }
 
 export const ConfirmationCallDialog = ({ open, onOpenChange, partySize, reservationType }: ConfirmationCallDialogProps) => {
-  const restaurantPhone = "(555) 123-4567"; // Replace with actual restaurant phone number
+  const restaurantPhone = "(503) 747-6063";
   
   const getConfirmationReason = () => {
     if (reservationType === 'trivia' && partySize >= 6) {
