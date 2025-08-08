@@ -72,8 +72,9 @@ export function CalendarWithEventSlots({
         return '11:00 AM - 10:00 PM PT';
       }
       
-      // Convert UTC to Pacific Time and format with PT indicator
-      return formatInTimeZone(new Date(eventDate), 'America/Los_Angeles', 'h:mm a') + ' PT';
+      // Convert UTC to Pacific Time and format with consistent AM/PM capitalization
+      const timeStr = formatInTimeZone(new Date(eventDate), 'America/Los_Angeles', 'h:mm a');
+      return timeStr.toUpperCase() + ' PT';
     } catch {
       return '';
     }
