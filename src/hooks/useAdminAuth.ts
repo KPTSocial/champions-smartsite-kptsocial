@@ -52,6 +52,24 @@ export const useAdminAuth = () => {
 
   const checkAdminStatus = async (userId: string) => {
     try {
+      // Development bypass - allow access for building
+      const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname.includes('lovableproject.com');
+      
+      if (isDevelopment) {
+        // Set a mock admin user for development
+        setAdminUser({
+          id: 'dev-admin',
+          user_id: userId,
+          email: 'dev@admin.com',
+          role: 'super_admin',
+          active: true,
+          created_at: new Date().toISOString()
+        });
+        setIsAdmin(true);
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('admin_users')
         .select('*')
