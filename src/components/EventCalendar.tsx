@@ -11,7 +11,9 @@ const EventCalendar = () => {
 
     const { data: dbEvents = [], isLoading } = useQuery<EventType[]>({
         queryKey: ['db-events'],
-        queryFn: getEvents
+        queryFn: getEvents,
+        staleTime: 30 * 1000, // 30 seconds
+        refetchOnWindowFocus: true
     });
 
     if (isLoading) {
