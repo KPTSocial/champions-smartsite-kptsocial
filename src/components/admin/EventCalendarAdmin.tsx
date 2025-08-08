@@ -55,7 +55,12 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
         return 'All Day';
       }
       
-      return pacificTime;
+      // Fix common time display issues
+      if (pacificTime === '9:00 am') {
+        return '9:00 AM';
+      }
+      
+      return pacificTime.toUpperCase();
     } catch (error) {
       console.error('Error formatting time:', error);
       return 'Time TBD';
