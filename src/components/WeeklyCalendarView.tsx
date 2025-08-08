@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { format, startOfWeek, addDays, isToday, endOfWeek } from 'date-fns';
-import { formatInTimeZone } from 'date-fns-tz';
+import { formatInTimeZone } from 'date-fns-tz/formatInTimeZone';
 import { type Event } from '@/services/eventService';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';

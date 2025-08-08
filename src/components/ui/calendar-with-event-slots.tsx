@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { format } from "date-fns";
-import { formatInTimeZone } from "date-fns-tz";
+import { formatInTimeZone } from "date-fns-tz/formatInTimeZone";
 import { PlusIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
