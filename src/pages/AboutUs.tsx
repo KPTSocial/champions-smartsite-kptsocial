@@ -64,10 +64,13 @@ const AboutUs = () => {
               <h2 className="font-serif text-4xl font-semibold mb-4">A Team with Purpose</h2>
               <div className="text-muted-foreground text-lg space-y-4 leading-relaxed">
                   <p>
-                      Jared and Michelle didn't just build a bar—they built a hub for Hillsboro. Champions isn't just about craft cocktails, 20 beers on tap, and weekend brunch (although let's be honest—those are all pretty great). It's about giving back.
+                      Jared and Michelle didn't just build a bar—they built a hub for Hillsboro. Champions isn't only about craft cocktails, 20 beers on tap, and weekend brunch (though, let's be honest—those are pretty great). It's about giving back.
                   </p>
                   <p>
-                    From sponsoring Reedville Baseball to supporting The Ronald McDonald House, Rock'n Rooms, Reclaiming Hope Ranch, and Ladybug Run, they've made giving part of their mission. They've even partnered with the Hillsboro Elks Lodge to support local families in need, especially during the holidays—because building community isn't a seasonal thing, it's a way of life.
+                      Over the years, Champions has supported a variety of local causes, from sponsoring Reedville Baseball to pitching in for events like The Ronald McDonald House, Rock'n Rooms, Reclaiming Hope Ranch, and Ladybug Run. But our longest-standing tradition—and one we're proud to continue every year—is partnering with the Hillsboro Elks Lodge, Hillsboro Police Department, and Hillsboro Fire Department to support families in need during the holidays.
+                  </p>
+                  <p>
+                      Through this community-wide effort, volunteers deliver gifts to more than 2,000 homes in the Hillsboro School District—families identified by DHS who could use a little extra help. While younger kids often receive plenty of toys, we focus on the harder-to-shop-for group: teens ages 12–18. Clothing, sports gear, gift cards, and personal care items are just a few ways we help brighten their season.
                   </p>
               </div>
             </div>
