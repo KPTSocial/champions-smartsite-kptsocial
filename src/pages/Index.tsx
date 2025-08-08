@@ -49,7 +49,7 @@ const Index = () => {
               <Link to="/reservations">Reservations</Link>
             </Button>
           </div>
-          <p className="mt-6 text-white text-lg md:text-xl text-center drop-shadow-md">
+          <p className="mt-6 text-white text-xl md:text-2xl text-center drop-shadow-md">
             <a href="tel:5037476063" className="hover:underline">(503) 747-6063</a>
           </p>
         </div>
