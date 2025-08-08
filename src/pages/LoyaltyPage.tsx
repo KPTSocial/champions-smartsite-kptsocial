@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReferralWidget } from "@/components/loyalty/ReferralWidget";
 import { MugClubWidget } from "@/components/loyalty/MugClubWidget";
 import { WhiskeyRoomWidget } from "@/components/loyalty/WhiskeyRoomWidget";
-import SpotOnLoyaltyWidget from "@/components/loyalty/SpotOnLoyaltyWidget";
+
 import { Badge } from "@/components/ui/badge";
 import { Gift, Trophy, Handshake, Star } from "lucide-react";
 import { Waves } from "@/components/ui/waves-background";
@@ -67,8 +67,6 @@ const LoyaltyPage = () => {
               </Card>
           </div>
           
-          {/* SpotOn Loyalty Widget */}
-          <SpotOnLoyaltyWidget />
         </div>
       </div>
     </div>

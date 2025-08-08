@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useHeaderMedia } from "@/hooks/useHeaderMedia";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
 import VideoHeader from "@/components/VideoHeader";
+import SpotOnLoyaltyWidget from "@/components/loyalty/SpotOnLoyaltyWidget";
 const Index = () => {
   const {
     data: headerMedia,
@@ -108,6 +109,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* SpotOn Loyalty Widget */}
+      <SpotOnLoyaltyWidget />
     </div>;
 };
 export default Index;
