@@ -45,22 +45,16 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
   // Get all dates that have events for calendar highlighting
   const eventDays = events.map(event => new Date(event.event_date));
 
-  const formatEventTime = (dateString: string) => {
+  const formatEventTime = (dateString: string, eventTitle?: string) => {
     try {
-      const date = new Date(dateString);
-      const pacificTime = formatInTimeZone(date, 'America/Los_Angeles', 'h:mm a');
-      
-      // Special case for Taco Tuesday
-      if (dateString.includes('Taco Tuesday')) {
-        return 'All Day';
+      // Special handling for Taco Tuesday - show full business hours
+      if (eventTitle && eventTitle.toLowerCase().includes('taco tuesday')) {
+        return '11:00 AM - 10:00 PM PT';
       }
       
-      // Fix common time display issues
-      if (pacificTime === '9:00 am') {
-        return '9:00 AM';
-      }
-      
-      return pacificTime.toUpperCase();
+      // Convert UTC to Pacific Time and format with consistent AM/PM capitalization
+      const timeStr = formatInTimeZone(new Date(dateString), 'America/Los_Angeles', 'h:mm a');
+      return timeStr.toUpperCase() + ' PT';
     } catch (error) {
       console.error('Error formatting time:', error);
       return 'Time TBD';
@@ -171,7 +165,7 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
                     <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                       <div className="flex items-center gap-1.5">
                         <Clock className="h-3.5 w-3.5" />
-                        <span>{formatEventTime(event.event_date)}</span>
+                        <span>{formatEventTime(event.event_date, event.event_title)}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <MapPin className="h-3.5 w-3.5" />
