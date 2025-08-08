@@ -40,7 +40,7 @@ export const useWallOfFameImages = () => {
         if (files && files.length > 0) {
           const storageImages = files
             .filter(file => file.name !== '.emptyFolderPlaceholder')
-            .slice(0, 4) // Limit to 4 storage images so fallback images show
+            .slice(0, 6) // Use all storage images up to 6
             .map(file => {
               const { data } = supabase.storage
                 .from('photos')
@@ -54,7 +54,7 @@ export const useWallOfFameImages = () => {
             });
 
           if (storageImages.length > 0) {
-            // Fill remaining slots with fallback images
+            // Use storage images first, fill remaining slots with fallback images only if needed
             const combinedImages = [
               ...storageImages,
               ...fallbackImages.slice(storageImages.length)
