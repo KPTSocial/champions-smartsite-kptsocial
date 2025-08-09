@@ -4,6 +4,7 @@ import { BackgroundContainer } from '@/components/ui/background-container';
 import { PageHeader } from '@/components/ui/page-header';
 import { RecurringEventsSection } from '@/components/happenings/RecurringEventsSection';
 import { SeasonalEventsSection } from '@/components/happenings/SeasonalEventsSection';
+import { SportsEventsSection } from '@/components/happenings/SportsEventsSection';
 const Happenings = () => {
   return <BackgroundContainer backgroundImage="https://res.cloudinary.com/de3djsvlk/image/upload/v1753119005/A7304962_psfeqt.jpg" className="py-16 md:py-24" grayscale={true}>
       <PageHeader title="Champions Happenings" description="We keep the fun rolling at Champions with weekly and seasonal events that bring the community together. Here's what's live right now:" />
@@ -15,6 +16,7 @@ const Happenings = () => {
         </div>
       </section>
 
+      <SportsEventsSection />
       <RecurringEventsSection />
       <SeasonalEventsSection />
 
