@@ -223,18 +223,31 @@ export function CalendarWithEventSlots({
             eventsForSelectedDate.map((event) => (
               <div
                 key={event.id}
-                className="bg-muted after:bg-primary/70 relative rounded-md p-2 pl-6 text-sm after:absolute after:inset-y-2 after:left-2 after:w-1 after:rounded-full"
+                className="bg-muted relative rounded-md p-3 text-sm"
               >
-                <div className="font-medium">{event.event_title}</div>
-                <div className="text-muted-foreground text-xs">
-                  {event.event_date && formatEventTime(event.event_date, event.event_title)}
-                  {event.event_type && ` • ${event.event_type}`}
-                </div>
-                {event.description && (
-                  <div className="text-muted-foreground text-xs mt-1">
-                    {event.description}
+                <div className="flex gap-3">
+                  {event.image_url && (
+                    <div className="flex-shrink-0">
+                      <img
+                        src={event.image_url}
+                        alt={event.event_title || 'Event image'}
+                        className="w-16 h-16 object-cover rounded-md"
+                      />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium">{event.event_title}</div>
+                    <div className="text-muted-foreground text-xs">
+                      {event.event_date && formatEventTime(event.event_date, event.event_title)}
+                      {event.event_type && ` • ${event.event_type}`}
+                    </div>
+                    {event.description && (
+                      <div className="text-muted-foreground text-xs mt-1 line-clamp-2">
+                        {event.description}
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
             ))
           )}
