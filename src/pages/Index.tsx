@@ -103,7 +103,9 @@ const Index = () => {
                         alt={content.alt_text || content.title} 
                       />
                     )}
-                    <h3 className="text-2xl font-serif font-semibold">{content.title}</h3>
+                    <h3 className="text-2xl font-serif font-semibold">
+                      {content.title === "Scratch-Made Goodness" ? "Seasonally Inspired Flavors" : content.title}
+                    </h3>
                     <p className="mt-2 text-muted-foreground">{content.description}</p>
                   </div>
                 )
