@@ -33,7 +33,7 @@ const Index = () => {
         
         <div className="relative z-20 container px-4">
           <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold drop-shadow-lg">
-            Where Game Day Energy Meets Seasonally Inspired Flavor
+            Hillsboro's Sports & Flavor Hub
           </h1>
           <p className="mt-4 text-lg md:text-xl max-w-3xl mx-auto drop-shadow-md">Experience the thrill of the game and the taste of locally-sourced, PNW cuisine. Welcome to your new favorite spot.</p>
           <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto">
