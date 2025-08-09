@@ -1,6 +1,10 @@
 import React from 'react';
-import { Mail } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { Mail, Calendar, MapPin } from 'lucide-react';
 import { EventCard } from './EventCard';
+import { getEvents, type Event } from '@/services/eventService';
+import { Button } from '@/components/ui/button';
+import { format } from 'date-fns';
 const seasonalEvents = [{
   title: "Summer Cornhole League",
   emoji: "🏆",
@@ -14,12 +18,119 @@ const seasonalEvents = [{
   backgroundImage: "https://res.cloudinary.com/de3djsvlk/image/upload/v1753120007/summer_cornhole_xbikfm.jpg"
 }];
 export function SeasonalEventsSection() {
-  return <section className="mt-24">
+  const { data: events = [] } = useQuery<Event[]>({
+    queryKey: ['seasonal-sports-events'],
+    queryFn: getEvents,
+    staleTime: 30 * 1000,
+  });
+
+  // Filter for featured sports events (Civil War and other major games)
+  const sportsEvents = events.filter(event => 
+    event.is_featured && 
+    (event.event_type === 'NCAA FB' || event.event_type === 'Soccer') &&
+    new Date(event.event_date) >= new Date()
+  ).slice(0, 3); // Show top 3 upcoming featured sports events
+
+  return (
+    <section className="mt-24">
       <h2 className="text-3xl md:text-4xl font-bold font-serif text-center mb-12">Seasonal &amp; Special Events</h2>
-      <div className="flex justify-center">
-        {seasonalEvents.map(event => <EventCard key={event.title} title={event.title} emoji={event.emoji} description={event.description} details={event.details} cta={event.cta} backgroundImage={event.backgroundImage} className="max-w-3xl w-full" style={{
-        backgroundPosition: 'center 20%'
-      }} />)}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+        {/* Summer Cornhole League */}
+        {seasonalEvents.map(event => (
+          <EventCard 
+            key={event.title} 
+            title={event.title} 
+            emoji={event.emoji} 
+            description={event.description} 
+            details={event.details} 
+            cta={event.cta} 
+            backgroundImage={event.backgroundImage} 
+            className="w-full" 
+            style={{
+              backgroundPosition: 'center 20%'
+            }} 
+          />
+        ))}
+        
+        {/* Major Sports Events */}
+        {sportsEvents.map(event => (
+          <SportsEventCard key={event.id} event={event} />
+        ))}
       </div>
-    </section>;
+    </section>
+  );
+}
+
+interface SportsEventCardProps {
+  event: Event;
+}
+
+function SportsEventCard({ event }: SportsEventCardProps) {
+  const eventDate = new Date(event.event_date);
+  const isHomeGame = event.location?.includes('on-site') || 
+                     event.location?.includes('Autzen') || 
+                     event.location?.includes('Reser');
+
+  return (
+    <div className="relative overflow-hidden rounded-lg bg-card border shadow-lg group hover:shadow-xl transition-shadow">
+      {event.image_url && (
+        <div className="absolute inset-0">
+          <img
+            src={event.image_url}
+            alt={event.event_title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+          <div className="absolute inset-0 bg-black/60" />
+        </div>
+      )}
+      
+      <div className="relative z-10 p-6 text-white min-h-[300px] flex flex-col justify-between">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className={`px-2 py-1 rounded text-xs font-semibold ${
+              event.event_type === 'NCAA FB' 
+                ? 'bg-orange-600 text-white' 
+                : 'bg-green-600 text-white'
+            }`}>
+              {event.event_type}
+            </span>
+            {isHomeGame && (
+              <span className="px-2 py-1 rounded text-xs font-semibold bg-blue-600 text-white">
+                HOME
+              </span>
+            )}
+          </div>
+          
+          <h3 className="text-xl font-bold font-serif mb-2">
+            {event.event_title}
+          </h3>
+          
+          <p className="text-white/90 text-sm mb-4 line-clamp-2">
+            {event.description}
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-sm">
+            <Calendar className="w-4 h-4" />
+            <span>{format(eventDate, 'EEEE, MMMM d, yyyy')}</span>
+          </div>
+          
+          <div className="flex items-center gap-2 text-sm">
+            <MapPin className="w-4 h-4" />
+            <span>{event.location}</span>
+          </div>
+
+          {event.allow_rsvp && (
+            <Button 
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+              onClick={() => window.location.href = '/reservations'}
+            >
+              Reserve Your Table
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
