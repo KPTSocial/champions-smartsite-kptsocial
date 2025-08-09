@@ -250,7 +250,7 @@ const Menu = () => {
           <div className="text-center">
             <h1 className="text-5xl font-bold mb-4">Our Menu</h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Farm-fresh ingredients, bold flavors. Explore our selection of hand-crafted dishes.
+              Seasonally Inspired Ingredients. Bold Flavors. Explore our selection of hand-crafted dishes, curated in-house year-round.
             </p>
           </div>
         </div>
