@@ -13,11 +13,11 @@ const navItems = [{
   name: 'Happenings',
   path: '/happenings'
 }, {
-  name: 'Photo Booth',
-  path: '/photo-booth'
-}, {
   name: 'Menu',
   path: '/menu'
+}, {
+  name: 'Photo Booth',
+  path: '/photo-booth'
 }];
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
