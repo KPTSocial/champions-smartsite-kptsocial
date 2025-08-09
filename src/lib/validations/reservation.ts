@@ -13,17 +13,6 @@ export const reservationSchema = z.object({
   notes: z.string().max(500, "Notes cannot exceed 500 characters.").optional(),
   specialEventReason: z.string().max(100, "Reason cannot exceed 100 characters.").optional(),
 }).superRefine((data, ctx) => {
-    // Bingo and Trivia reservations - maximum 4 people
-    if ((data.reservationType === 'bingo' || data.reservationType === 'trivia') && data.partySize > 4) {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: data.reservationType === 'bingo' 
-                ? "Bingo Night reservations are limited to 4 people maximum."
-                : "Trivia Night reservations are limited to 4 people maximum.",
-            path: ["partySize"],
-        });
-    }
-    
     // Special event validation
     if (data.reservationType === 'special-event' && (!data.specialEventReason || data.specialEventReason.length < 2)) {
         ctx.addIssue({
