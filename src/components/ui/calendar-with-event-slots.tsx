@@ -71,9 +71,16 @@ export function CalendarWithEventSlots({
       if (eventTitle && eventTitle.toLowerCase().includes('taco tuesday')) {
         return '11:00 AM - 10:00 PM PT';
       }
+
+      // Portland Thorns games are currently stored 3 hours ahead — adjust display only
+      const isThorns = eventTitle?.toLowerCase().includes('thorns') ?? false;
+      let date = new Date(eventDate);
+      if (isThorns) {
+        date = new Date(date.getTime() - 3 * 60 * 60 * 1000);
+      }
       
-      // Convert UTC to Pacific Time and format with consistent AM/PM capitalization
-      const timeStr = formatInTimeZone(new Date(eventDate), 'America/Los_Angeles', 'h:mm a');
+      // Convert to Pacific Time and format with consistent AM/PM capitalization
+      const timeStr = formatInTimeZone(date, 'America/Los_Angeles', 'h:mm a');
       return timeStr.toUpperCase() + ' PT';
     } catch {
       return '';
