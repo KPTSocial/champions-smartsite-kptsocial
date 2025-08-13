@@ -465,6 +465,7 @@ export type Database = {
       photo_booth_posts: {
         Row: {
           admin_notes: string | null
+          approved: boolean
           approved_at: string | null
           approved_by: string | null
           caption: string
@@ -478,6 +479,7 @@ export type Database = {
         }
         Insert: {
           admin_notes?: string | null
+          approved?: boolean
           approved_at?: string | null
           approved_by?: string | null
           caption: string
@@ -491,6 +493,7 @@ export type Database = {
         }
         Update: {
           admin_notes?: string | null
+          approved?: boolean
           approved_at?: string | null
           approved_by?: string | null
           caption?: string

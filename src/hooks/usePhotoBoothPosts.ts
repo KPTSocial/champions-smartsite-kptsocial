@@ -65,6 +65,7 @@ export const usePhotoBoothPosts = (filters: PhotoBoothFilters = {}) => {
     try {
       const updates: any = { 
         status,
+        approved: status === 'approved', // Set approved boolean based on status
         approved_at: status === 'approved' ? new Date().toISOString() : null
       };
       
