@@ -1,7 +1,9 @@
 import React from 'react';
 import { MenuItem } from '@/types/menu';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
+import { Sparkles } from 'lucide-react';
 
 interface MenuItemAccordionProps {
   item: MenuItem;
@@ -11,7 +13,7 @@ const MenuItemAccordion: React.FC<MenuItemAccordionProps> = ({ item }) => {
   return (
     <AccordionItem value={item.id} className="bg-background/70 backdrop-blur-sm rounded-lg border border-border/50 overflow-hidden">
       <AccordionTrigger className="px-6 py-4 hover:no-underline">
-        <span className="font-semibold text-left flex items-center gap-2">
+        <span className="font-semibold text-left flex items-center gap-2 flex-wrap">
           {item.tags?.includes('CF') && (
             <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/fav_jvg2qc.jpg" alt="Champ's Favorite" className="w-6 h-6" />
           )}
@@ -21,7 +23,13 @@ const MenuItemAccordion: React.FC<MenuItemAccordionProps> = ({ item }) => {
           {item.tags?.includes('V') && (
             <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/veg_fbwf0q.jpg" alt="Vegetarian" className="w-6 h-6" />
           )}
-          {item.name}
+          <span className="flex-1">{item.name}</span>
+          {item.tags?.includes('NEW') && (
+            <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 animate-new-pulse font-bold shadow-lg ml-auto">
+              <Sparkles className="h-3 w-3 mr-1" />
+              NEW
+            </Badge>
+          )}
         </span>
       </AccordionTrigger>
       <AccordionContent className="px-6 pb-4">

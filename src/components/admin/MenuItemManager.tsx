@@ -10,7 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Edit, Trash2, Search, Star, Clock, Eye, EyeOff } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Star, Clock, Eye, EyeOff, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
@@ -237,6 +237,19 @@ const MenuItemManager: React.FC = () => {
     });
   };
 
+  const toggleNewTag = (item: MenuItem) => {
+    const currentTags = item.tags || [];
+    const hasNewTag = currentTags.includes('NEW');
+    const updatedTags = hasNewTag 
+      ? currentTags.filter(tag => tag !== 'NEW')
+      : [...currentTags, 'NEW'];
+    
+    updateMutation.mutate({
+      id: item.id,
+      tags: updatedTags
+    });
+  };
+
   // Filter items based on search and category
   const filteredItems = items?.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -340,7 +353,7 @@ const MenuItemManager: React.FC = () => {
               </div>
 
               {/* Toggles */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="is_available"
@@ -364,6 +377,21 @@ const MenuItemManager: React.FC = () => {
                     onCheckedChange={(checked) => setFormData({ ...formData, is_special: checked })}
                   />
                   <Label htmlFor="is_special">Monthly Special</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="is_new"
+                    checked={formData.tags.includes('NEW')}
+                    onCheckedChange={(checked) => {
+                      const tags = formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag && tag !== 'NEW');
+                      if (checked) tags.push('NEW');
+                      setFormData({ ...formData, tags: tags.join(', ') });
+                    }}
+                  />
+                  <Label htmlFor="is_new" className="flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" />
+                    Mark as New
+                  </Label>
                 </div>
               </div>
 
@@ -454,6 +482,12 @@ const MenuItemManager: React.FC = () => {
                         Special
                       </Badge>
                     )}
+                    {item.tags?.includes('NEW') && (
+                      <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 animate-pulse">
+                        <Sparkles className="h-3 w-3 mr-1" />
+                        NEW
+                      </Badge>
+                    )}
                   </div>
                   {item.description && (
                     <CardDescription>{item.description}</CardDescription>
@@ -472,6 +506,15 @@ const MenuItemManager: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => toggleNewTag(item)}
+                    className={item.tags?.includes('NEW') ? 'text-orange-600' : ''}
+                    title={item.tags?.includes('NEW') ? 'Remove NEW tag' : 'Mark as NEW'}
+                  >
+                    <Sparkles className="h-3 w-3" />
+                  </Button>
                   <Button
                     variant="outline"
                     size="sm"
