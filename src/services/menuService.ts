@@ -26,6 +26,7 @@ export async function getMenuData(): Promise<MenuSection[]> {
           description,
           price,
           image_url,
+          is_available,
           variants:menu_item_variants (
             id,
             name,
@@ -45,6 +46,15 @@ export async function getMenuData(): Promise<MenuSection[]> {
     throw error;
   }
 
-  // Supabase might return null if the table is empty or RLS fails.
-  return data || [];
+  // Filter out items that are not available (hidden from public view)
+  // Keep the structure intact, just filter the items within each category
+  const filteredData = data?.map(section => ({
+    ...section,
+    categories: section.categories?.map(category => ({
+      ...category,
+      items: category.items?.filter(item => item.is_available !== false) || []
+    })) || []
+  })) || [];
+
+  return filteredData;
 }

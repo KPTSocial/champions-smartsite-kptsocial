@@ -13,6 +13,7 @@ export interface MenuItem {
   image_url: string | null;
   tags?: string[];
   variants?: MenuItemVariant[];
+  is_available?: boolean;
 }
 
 export interface MenuCategory {
