@@ -27,6 +27,7 @@ export async function getMenuData(): Promise<MenuSection[]> {
           price,
           image_url,
           is_available,
+          tags,
           variants:menu_item_variants (
             id,
             name,
