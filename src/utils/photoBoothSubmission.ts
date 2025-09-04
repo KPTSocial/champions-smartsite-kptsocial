@@ -5,11 +5,20 @@ import { supabase } from "@/integrations/supabase/client";
 import type { PhotoFormValues } from "@/lib/validations/photoBoothForm";
 
 export const submitPhotoBoothForm = async (values: PhotoFormValues) => {
-  const file = values.picture[0];
+  // Get file from FileList or array-like object
+  const file = values.picture?.[0] || values.picture?.item?.(0);
+  
+  if (!file) {
+    throw new Error("No image file found. Please select an image.");
+  }
+  
+  console.log('Submitting photo:', file.name, 'Size:', file.size);
+  
   const userFullName = `${values.firstName} ${values.lastName}`;
   
   // Upload photo
   const publicUrl = await uploadToPhotoBucket(file, userFullName);
+  console.log('Photo uploaded to:', publicUrl);
   
   // Write to Supabase
   const { error } = await supabase
@@ -25,18 +34,29 @@ export const submitPhotoBoothForm = async (values: PhotoFormValues) => {
       image_url: publicUrl,
     }]);
   
-  if (error) throw error;
+  if (error) {
+    console.error('Supabase insert error:', error);
+    throw error;
+  }
+  
+  console.log('Data saved to Supabase');
 
   // Send to webhook
   const now = new Date();
-  await sendToWebhook({
-    firstName: values.firstName,
-    lastName: values.lastName,
-    email: values.email,
-    caption: values.caption?.trim() || null,
-    imageUrl: publicUrl,
-    timestamp: now.toISOString(),
-    formattedDate: formatDateToMMDDYY(now),
-    aiCaptionRequested: !values.caption?.trim() && values.wantAICaption ? true : false,
-  });
+  try {
+    await sendToWebhook({
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      caption: values.caption?.trim() || null,
+      imageUrl: publicUrl,
+      timestamp: now.toISOString(),
+      formattedDate: formatDateToMMDDYY(now),
+      aiCaptionRequested: !values.caption?.trim() && values.wantAICaption ? true : false,
+    });
+    console.log('Webhook sent successfully');
+  } catch (webhookError) {
+    console.error('Webhook failed but form submission continues:', webhookError);
+    // Don't throw - webhook failure shouldn't block the submission
+  }
 };

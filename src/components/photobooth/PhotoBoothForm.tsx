@@ -40,8 +40,11 @@ const PhotoBoothForm: React.FC = () => {
     const file = e.target.files?.[0];
     if (file) {
       try {
+        console.log('Processing file:', file.name, 'Size:', file.size);
+        
         // Compress image for mobile
         const compressedFile = await compressImage(file, 1920, 0.8);
+        console.log('Compressed file size:', compressedFile.size);
         
         const reader = new FileReader();
         reader.onload = (event) => {
@@ -49,10 +52,21 @@ const PhotoBoothForm: React.FC = () => {
         };
         reader.readAsDataURL(compressedFile);
         
-        // Update form with compressed file
-        const fileList = new DataTransfer();
-        fileList.items.add(compressedFile);
-        form.setValue('picture', fileList.files);
+        // Update form with compressed file - mobile compatible approach
+        // Create a FileList-like array that works on mobile
+        const files = [compressedFile] as any;
+        files.length = 1;
+        files.item = (index: number) => index === 0 ? compressedFile : null;
+        
+        form.setValue('picture', files, { 
+          shouldValidate: true,
+          shouldDirty: true 
+        });
+        
+        // Clear any previous errors
+        form.clearErrors('picture');
+        
+        console.log('File set successfully');
       } catch (error) {
         console.error('Error processing image:', error);
         toast({
@@ -122,7 +136,7 @@ const PhotoBoothForm: React.FC = () => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <PersonalInfoFields control={form.control} />
               
-              <FormField control={form.control} name="picture" render={({ field }) => (
+              <FormField control={form.control} name="picture" render={({ field, fieldState }) => (
                 <div className="space-y-4">
                   <MobilePhotoCapture
                     onCapture={handleFileChange}
@@ -135,6 +149,11 @@ const PhotoBoothForm: React.FC = () => {
                     onClearPreview={clearImagePreview}
                     field={field}
                   />
+                  {fieldState.error && (
+                    <p className="text-sm text-destructive">
+                      {fieldState.error.message}
+                    </p>
+                  )}
                 </div>
               )} />
               
