@@ -12,7 +12,7 @@ export const submitPhotoBoothForm = async (values: PhotoFormValues) => {
     throw new Error("No image file found. Please select an image.");
   }
   
-  console.log('Submitting photo:', file.name, 'Size:', file.size);
+  console.log('Submitting photo:', file.name, 'Size:', file.size, 'Type:', file.type);
   
   const userFullName = `${values.firstName} ${values.lastName}`;
   
@@ -41,20 +41,42 @@ export const submitPhotoBoothForm = async (values: PhotoFormValues) => {
   
   console.log('Data saved to Supabase');
 
-  // Send to webhook
+  // Send to webhook with enhanced payload
   const now = new Date();
   try {
+    // Parse tags from comma-separated string to array
+    const tagsArray = values.tags
+      ? values.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
+      : undefined;
+    
     await sendToWebhook({
-      firstName: values.firstName,
-      lastName: values.lastName,
-      email: values.email,
-      caption: values.caption?.trim() || null,
-      imageUrl: publicUrl,
+      // Core fields
       timestamp: now.toISOString(),
-      formattedDate: formatDateToMMDDYY(now),
-      aiCaptionRequested: !values.caption?.trim() && values.wantAICaption ? true : false,
+      formatted_date: formatDateToMMDDYY(now),
+      first_name: values.firstName,
+      last_name: values.lastName,
+      email: values.email,
+      caption_request: !values.caption?.trim() && values.wantAICaption ? true : false,
+      event_name: values.eventName || undefined,
+      status: 'QUEUED',
+      source: 'web',
+      
+      // File metadata
+      original_filename: file.name,
+      mime_type: file.type,
+      image_url: publicUrl,
+      image_data_size: file.size,
+      
+      // Optional fields
+      caption: values.caption?.trim() || null,
+      
+      // Advanced options
+      watermarkScale: values.watermarkScale || 0.2,
+      watermarkPosition: values.watermarkPosition || 'south_east',
+      shareConsent: values.consent,
+      tags: tagsArray,
     });
-    console.log('Webhook sent successfully');
+    console.log('Webhook sent successfully with enhanced payload');
   } catch (webhookError) {
     console.error('Webhook failed but form submission continues:', webhookError);
     // Don't throw - webhook failure shouldn't block the submission

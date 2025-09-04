@@ -1,19 +1,39 @@
 
 interface WebhookPayload {
-  firstName: string;
-  lastName: string;
-  email: string;
-  caption: string | null;
-  imageUrl: string;
+  // Core fields
   timestamp: string;
-  formattedDate: string;
-  aiCaptionRequested: boolean;
+  formatted_date: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  caption_request: boolean;
+  event_name?: string;
+  status: string;
+  source: string;
+  
+  // File metadata
+  original_filename: string;
+  mime_type: string;
+  image_url: string;
+  image_data_size: number;
+  
+  // Optional fields
+  caption?: string | null;
+  webhook_run_id?: string;
+  
+  // Advanced options
+  watermarkScale?: number;
+  watermarkPosition?: string;
+  shareConsent: boolean;
+  tags?: string[];
 }
 
 export async function sendToWebhook(payload: WebhookPayload): Promise<void> {
   const webhookUrl = "http://localhost:5678/webhook-test/champions-photobooth-upload";
   
   try {
+    console.log('Sending webhook with payload:', payload);
+    
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: {

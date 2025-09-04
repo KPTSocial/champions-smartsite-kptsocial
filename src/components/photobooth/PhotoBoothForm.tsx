@@ -14,6 +14,7 @@ import PhotoUploadField from './PhotoUploadField';
 import PersonalInfoFields from './form-fields/PersonalInfoFields';
 import CaptionFields from './form-fields/CaptionFields';
 import ConsentField from './form-fields/ConsentField';
+import AdvancedOptionsFields from './form-fields/AdvancedOptionsFields';
 import MobilePhotoCapture from './MobilePhotoCapture';
 
 const PhotoBoothForm: React.FC = () => {
@@ -31,6 +32,10 @@ const PhotoBoothForm: React.FC = () => {
       caption: "",
       wantAICaption: false,
       consent: false,
+      eventName: "",
+      watermarkScale: 0.2,
+      watermarkPosition: "south_east",
+      tags: "",
     },
   });
 
@@ -160,6 +165,8 @@ const PhotoBoothForm: React.FC = () => {
               <CaptionFields control={form.control} captionValue={captionValue} />
               
               <ConsentField control={form.control} />
+              
+              <AdvancedOptionsFields control={form.control} />
               
               {isLoading && uploadProgress > 0 && (
                 <div className="space-y-2">
