@@ -10,17 +10,17 @@ const MenuStats: React.FC = () => {
     queryKey: ['menu-stats'],
     queryFn: async () => {
       const [sectionsResult, categoriesResult, itemsResult, specialsResult] = await Promise.all([
-        supabase.from('menu_sections').select('id').eq('id', 'id'),
-        supabase.from('menu_categories').select('id').eq('id', 'id'),
-        supabase.from('menu_items').select('id').eq('id', 'id'),
-        supabase.from('menu_items').select('id').eq('is_special', true)
+        supabase.from('menu_sections').select('*', { count: 'exact', head: true }),
+        supabase.from('menu_categories').select('*', { count: 'exact', head: true }),
+        supabase.from('menu_items').select('*', { count: 'exact', head: true }),
+        supabase.from('menu_items').select('*', { count: 'exact', head: true }).eq('is_special', true)
       ]);
 
       return {
-        sections: sectionsResult.data?.length || 0,
-        categories: categoriesResult.data?.length || 0,
-        items: itemsResult.data?.length || 0,
-        specials: specialsResult.data?.length || 0
+        sections: sectionsResult.count || 0,
+        categories: categoriesResult.count || 0,
+        items: itemsResult.count || 0,
+        specials: specialsResult.count || 0
       };
     }
   });
