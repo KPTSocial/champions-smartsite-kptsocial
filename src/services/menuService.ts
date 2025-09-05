@@ -28,6 +28,7 @@ export async function getMenuData(): Promise<MenuSection[]> {
           image_url,
           is_available,
           tags,
+          sort_order,
           variants:menu_item_variants (
             id,
             name,
@@ -38,9 +39,7 @@ export async function getMenuData(): Promise<MenuSection[]> {
     `)
     .eq('menu_categories.is_visible', true)
     .order('sort_order', { ascending: true })
-    .order('sort_order', { foreignTable: 'menu_categories', ascending: true })
-    .order('sort_order', { foreignTable: 'menu_items', ascending: true });
-
+    .order('sort_order', { foreignTable: 'menu_categories', ascending: true });
 
   if (error) {
     console.error('Error fetching menu data:', error);
@@ -49,12 +48,13 @@ export async function getMenuData(): Promise<MenuSection[]> {
   }
 
   // Filter out items that are not available (hidden from public view)
-  // Keep the structure intact, just filter the items within each category
+  // Keep the structure intact, just filter and sort the items within each category
   const filteredData = data?.map(section => ({
     ...section,
     categories: section.categories?.map(category => ({
       ...category,
-      items: category.items?.filter(item => item.is_available !== false) || []
+      items: (category.items?.filter(item => item.is_available !== false) || [])
+        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
     })) || []
   })) || [];
 
