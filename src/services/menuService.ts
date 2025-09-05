@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { MenuSection } from '@/types/menu';
 
@@ -20,6 +19,7 @@ export async function getMenuData(): Promise<MenuSection[]> {
         name,
         description,
         is_visible,
+        sort_order,
         items:menu_items (
           id,
           name,
@@ -48,14 +48,16 @@ export async function getMenuData(): Promise<MenuSection[]> {
   }
 
   // Filter out items that are not available (hidden from public view)
-  // Keep the structure intact, just filter and sort the items within each category
-  const filteredData = data?.map(section => ({
+  // Keep the structure intact, but also sort categories and items by sort_order
+  const filteredData = data?.map((section: any) => ({
     ...section,
-    categories: section.categories?.map(category => ({
-      ...category,
-      items: (category.items?.filter(item => item.is_available !== false) || [])
-        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
-    })) || []
+    categories: (section.categories || [])
+      .sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0))
+      .map((category: any) => ({
+        ...category,
+        items: (category.items?.filter((item: any) => item.is_available !== false) || [])
+          .sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0))
+      }))
   })) || [];
 
   return filteredData;

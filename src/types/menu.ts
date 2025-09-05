@@ -14,6 +14,7 @@ export interface MenuItem {
   tags?: string[];
   variants?: MenuItemVariant[];
   is_available?: boolean;
+  sort_order?: number;
 }
 
 export interface MenuCategory {
@@ -21,6 +22,7 @@ export interface MenuCategory {
   name: string;
   description: string | null;
   is_visible?: boolean;
+  sort_order?: number;
   items: MenuItem[];
 }
 
