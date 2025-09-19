@@ -65,6 +65,9 @@ const VideoHeader = ({
         onLoadedData={handleVideoLoaded}
         onCanPlay={handleVideoCanPlay}
         className={`absolute inset-0 w-full h-full object-cover ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-500 ${className}`}
+        style={{
+          filter: 'brightness(1.15) contrast(1.1) saturate(1.2)',
+        }}
         aria-label={description || title || "Header video"}
       >
         <source src={videoUrl} type="video/mp4" />
