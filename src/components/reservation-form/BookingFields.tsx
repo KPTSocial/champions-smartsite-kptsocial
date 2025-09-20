@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ReservationFormData } from '@/lib/validations/reservation';
 import { EventCalendarField } from './EventCalendarField';
+import { TimePickerField } from './TimePickerField';
 
 export const BookingFields = () => {
   const { control } = useFormContext<ReservationFormData>();
@@ -31,19 +32,7 @@ export const BookingFields = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <EventCalendarField />
-          <FormField
-            control={control}
-            name="reservationTime"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Time (24hr format)</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g., 19:30" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <TimePickerField />
       </div>
 
       <FormField
