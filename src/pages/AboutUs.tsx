@@ -129,14 +129,16 @@ const AboutUs = () => {
               
               <Card className="overflow-hidden">
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-xl font-serif text-center">Seasonal Blizzards</CardTitle>
+                  <CardTitle className="text-xl font-serif text-center">Blizzard Wines</CardTitle>
                 </CardHeader>
                 <CardContent className="p-6 pt-0">
-                  <img 
-                    src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754712529/blizzard_jxofq3.jpg" 
-                    alt="Blizzard seasonal offerings" 
-                    className="rounded-lg object-cover aspect-square w-full" 
-                  />
+                  <div className="relative bg-muted/30 rounded-lg p-8 aspect-square flex items-center justify-center">
+                    <img 
+                      src="https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/photos/About%20Us%20/LogoFinalNoIcon.png" 
+                      alt="Blizzard Wines - Local wine partner" 
+                      className="max-w-full max-h-full object-contain" 
+                    />
+                  </div>
                 </CardContent>
               </Card>
           </div>
