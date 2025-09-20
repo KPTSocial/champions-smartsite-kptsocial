@@ -52,6 +52,11 @@ const Index = () => {
           <p className="mt-6 text-white text-xl md:text-2xl text-center drop-shadow-md">
             <a href="tel:5037476063" className="hover:underline">(503) 747-6063</a>
           </p>
+          
+          {/* Loyalty Widget - Desktop Only */}
+          <div className="hidden lg:block mt-8">
+            <SpotOnLoyaltyWidget variant="hero" className="mx-auto max-w-[250px]" />
+          </div>
         </div>
       </section>
 
@@ -116,9 +121,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      {/* SpotOn Loyalty Widget */}
-      <SpotOnLoyaltyWidget />
     </div>;
 };
 export default Index;

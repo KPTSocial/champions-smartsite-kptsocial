@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { cn } from '@/lib/utils';
 
-const SpotOnLoyaltyWidget = () => {
+interface SpotOnLoyaltyWidgetProps {
+  variant?: 'floating' | 'hero' | 'navbar';
+  className?: string;
+}
+
+const SpotOnLoyaltyWidget = ({ variant = 'floating', className }: SpotOnLoyaltyWidgetProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalState, setModalState] = useState<'form' | 'success' | 'error'>('form');
   const [isLoading, setIsLoading] = useState(false);
@@ -109,19 +115,59 @@ const SpotOnLoyaltyWidget = () => {
     resetForm();
   };
 
+  const getButtonStyles = () => {
+    switch (variant) {
+      case 'hero':
+        return cn(
+          "inline-flex items-center cursor-pointer rounded-3xl p-2 shadow-lg transition-all hover:scale-105",
+          "bg-[#1254cc] hover:bg-[#0e3fa0]",
+          className
+        );
+      case 'navbar':
+        return cn(
+          "flex items-center cursor-pointer rounded-full px-3 py-1.5 shadow-md transition-all hover:scale-105",
+          "bg-[#1254cc] hover:bg-[#0e3fa0]",
+          className
+        );
+      default:
+        return cn(
+          "fixed bottom-8 right-11 z-[99] flex items-center cursor-pointer rounded-3xl p-2 max-w-[187px] w-full shadow-lg",
+          className
+        );
+    }
+  };
+
+  const getTextStyles = () => {
+    switch (variant) {
+      case 'navbar':
+        return "text-white font-semibold text-xs font-['Poppins',sans-serif] whitespace-nowrap";
+      default:
+        return "text-white border-l-2 border-white pl-2 ml-2 font-semibold text-xs font-['Poppins',sans-serif]";
+    }
+  };
+
+  const getIconSize = () => {
+    switch (variant) {
+      case 'navbar':
+        return "min-w-[24px] h-[24px]";
+      default:
+        return "min-w-[30px] h-[30px]";
+    }
+  };
+
   return (
     <>
-      {/* Floating Button */}
+      {/* Button */}
       <div
         onClick={() => setIsModalOpen(true)}
-        className="fixed bottom-8 right-11 z-[99] flex items-center cursor-pointer rounded-3xl p-2 max-w-[187px] w-full shadow-lg"
-        style={{
+        className={getButtonStyles()}
+        style={variant !== 'hero' && variant !== 'navbar' ? {
           backgroundColor: '#1254cc',
           boxShadow: '0 6px 12px rgba(53, 63, 94, 0.1)'
-        }}
+        } : undefined}
       >
         <div
-          className="min-w-[30px] h-[30px] rounded-full overflow-hidden"
+          className={cn("rounded-full overflow-hidden", getIconSize())}
           style={{
             backgroundImage: "url('https://s3.amazonaws.com/spoton-gallery/672d0ac8b34c271342f0cb2e/672d0ac8b34c271342f0cb2e/b71ad7b3-37b2-4d6c-b9c2-1f18efcfd38d.png')",
             backgroundColor: '#ffffff',
@@ -130,8 +176,8 @@ const SpotOnLoyaltyWidget = () => {
             backgroundSize: 'cover'
           }}
         />
-        <div className="text-white border-l-2 border-white pl-2 ml-2 font-semibold text-xs font-['Poppins',sans-serif]">
-          Join our rewards program today
+        <div className={getTextStyles()}>
+          {variant === 'navbar' ? 'Rewards' : 'Join our rewards program today'}
         </div>
       </div>
 
