@@ -132,7 +132,7 @@ const AboutUs = () => {
                   <CardTitle className="text-xl font-serif text-center">Blizzard Wines</CardTitle>
                 </CardHeader>
                 <CardContent className="p-6 pt-0">
-                  <div className="relative bg-muted/30 rounded-lg p-8 aspect-square flex items-center justify-center">
+                  <div className="relative bg-muted/30 rounded-lg p-4 aspect-square flex items-center justify-center">
                     <img 
                       src="https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/photos/About%20Us%20/BlizzardWinesLogoSmall.webp" 
                       alt="Blizzard Wines - Local wine partner" 
