@@ -88,7 +88,8 @@ const Menu = () => {
                  sectionName.includes('main') ||
                  sectionName.includes('dessert') ||
                  sectionName.includes('salad') ||
-                 sectionName.includes('soup');
+                 sectionName.includes('soup') ||
+                 sectionName.includes('breakfast');
         } else {
           return sectionName.includes('drink') || 
                  sectionName.includes('beverage') || 
@@ -178,7 +179,8 @@ const Menu = () => {
            sectionName.includes('main') ||
            sectionName.includes('dessert') ||
            sectionName.includes('salad') ||
-           sectionName.includes('soup');
+           sectionName.includes('soup') ||
+           sectionName.includes('breakfast');
   };
 
   // Set initial active section when data loads
