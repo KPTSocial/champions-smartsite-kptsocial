@@ -61,7 +61,8 @@ const Footer = () => {
           <div>
             <h3 className="font-serif text-lg font-semibold tracking-wider uppercase text-primary">Hours</h3>
             <ul className="mt-4 space-y-2 text-sm text-secondary-foreground/70">
-                <li><span className="font-semibold text-secondary-foreground">Sun - Tue:</span> 11AM - 10PM</li>
+                <li><span className="font-semibold text-secondary-foreground">Sun:</span> 9AM - 10PM</li>
+                <li><span className="font-semibold text-secondary-foreground">Mon - Tue:</span> 11AM - 10PM</li>
                 <li><span className="font-semibold text-secondary-foreground">Wed - Thu:</span> 11AM - 11PM</li>
                 <li><span className="font-semibold text-secondary-foreground">Fri:</span> 11AM - 12AM</li>
                 <li><span className="font-semibold text-secondary-foreground">Sat:</span> 11AM - 11PM</li>
