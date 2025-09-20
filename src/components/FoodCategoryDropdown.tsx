@@ -66,89 +66,24 @@ const FoodCategoryDropdown: React.FC<FoodCategoryDropdownProps> = ({
                 </div>
               </button>
               
-              {/* 4-row grid layout */}
-              <div className="space-y-3">
-                {/* Row 1: First 3 categories */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
-                  {categories.slice(0, 3).map((category) => (
-                    <button
-                      key={category.id}
-                      onClick={() => handleCategorySelect(category.id)}
-                      className={`p-2 sm:p-3 rounded-lg transition-colors text-center ${
-                        selectedCategory === category.id 
-                          ? 'bg-primary/20 text-primary border border-primary/30' 
-                          : 'bg-background/50 hover:bg-background/80 border border-border/30'
-                      }`}
-                    >
-                      <div className="font-medium text-xs sm:text-sm">{category.name}</div>
-                      <Badge variant="outline" className="text-xs mt-1">
-                        {category.items.length} items
-                      </Badge>
-                    </button>
-                  ))}
-                </div>
-                
-                {/* Row 2: Categories 4-6 */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
-                  {categories.slice(3, 6).map((category) => (
-                    <button
-                      key={category.id}
-                       onClick={() => handleCategorySelect(category.id)}
-                      className={`p-2 sm:p-3 rounded-lg transition-colors text-center ${
-                        selectedCategory === category.id 
-                          ? 'bg-primary/20 text-primary border border-primary/30' 
-                          : 'bg-background/50 hover:bg-background/80 border border-border/30'
-                      }`}
-                    >
-                      <div className="font-medium text-xs sm:text-sm">{category.name}</div>
-                      <Badge variant="outline" className="text-xs mt-1">
-                        {category.items.length} items
-                      </Badge>
-                    </button>
-                  ))}
-                </div>
-                
-                {/* Row 3: Categories 7-9 */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
-                  {categories.slice(6, 9).map((category) => (
-                    <button
-                      key={category.id}
-                       onClick={() => handleCategorySelect(category.id)}
-                      className={`p-2 sm:p-3 rounded-lg transition-colors text-center ${
-                        selectedCategory === category.id 
-                          ? 'bg-primary/20 text-primary border border-primary/30' 
-                          : 'bg-background/50 hover:bg-background/80 border border-border/30'
-                      }`}
-                    >
-                      <div className="font-medium text-xs sm:text-sm">{category.name}</div>
-                      <Badge variant="outline" className="text-xs mt-1">
-                        {category.items.length} items
-                      </Badge>
-                    </button>
-                  ))}
-                </div>
-                
-                {/* Row 4: Remaining categories (2 columns, centered) */}
-                {categories.slice(9).length > 0 && (
-                  <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4 max-w-md mx-auto">
-                    {categories.slice(9).map((category) => (
-                      <button
-                        key={category.id}
-                        onClick={() => handleCategorySelect(category.id)}
-                        className={`p-2 sm:p-3 rounded-lg transition-colors text-center ${
-                          selectedCategory === category.id 
-                            ? 'bg-primary/20 text-primary border border-primary/30' 
-                            : 'bg-background/50 hover:bg-background/80 border border-border/30'
-                        }`}
-                      >
-                        <div className="font-medium text-xs sm:text-sm">{category.name}</div>
-                        <Badge variant="outline" className="text-xs mt-1">
-                          {category.items.length} items
-                        </Badge>
-                      </button>
-                    ))}
-                  </div>
-                )}
+              {/* All categories in a single responsive grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => handleCategorySelect(category.id)}
+                    className={`p-2 sm:p-3 rounded-lg transition-colors text-center ${
+                      selectedCategory === category.id 
+                        ? 'bg-primary/20 text-primary border border-primary/30' 
+                        : 'bg-background/50 hover:bg-background/80 border border-border/30'
+                    }`}
+                  >
+                    <div className="font-medium text-xs sm:text-sm">{category.name}</div>
+                    <Badge variant="outline" className="text-xs mt-1">
+                      {category.items.length} items
+                    </Badge>
+                  </button>
+                ))}
               </div>
             </div>
           </AccordionContent>
