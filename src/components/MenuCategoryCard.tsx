@@ -18,7 +18,12 @@ const MenuCategoryCard: React.FC<MenuCategoryCardProps> = ({
   }
   return <Card className="h-full overflow-hidden">
       <CardHeader className="pb-4">
-        <CardTitle className="text-2xl font-serif text-secondary">{category.name}</CardTitle>
+        <CardTitle className="text-2xl font-serif text-secondary">
+          {category.name}
+          {category.name === 'Happy Hour' && (
+            <span className="text-base font-normal text-muted-foreground ml-2">(Dine-In Only)</span>
+          )}
+        </CardTitle>
         {category.description}
       </CardHeader>
       <CardContent className="pt-0">
