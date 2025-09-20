@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { BackgroundPaths } from "@/components/ui/background-paths";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 const AboutUs = () => {
   const jaredSectionRef = useRef<HTMLDivElement | null>(null);
   const handleHeroButtonClick = () => {
@@ -98,9 +99,46 @@ const AboutUs = () => {
               <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">Our ingredients shift with the seasons—because the best flavors come from right here, right now. Grown in Northwest soil and crafted in-house, every dish tells the story of where we live and what we stand for.</p>
           </div>
           <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              <img src="https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/photos/About%20Us%20/logo-%20Hills%20Meats.png" alt="Hills Meats - Local meat supplier" className="rounded-lg object-cover aspect-square shadow-md" />
-              <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754712529/Vertigo_Brewing_o9aigv.jpg" alt="Vertigo Brewing collaboration" className="rounded-lg object-cover aspect-square shadow-md" />
-              <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754712529/blizzard_jxofq3.jpg" alt="Blizzard seasonal offerings" className="rounded-lg object-cover aspect-square shadow-md" />
+              <Card className="overflow-hidden">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-xl font-serif text-center">Hills Meats</CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 pt-0">
+                  <div className="relative bg-muted/30 rounded-lg p-8 aspect-square flex items-center justify-center">
+                    <img 
+                      src="https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/photos/About%20Us%20/logo-%20Hills%20Meats.png" 
+                      alt="Hills Meats - Local meat supplier" 
+                      className="max-w-full max-h-full object-contain" 
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="overflow-hidden">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-xl font-serif text-center">Vertigo Brewing</CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 pt-0">
+                  <img 
+                    src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754712529/Vertigo_Brewing_o9aigv.jpg" 
+                    alt="Vertigo Brewing collaboration" 
+                    className="rounded-lg object-cover aspect-square w-full" 
+                  />
+                </CardContent>
+              </Card>
+              
+              <Card className="overflow-hidden">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-xl font-serif text-center">Seasonal Blizzards</CardTitle>
+                </CardHeader>
+                <CardContent className="p-6 pt-0">
+                  <img 
+                    src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754712529/blizzard_jxofq3.jpg" 
+                    alt="Blizzard seasonal offerings" 
+                    className="rounded-lg object-cover aspect-square w-full" 
+                  />
+                </CardContent>
+              </Card>
           </div>
         </div>
       </div>
