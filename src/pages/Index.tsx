@@ -54,7 +54,7 @@ const Index = () => {
           </p>
           
           {/* Loyalty Widget - Desktop Only */}
-          <div className="hidden lg:block mt-12">
+          <div className="mt-12">
             <SpotOnLoyaltyWidget variant="hero" className="mx-auto max-w-[250px]" />
           </div>
         </div>

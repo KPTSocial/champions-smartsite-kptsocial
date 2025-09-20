@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Menu as MenuIcon } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from 'react';
-import SpotOnLoyaltyWidget from '@/components/loyalty/SpotOnLoyaltyWidget';
 const navItems = [{
   name: 'Home',
   path: '/'
@@ -36,10 +35,8 @@ const Header = () => {
             </NavLink>)}
         </nav>
         
-        {/* Loyalty Widget - Mobile/Tablet Only */}
-        <div className="lg:hidden flex items-center gap-3">
-          <SpotOnLoyaltyWidget variant="navbar" />
-          <div>
+        {/* Mobile Menu Button */}
+        <div className="lg:hidden">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="h-10 w-10">
@@ -64,7 +61,6 @@ const Header = () => {
               </div>
           </SheetContent>
         </Sheet>
-          </div>
         </div>
       </div>
     </header>;
