@@ -4,6 +4,7 @@ import FoodCategoryDropdown from './FoodCategoryDropdown';
 import MenuCategoryCard from './MenuCategoryCard';
 import FoodSectionDisclaimer from './FoodSectionDisclaimer';
 import DrinksSectionDisclaimer from './DrinksSectionDisclaimer';
+import SundayBreakfastDisclaimer from './SundayBreakfastDisclaimer';
 
 interface EnhancedFoodSectionProps {
   section: MenuSection;
@@ -53,9 +54,13 @@ const EnhancedFoodSection: React.FC<EnhancedFoodSectionProps> = ({
       
       {/* Show disclaimer after the cards */}
       {displayCategories.length > 0 && (
-        section.name?.toLowerCase().includes('drink') || section.name?.toLowerCase().includes('beverage') || section.name?.toLowerCase().includes('bar') ? 
-          <DrinksSectionDisclaimer categoryDescription={section.description} /> : 
+        section.name === 'Sunday Breakfast' ? (
+          <SundayBreakfastDisclaimer />
+        ) : section.name?.toLowerCase().includes('drink') || section.name?.toLowerCase().includes('beverage') || section.name?.toLowerCase().includes('bar') ? (
+          <DrinksSectionDisclaimer categoryDescription={section.description} />
+        ) : (
           <FoodSectionDisclaimer categoryDescription={section.description} />
+        )
       )}
     </section>
   );
