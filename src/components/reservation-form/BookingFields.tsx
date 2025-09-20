@@ -13,34 +13,32 @@ export const BookingFields = () => {
   const { control } = useFormContext<ReservationFormData>();
 
   return (
-    <>
+    <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <FormField
-              control={control}
-              name="partySize"
-              render={({ field }) => (
-                  <FormItem>
-                  <FormLabel>Party Size <span className="text-destructive">*</span></FormLabel>
-                  <FormControl>
-                      <Input type="number" min={1} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                  </FormItem>
-              )}
-          />
+        <FormField
+          control={control}
+          name="partySize"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Party Size <span className="text-destructive">*</span></FormLabel>
+              <FormControl>
+                <Input type="number" min={1} placeholder="2" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <EventCalendarField />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <EventCalendarField />
-          <TimePickerField />
-      </div>
+      <TimePickerField />
 
       <FormField
         control={control}
         name="notes"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Notes (optional)</FormLabel>
+            <FormLabel>Notes <span className="text-muted-foreground">(Optional)</span></FormLabel>
             <FormControl>
               <Textarea
                 placeholder="Any special requests or dietary restrictions?"
@@ -52,6 +50,6 @@ export const BookingFields = () => {
           </FormItem>
         )}
       />
-    </>
+    </div>
   );
 };
