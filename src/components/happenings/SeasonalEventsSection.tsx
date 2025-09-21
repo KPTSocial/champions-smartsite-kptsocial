@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Mail, Calendar, MapPin } from 'lucide-react';
+import { Mail, Calendar, MapPin, Phone } from 'lucide-react';
 import { EventCard } from './EventCard';
 import { getEvents, type Event } from '@/services/eventService';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,17 @@ const seasonalEvents = [{
     icon: Mail
   },
   backgroundImage: "https://res.cloudinary.com/de3djsvlk/image/upload/v1753120007/summer_cornhole_xbikfm.jpg"
+}, {
+  title: "Sunday Breakfast & NFL Games",
+  emoji: "🏈",
+  description: "Join us for Sunday breakfast from 9am-12pm throughout football season! As a Green Bay Packers bar, all televised games are shown with sound. Start your game day right with a hearty breakfast.",
+  details: ["Every Sunday during Football Season", "Breakfast: 9am - 12pm", "All Packers games with sound"],
+  cta: {
+    text: "Call for Game Placement",
+    href: "tel:+15037476063",
+    icon: Phone
+  },
+  backgroundImage: "" // Placeholder for user's image upload
 }];
 export function SeasonalEventsSection() {
   const { data: events = [] } = useQuery<Event[]>({
