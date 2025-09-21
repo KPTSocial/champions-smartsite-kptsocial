@@ -19,7 +19,7 @@ const seasonalEvents = [{
 }, {
   title: "Sunday Breakfast & NFL Games",
   emoji: "🏈",
-  description: "Join us for Sunday breakfast from 9am-12pm throughout football season! As a Green Bay Packers bar, all televised games are shown with sound. Start your game day right with a hearty breakfast.",
+  description: "Join us for Sunday breakfast from 9am-12pm throughout football season! Start your game day right with a hearty breakfast.",
   details: ["Every Sunday during Football Season", "Breakfast: 9am - 12pm", "All Packers games with sound"],
   cta: {
     text: "Call for Game Placement",
