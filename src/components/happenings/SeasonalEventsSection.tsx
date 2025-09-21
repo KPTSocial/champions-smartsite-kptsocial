@@ -26,7 +26,7 @@ const seasonalEvents = [{
     href: "tel:+15037476063",
     icon: Phone
   },
-  backgroundImage: "" // Placeholder for user's image upload
+  backgroundImage: "https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/photos/Special%20Events/Gemini_Generated_Image_mjg6qomjg6qomjg6.png"
 }];
 export function SeasonalEventsSection() {
   const { data: events = [] } = useQuery<Event[]>({
