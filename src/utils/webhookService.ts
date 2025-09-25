@@ -29,7 +29,7 @@ interface WebhookPayload {
 }
 
 export async function sendToWebhook(payload: WebhookPayload): Promise<void> {
-  const webhookUrl = "http://localhost:5678/webhook-test/champions-photobooth-upload";
+  const webhookUrl = "https://hook.us2.make.com/8l5czub5ulppyui2m5h31h2vinwogcky";
   
   try {
     console.log('Sending webhook with payload:', payload);
