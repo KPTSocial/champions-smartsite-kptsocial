@@ -23,7 +23,7 @@ const Index = () => {
   console.log('Error:', error);
   return <div>
       {/* Hero Section */}
-      <section className="relative h-[60vh] md:h-[80vh] w-full flex items-center justify-center text-center text-white">
+      <section className="relative min-h-[500px] h-[60vh] h-[60dvh] md:min-h-[600px] md:h-[80vh] md:h-[80dvh] w-full flex items-center justify-center text-center text-white">
         <div className="absolute inset-0 bg-black/50 z-10"></div>
         
         {/* Video or clean background */}
