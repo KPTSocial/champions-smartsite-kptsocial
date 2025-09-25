@@ -73,15 +73,6 @@ const PhotoUploadField: React.FC<PhotoUploadFieldProps> = ({
               )}
               onClick={handleUploadClick}
             >
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onChange={handleFileInputChange}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
-              
               <div className="flex flex-col items-center space-y-4">
                 <div className={cn(
                   "p-4 rounded-full transition-colors duration-200",
