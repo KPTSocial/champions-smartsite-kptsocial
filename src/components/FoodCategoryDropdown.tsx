@@ -52,6 +52,8 @@ const FoodCategoryDropdown: React.FC<FoodCategoryDropdownProps> = ({
             <div className="space-y-4">
               <button
                 onClick={() => handleCategorySelect(null)}
+                aria-label="View all food categories"
+                aria-pressed={!selectedCategory}
                 className={`w-full text-left p-3 rounded-lg transition-colors ${
                   !selectedCategory 
                     ? 'bg-primary/20 text-primary border border-primary/30' 
@@ -72,6 +74,8 @@ const FoodCategoryDropdown: React.FC<FoodCategoryDropdownProps> = ({
                   <button
                     key={category.id}
                     onClick={() => handleCategorySelect(category.id)}
+                    aria-label={`Select ${category.name} category with ${category.items.length} items`}
+                    aria-pressed={selectedCategory === category.id}
                     className={`p-2 sm:p-3 rounded-lg transition-colors text-center ${
                       selectedCategory === category.id 
                         ? 'bg-primary/20 text-primary border border-primary/30' 

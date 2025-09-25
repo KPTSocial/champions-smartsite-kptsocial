@@ -41,6 +41,8 @@ const DesktopMenuNavigation = ({
     <button
       key={category.id}
       onClick={() => onCategoryChange(category.id)}
+      aria-label={`Select ${category.name} category`}
+      aria-pressed={selectedCategory === category.id}
       className={`px-4 py-2 rounded-full border transition-colors text-sm font-medium ${
         selectedCategory === category.id
           ? 'bg-primary text-primary-foreground'

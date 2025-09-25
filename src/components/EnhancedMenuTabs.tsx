@@ -49,7 +49,7 @@ const EnhancedMenuTabs: React.FC<EnhancedMenuTabsProps> = ({
   }, []);
 
   return (
-    <nav ref={tabsRef} className="relative flex flex-wrap gap-3 w-fit mx-auto mb-12">
+    <nav ref={tabsRef} className="relative flex flex-wrap gap-3 w-fit mx-auto mb-12" role="tablist">
       {/* Moving highlight */}
       <span
         className="absolute bg-primary rounded-full transition-all duration-300 ease-out -z-10"
@@ -61,6 +61,9 @@ const EnhancedMenuTabs: React.FC<EnhancedMenuTabsProps> = ({
           key={section.id}
           ref={activeSection === section.id ? activeTabRef : null}
           onClick={() => onSectionChange(section.id)}
+          role="tab"
+          aria-selected={activeSection === section.id}
+          aria-label={`View ${section.name} menu section`}
           className={cn(
             "relative px-6 py-3 font-semibold transition-colors duration-200 rounded-full",
             activeSection === section.id

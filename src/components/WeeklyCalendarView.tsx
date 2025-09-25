@@ -36,11 +36,11 @@ const WeeklyCalendarView: React.FC<WeeklyCalendarViewProps> = ({ events, current
   return (
     <Card className="rounded-lg border bg-card text-card-foreground shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between p-4 border-b">
-        <Button variant="outline" size="icon" className="h-7 w-7" onClick={onPrevWeek}>
+        <Button variant="outline" size="icon" className="h-7 w-7" onClick={onPrevWeek} aria-label="Previous week">
             <ChevronLeft className="h-4 w-4" />
         </Button>
         <p className="text-sm font-medium">{format(weekStart, 'MMM d')} - {format(weekEnd, 'd, yyyy')}</p>
-        <Button variant="outline" size="icon" className="h-7 w-7" onClick={onNextWeek}>
+        <Button variant="outline" size="icon" className="h-7 w-7" onClick={onNextWeek} aria-label="Next week">
             <ChevronRight className="h-4 w-4" />
         </Button>
       </CardHeader>

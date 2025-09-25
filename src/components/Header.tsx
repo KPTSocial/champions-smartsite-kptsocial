@@ -39,7 +39,7 @@ const Header = () => {
         <div className="lg:hidden">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="h-10 w-10">
+              <Button variant="outline" size="icon" className="h-10 w-10" aria-label="Open menu">
                 <MenuIcon className="h-5 w-5" />
               </Button>
             </SheetTrigger>
