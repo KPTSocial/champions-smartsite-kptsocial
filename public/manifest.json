@@ -10,19 +10,19 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/favicon.ico",
+      "src": "https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/photos/Watermark/ChatGPT%20Image%20Jun%2018,%202025,%2010_31_45%20PM.png",
       "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "type": "image/png"
     },
     {
-      "src": "/placeholder.svg",
-      "type": "image/svg+xml",
+      "src": "https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/photos/Watermark/ChatGPT%20Image%20Jun%2018,%202025,%2010_31_45%20PM.png",
+      "type": "image/png",
       "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
-      "src": "/placeholder.svg",
-      "type": "image/svg+xml",
+      "src": "https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/photos/Watermark/ChatGPT%20Image%20Jun%2018,%202025,%2010_31_45%20PM.png",
+      "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
     }
