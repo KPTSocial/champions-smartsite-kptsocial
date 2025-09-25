@@ -148,12 +148,14 @@ const PhotoBoothForm: React.FC = () => {
                     imagePreview={imagePreview}
                     onClearPreview={clearImagePreview}
                   />
-                  <PhotoUploadField
-                    imagePreview={imagePreview}
-                    onFileChange={handleFileChange}
-                    onClearPreview={clearImagePreview}
-                    field={field}
-                  />
+                  <div className="hidden md:block">
+                    <PhotoUploadField
+                      imagePreview={imagePreview}
+                      onFileChange={handleFileChange}
+                      onClearPreview={clearImagePreview}
+                      field={field}
+                    />
+                  </div>
                   {fieldState.error && (
                     <p className="text-sm text-destructive">
                       {fieldState.error.message}
