@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.50.0";
+import { toZonedTime, format } from "https://esm.sh/date-fns-tz@3.2.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -78,12 +79,22 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
-    // Format date for webhook
+    // Convert UTC to Pacific Time for webhook
+    const timeZone = 'America/Los_Angeles';
+    const utcDate = new Date(reservation.reservation_date);
+    const pacificDate = toZonedTime(utcDate, timeZone);
+    
+    // Format date for webhook (MM/DD/YY)
     const formatDateForWebhook = (date: Date): string => {
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
       const year = String(date.getFullYear()).slice(-2);
       return `${month}/${day}/${year}`;
+    };
+    
+    // Format time in Pacific Time (HH:MM)
+    const formatTimeForWebhook = (date: Date): string => {
+      return format(date, 'HH:mm', { timeZone });
     };
 
     // Prepare webhook payload
@@ -95,12 +106,12 @@ const handler = async (req: Request): Promise<Response> => {
       email: reservation.email,
       phoneNumber: reservation.phone_number || '',
       
-      // Reservation Details
+      // Reservation Details (in Pacific Time)
       partySize: reservation.party_size,
       reservationType: reservationType,
-      reservationDate: formatDateForWebhook(new Date(reservation.reservation_date)),
-      reservationTime: new Date(reservation.reservation_date).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }),
-      reservationDateTime: reservation.reservation_date,
+      reservationDate: formatDateForWebhook(pacificDate),
+      reservationTime: formatTimeForWebhook(pacificDate),
+      reservationDateTime: reservation.reservation_date, // Keep UTC for reference
       
       // Additional Information
       notes: reservation.notes || '',

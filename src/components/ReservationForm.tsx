@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
+import { toZonedTime, fromZonedTime } from "date-fns-tz";
 
 import { reservationSchema, ReservationFormData } from "@/lib/validations/reservation";
 import { useAddReservation } from "@/hooks/useAddReservation";
@@ -54,11 +55,19 @@ const ReservationForm = () => {
     console.log("=== FORM SUBMISSION START ===");
     console.log("Form data:", JSON.stringify(data, null, 2));
     
+    // Pacific Time zone
+    const timeZone = 'America/Los_Angeles';
+    
+    // Create a date in Pacific Time
     const [hour, minute] = data.reservationTime.split(':').map(Number);
-    const combinedDateTime = new Date(data.reservationDate);
-    combinedDateTime.setHours(hour, minute);
-
-    console.log("Combined date/time:", combinedDateTime.toISOString());
+    const pacificDate = new Date(data.reservationDate);
+    pacificDate.setHours(hour, minute, 0, 0);
+    
+    // Convert Pacific Time to UTC for storage
+    const utcDate = fromZonedTime(pacificDate, timeZone);
+    
+    console.log("Pacific time:", pacificDate.toLocaleString('en-US', { timeZone }));
+    console.log("UTC time for storage:", utcDate.toISOString());
 
     // Concatenate full name for DB insertion
     const fullName = data.lastName 
@@ -105,7 +114,7 @@ const ReservationForm = () => {
           email: data.email,
           phone_number: data.phoneNumber || null,
           party_size: data.partySize,
-          reservation_date: combinedDateTime.toISOString(),
+          reservation_date: utcDate.toISOString(),
           notes: data.notes || null,
           reservation_type: 'Event',
           event_id: matchingEvent.id,
@@ -135,7 +144,7 @@ const ReservationForm = () => {
           email: data.email,
           phone_number: data.phoneNumber || null,
           party_size: data.partySize,
-          reservation_date: combinedDateTime.toISOString(),
+          reservation_date: utcDate.toISOString(),
           notes: finalNotes || null,
           reservation_type: 'Table',
           event_id: null,
