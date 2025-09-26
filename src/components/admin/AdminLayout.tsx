@@ -35,9 +35,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const isActiveRoute = (path: string) => location.pathname === path;
 
   const navigationItems = [
-    { href: '/admin/photo-booth', icon: Camera, label: 'Photo Booth' },
     { href: '/admin/menu', icon: MenuIcon, label: 'Menu' },
     { href: '/admin/events', icon: Calendar, label: 'Events' },
+    { href: '/admin/photo-booth', icon: Camera, label: 'Photo Booth' },
     { href: '/admin/members', icon: Users, label: 'Members' },
   ];
 
