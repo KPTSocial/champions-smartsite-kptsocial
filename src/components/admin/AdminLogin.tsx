@@ -25,7 +25,7 @@ const AdminLogin: React.FC = () => {
   }
 
   if (isAdmin) {
-    return <Navigate to="/admin/photo-booth" replace />;
+    return <Navigate to="/admin/menu" replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
