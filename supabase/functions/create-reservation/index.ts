@@ -153,10 +153,11 @@ const handler = async (req: Request): Promise<Response> => {
 
   } catch (error) {
     console.error('Error in create-reservation function:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
       JSON.stringify({ 
         error: 'Failed to create reservation', 
-        details: error.message 
+        details: errorMessage
       }),
       {
         status: 500,

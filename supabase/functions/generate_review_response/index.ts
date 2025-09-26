@@ -68,7 +68,7 @@ serve(async (req) => {
     const aiResponseText = aiData.choices?.[0]?.message?.content || null;
 
     // Update database with AI response
-    if (feedbackId && aiResponseText) {
+    if (feedbackId && aiResponseText && supabaseKey) {
       await fetch(`${supabaseUrl}/rest/v1/guest_feedback?id=eq.${feedbackId}`, {
         method: "PATCH",
         headers: {
@@ -112,7 +112,8 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), {
+    const errorMessage = e instanceof Error ? e.message : 'Unknown error occurred';
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

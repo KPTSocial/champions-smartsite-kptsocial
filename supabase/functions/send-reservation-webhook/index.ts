@@ -120,10 +120,11 @@ const handler = async (req: Request): Promise<Response> => {
 
   } catch (error) {
     console.error('Error in send-reservation-webhook function:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
       JSON.stringify({ 
         error: 'Failed to send webhook', 
-        details: error.message 
+        details: errorMessage
       }),
       {
         status: 500,
@@ -131,6 +132,15 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
   }
+  
+  // Default return for TypeScript compliance (should never reach here)
+  return new Response(
+    JSON.stringify({ error: 'Unexpected execution path' }),
+    {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    }
+  );
 };
 
 serve(handler);
