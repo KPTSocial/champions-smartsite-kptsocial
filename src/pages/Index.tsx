@@ -23,7 +23,7 @@ const Index = () => {
   console.log('Error:', error);
   return <div>
       {/* Hero Section */}
-      <section className="relative min-h-[500px] h-[60vh] h-[60dvh] md:min-h-[600px] md:h-[80vh] md:h-[80dvh] w-full flex items-center justify-center text-center text-white">
+      <section className="relative min-h-[100dvh] pt-20 md:pt-24 w-full flex items-center justify-center text-center text-white">
         <div className="absolute inset-0 bg-black/50 z-10"></div>
         
         {/* Video or clean background */}
@@ -31,7 +31,7 @@ const Index = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
           </div> : headerMedia && headerMedia.video_url ? <VideoHeader videoUrl={headerMedia.video_url} title={headerMedia.title} description={headerMedia.description} /> : <div className="absolute inset-0 w-full h-full bg-gray-900" />}
         
-        <div className="relative z-20 container px-4">
+        <div className="relative z-20 container px-4 py-8 flex flex-col justify-center">
           <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold drop-shadow-lg">
             Hillsboro's Sports & Flavor Hub
           </h1>
