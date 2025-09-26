@@ -9,11 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
-import { Calendar, Clock, MapPin, Save, Eye } from 'lucide-react';
+import { Calendar, Clock, MapPin, Save, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Event } from '@/services/eventService';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const eventFormSchema = z.object({
   event_title: z.string().min(1, 'Event title is required'),
@@ -46,6 +48,7 @@ interface EventFormProps {
 const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const form = useForm<EventFormData>({
     resolver: zodResolver(eventFormSchema),
@@ -194,6 +197,286 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
   const showTriviaPreview = watchEventTitle.toLowerCase().includes('taco tuesday') && 
                            watchRecurringPattern === 'weekly';
 
+  // Mobile version with accordion
+  if (isMobile) {
+    return (
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <Accordion type="single" collapsible defaultValue="basic" className="space-y-3">
+            {/* Basic Information */}
+            <AccordionItem value="basic" className="border rounded-lg">
+              <AccordionTrigger className="px-4 hover:no-underline">
+                <div className="flex items-center gap-2 font-medium">
+                  <Calendar className="h-4 w-4" />
+                  Basic Information
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 space-y-4">
+                <FormField
+                  control={form.control}
+                  name="event_title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Event Title</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter event title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="event_date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Date & Time</FormLabel>
+                      <FormControl>
+                        <Input type="datetime-local" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="event_type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Event Type</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select event type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Live Music">Live Music</SelectItem>
+                          <SelectItem value="Game Night">Game Night</SelectItem>
+                          <SelectItem value="Specials">Specials</SelectItem>
+                          <SelectItem value="Soccer">Soccer</SelectItem>
+                          <SelectItem value="NCAA FB">NCAA FB</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Enter event description..."
+                          className="resize-none"
+                          rows={3}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="image_url"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Image URL</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://example.com/image.jpg" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Location & Settings */}
+            <AccordionItem value="location" className="border rounded-lg">
+              <AccordionTrigger className="px-4 hover:no-underline">
+                <div className="flex items-center gap-2 font-medium">
+                  <MapPin className="h-4 w-4" />
+                  Location & Settings
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 space-y-4">
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Location</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="on-site">On-site</SelectItem>
+                          <SelectItem value="off-site">Off-site</SelectItem>
+                          <SelectItem value="virtual">Virtual</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="recurring_pattern"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Recurring Pattern</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="none">No Repeat</SelectItem>
+                          <SelectItem value="weekly">Weekly</SelectItem>
+                          <SelectItem value="monthly">Monthly</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="is_featured"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                      <div className="space-y-0.5">
+                        <FormLabel>Featured Event</FormLabel>
+                        <FormDescription>Display prominently on homepage</FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="allow_rsvp"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                      <div className="space-y-0.5">
+                        <FormLabel>Allow RSVP</FormLabel>
+                        <FormDescription>Enable RSVP functionality</FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                {watchAllowRsvp && (
+                  <FormField
+                    control={form.control}
+                    name="rsvp_link"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>RSVP Link</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://example.com/rsvp" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Publication Status */}
+            <AccordionItem value="status" className="border rounded-lg">
+              <AccordionTrigger className="px-4 hover:no-underline">
+                <div className="flex items-center gap-2 font-medium">
+                  <Eye className="h-4 w-4" />
+                  Publication Status
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4">
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="draft">Draft - Save but don't publish</SelectItem>
+                          <SelectItem value="published">Published - Live on public calendar</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormDescription>
+                        {field.value === 'draft' 
+                          ? 'Event will be saved as a draft'
+                          : 'Event will be visible on public calendar'}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
+          {/* Auto-generated Event Preview */}
+          {showTriviaPreview && (
+            <Card className="border-blue-200 bg-blue-50">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-sm text-blue-800">
+                  <Clock className="h-4 w-4" />
+                  Auto-Generated Event
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <p className="text-sm text-blue-700">
+                  🎉 A "Trivia Night" event will be auto-created!
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Form Actions */}
+          <div className="flex gap-3 pt-4">
+            <Button type="submit" disabled={isSubmitting} className="flex-1 gap-2">
+              <Save className="h-4 w-4" />
+              {isSubmitting ? 'Saving...' : (event ? 'Update' : 'Create')}
+            </Button>
+            <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </Form>
+    );
+  }
+
+  // Desktop version (original)
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
