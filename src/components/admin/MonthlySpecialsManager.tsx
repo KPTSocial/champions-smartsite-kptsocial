@@ -21,12 +21,14 @@ import {
   ChevronDown,
   ChevronUp,
   Archive,
-  Wand2
+  Wand2,
+  Upload
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import PdfMenuUploadDialog from './PdfMenuUploadDialog';
 
 interface MenuItem {
   id: string;
@@ -48,6 +50,7 @@ const MonthlySpecialsManager: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [isNextMonthOpen, setIsNextMonthOpen] = useState(false);
+  const [isPdfUploadOpen, setIsPdfUploadOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -460,7 +463,15 @@ const MonthlySpecialsManager: React.FC = () => {
           </CardHeader>
           <CollapsibleContent>
             <CardContent className="pt-0">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsPdfUploadOpen(true)}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload PDF Menu
+                </Button>
+
                 <Button
                   variant="outline"
                   onClick={() => resetSortOrderMutation.mutate()}
@@ -509,6 +520,16 @@ const MonthlySpecialsManager: React.FC = () => {
           </CollapsibleContent>
         </Card>
       </Collapsible>
+
+      {/* PDF Upload Dialog */}
+      <PdfMenuUploadDialog
+        open={isPdfUploadOpen}
+        onOpenChange={setIsPdfUploadOpen}
+        categoryId={monthlySpecialsCategory?.id || ''}
+        onImportComplete={() => {
+          queryClient.invalidateQueries({ queryKey: ['monthly-specials-items'] });
+        }}
+      />
 
       {/* Monthly Specials List */}
       <div className="space-y-4">
