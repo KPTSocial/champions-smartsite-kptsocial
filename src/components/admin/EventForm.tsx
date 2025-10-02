@@ -9,24 +9,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
-import { Calendar, Clock, MapPin, Save, Eye, ChevronDown, ChevronUp } from 'lucide-react';
+import { Calendar, Clock, MapPin, Save, Eye, ChevronDown, ChevronUp, Copy } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { Event } from '@/services/eventService';
+import { Event, createDuplicateEvent } from '@/services/eventService';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 
 const eventFormSchema = z.object({
   event_title: z.string().min(1, 'Event title is required'),
-  event_date: z.string().min(1, 'Event date is required').refine((dateStr) => {
-    try {
-      const date = new Date(dateStr);
-      return !isNaN(date.getTime());
-    } catch {
-      return false;
-    }
-  }, 'Please enter a valid date and time'),
+  event_date: z.string().optional(),
   event_type: z.enum(['Live Music', 'Game Night', 'Specials', 'Soccer', 'NCAA FB']),
   description: z.string().optional(),
   location: z.enum(['on-site', 'off-site', 'virtual']).default('on-site'),
@@ -36,6 +37,36 @@ const eventFormSchema = z.object({
   rsvp_link: z.string().optional(),
   recurring_pattern: z.enum(['none', 'weekly', 'monthly']).default('none'),
   status: z.enum(['draft', 'published']).default('draft')
+}).superRefine((data, ctx) => {
+  // If status is published, event_date is required and must be valid
+  if (data.status === 'published') {
+    if (!data.event_date || data.event_date.trim() === '') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Published events require a valid date. Save as draft if date is not set.',
+        path: ['event_date'],
+      });
+      return;
+    }
+    const date = new Date(data.event_date);
+    if (isNaN(date.getTime())) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Please enter a valid date and time',
+        path: ['event_date'],
+      });
+    }
+  } else if (data.event_date && data.event_date.trim() !== '') {
+    // For drafts, if date is provided, it must be valid
+    const date = new Date(data.event_date);
+    if (isNaN(date.getTime())) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Please enter a valid date and time',
+        path: ['event_date'],
+      });
+    }
+  }
 });
 
 type EventFormData = z.infer<typeof eventFormSchema>;
@@ -49,6 +80,12 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  
+  // Duplication state
+  const [enableDuplication, setEnableDuplication] = useState(false);
+  const [duplicateOption, setDuplicateOption] = useState<'draft' | 'future-date'>('draft');
+  const [duplicateDate, setDuplicateDate] = useState<Date | undefined>();
+  const [showDuplicateConfirm, setShowDuplicateConfirm] = useState(false);
 
   const form = useForm<EventFormData>({
     resolver: zodResolver(eventFormSchema),
@@ -102,22 +139,35 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
     setIsSubmitting(true);
     
     try {
-      // Validate and format the date
-      let eventDate: string;
-      try {
-        const date = new Date(data.event_date);
-        if (isNaN(date.getTime())) {
-          throw new Error('Invalid date');
-        }
-        eventDate = date.toISOString();
-      } catch (dateError) {
+      // Validate duplication settings
+      if (enableDuplication && duplicateOption === 'future-date' && !duplicateDate) {
         toast({
-          title: "Invalid date",
-          description: "Please enter a valid date and time.",
+          title: "Date required",
+          description: "Please select a date for the duplicate event or choose 'Save as Draft'.",
           variant: "destructive",
         });
         setIsSubmitting(false);
         return;
+      }
+
+      // Validate and format the date
+      let eventDate: string | null = null;
+      if (data.event_date && data.event_date.trim() !== '') {
+        try {
+          const date = new Date(data.event_date);
+          if (isNaN(date.getTime())) {
+            throw new Error('Invalid date');
+          }
+          eventDate = date.toISOString();
+        } catch (dateError) {
+          toast({
+            title: "Invalid date",
+            description: "Please enter a valid date and time.",
+            variant: "destructive",
+          });
+          setIsSubmitting(false);
+          return;
+        }
       }
 
       const eventData = {
@@ -149,18 +199,65 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
         });
       } else {
         // Create new event
-        const { error } = await supabase
+        const { data: createdEvent, error } = await supabase
           .from('events')
-          .insert(eventData);
+          .insert(eventData)
+          .select()
+          .single();
 
         if (error) throw error;
 
-        toast({
-          title: "Event created",
-          description: data.status === 'published' 
-            ? "The event has been created and published to the live calendar."
-            : "The event has been saved as a draft.",
-        });
+        // Handle duplication if enabled
+        if (enableDuplication && createdEvent) {
+          if (duplicateOption === 'draft') {
+            // Create duplicate as draft with no date
+            const { error: dupError } = await createDuplicateEvent(createdEvent, {
+              clearDate: true,
+              status: 'draft'
+            });
+            
+            if (dupError) {
+              console.error('Error creating duplicate:', dupError);
+              toast({
+                title: "Event created",
+                description: "Event created but duplication failed. Please duplicate manually.",
+                variant: "default",
+              });
+            } else {
+              toast({
+                title: "Event created and duplicated",
+                description: "Event created successfully and duplicated as draft.",
+              });
+            }
+          } else if (duplicateOption === 'future-date' && duplicateDate) {
+            // Create duplicate with selected future date
+            const { error: dupError } = await createDuplicateEvent(createdEvent, {
+              newDate: duplicateDate.toISOString(),
+              status: 'draft'
+            });
+            
+            if (dupError) {
+              console.error('Error creating duplicate:', dupError);
+              toast({
+                title: "Event created",
+                description: "Event created but duplication failed. Please duplicate manually.",
+                variant: "default",
+              });
+            } else {
+              toast({
+                title: "Event created and duplicated",
+                description: `Event created and duplicated for ${format(duplicateDate, 'PPP')}.`,
+              });
+            }
+          }
+        } else {
+          toast({
+            title: "Event created",
+            description: data.status === 'published' 
+              ? "The event has been created and published to the live calendar."
+              : "The event has been saved as a draft.",
+          });
+        }
       }
 
       onClose();
@@ -186,6 +283,37 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDuplicateCurrentEvent = async () => {
+    if (!event) return;
+    
+    setIsSubmitting(true);
+    try {
+      const { error } = await createDuplicateEvent(event, {
+        clearDate: true,
+        status: 'draft'
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Event duplicated",
+        description: "Event duplicated as draft. Set a date before publishing.",
+      });
+
+      onClose();
+    } catch (error) {
+      console.error('Error duplicating event:', error);
+      toast({
+        title: "Error",
+        description: "Failed to duplicate the event. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+      setShowDuplicateConfirm(false);
     }
   };
 
@@ -461,16 +589,151 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
             </Card>
           )}
 
+          {/* Duplication Section - Create Mode Only */}
+          {!event && (
+            <Card className="bg-muted/30 border-dashed">
+              <CardContent className="pt-6 space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="enable-duplication"
+                    checked={enableDuplication}
+                    onCheckedChange={(checked) => setEnableDuplication(checked as boolean)}
+                  />
+                  <Label htmlFor="enable-duplication" className="text-sm font-medium cursor-pointer">
+                    Duplicate this Event
+                  </Label>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="text-muted-foreground cursor-help">ⓘ</span>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <p>Creates a copy of this event for reuse. Date must be entered before publishing.</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+
+                {enableDuplication && (
+                  <RadioGroup value={duplicateOption} onValueChange={(val) => setDuplicateOption(val as 'draft' | 'future-date')} className="space-y-3 pl-6">
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="draft" id="draft-option" />
+                      <Label htmlFor="draft-option" className="text-sm cursor-pointer">
+                        Save as Draft
+                      </Label>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="text-muted-foreground cursor-help text-xs">ⓘ</span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Duplicate will be saved as a draft without a date</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="future-date" id="future-date-option" />
+                      <Label htmlFor="future-date-option" className="text-sm cursor-pointer">
+                        Choose Future Date
+                      </Label>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="text-muted-foreground cursor-help text-xs">ⓘ</span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Duplicate will be created with the selected date</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+
+                    {duplicateOption === 'future-date' && (
+                      <div className="pl-6 pt-2">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "w-full justify-start text-left font-normal",
+                                !duplicateDate && "text-muted-foreground"
+                              )}
+                            >
+                              <Calendar className="mr-2 h-4 w-4" />
+                              {duplicateDate ? format(duplicateDate, "PPP") : "Pick a date"}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <CalendarComponent
+                              mode="single"
+                              selected={duplicateDate}
+                              onSelect={setDuplicateDate}
+                              initialFocus
+                              className="pointer-events-auto"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    )}
+                  </RadioGroup>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Form Actions */}
           <div className="flex gap-3 pt-4">
+            {event && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => setShowDuplicateConfirm(true)}
+                      disabled={isSubmitting}
+                      className="gap-2"
+                    >
+                      <Copy className="h-4 w-4" />
+                      Duplicate
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Create a copy of this event as a new draft</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+              Cancel
+            </Button>
             <Button type="submit" disabled={isSubmitting} className="flex-1 gap-2">
               <Save className="h-4 w-4" />
               {isSubmitting ? 'Saving...' : (event ? 'Update' : 'Create')}
             </Button>
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1">
-              Cancel
-            </Button>
           </div>
+
+          {/* Duplicate Confirmation Dialog */}
+          <AlertDialog open={showDuplicateConfirm} onOpenChange={setShowDuplicateConfirm}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Duplicate Event?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will create a copy of this event as a new draft.
+                  <br /><br />
+                  The date will be blank and must be set before publishing.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDuplicateCurrentEvent}>
+                  Duplicate Event
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </form>
       </Form>
     );
@@ -765,6 +1028,100 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
           </CardContent>
         </Card>
 
+        {/* Duplication Section - Create Mode Only */}
+        {!event && (
+          <Card className="bg-muted/30 border-dashed">
+            <CardContent className="pt-6 space-y-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="enable-duplication-desktop"
+                  checked={enableDuplication}
+                  onCheckedChange={(checked) => setEnableDuplication(checked as boolean)}
+                />
+                <Label htmlFor="enable-duplication-desktop" className="text-sm font-medium cursor-pointer">
+                  Duplicate this Event
+                </Label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="text-muted-foreground cursor-help">ⓘ</span>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p>Creates a copy of this event for reuse. Date must be entered before publishing.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+
+              {enableDuplication && (
+                <RadioGroup value={duplicateOption} onValueChange={(val) => setDuplicateOption(val as 'draft' | 'future-date')} className="space-y-3 pl-6">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="draft" id="draft-option-desktop" />
+                    <Label htmlFor="draft-option-desktop" className="text-sm cursor-pointer">
+                      Save as Draft
+                    </Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="text-muted-foreground cursor-help text-xs">ⓘ</span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Duplicate will be saved as a draft without a date</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="future-date" id="future-date-option-desktop" />
+                    <Label htmlFor="future-date-option-desktop" className="text-sm cursor-pointer">
+                      Choose Future Date
+                    </Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="text-muted-foreground cursor-help text-xs">ⓘ</span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Duplicate will be created with the selected date</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+
+                  {duplicateOption === 'future-date' && (
+                    <div className="pl-6 pt-2">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !duplicateDate && "text-muted-foreground"
+                            )}
+                          >
+                            <Calendar className="mr-2 h-4 w-4" />
+                            {duplicateDate ? format(duplicateDate, "PPP") : "Pick a date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarComponent
+                            mode="single"
+                            selected={duplicateDate}
+                            onSelect={setDuplicateDate}
+                            initialFocus
+                            className="pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  )}
+                </RadioGroup>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         {/* Form Actions */}
         <div className="flex items-center justify-end gap-3">
           <Button
@@ -775,6 +1132,27 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
           >
             Cancel
           </Button>
+          {event && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setShowDuplicateConfirm(true)}
+                    disabled={isSubmitting}
+                    className="gap-2"
+                  >
+                    <Copy className="h-4 w-4" />
+                    Duplicate This Event
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Create a copy of this event as a new draft</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
           <Button
             type="submit"
             disabled={isSubmitting}
@@ -789,6 +1167,26 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
             }
           </Button>
         </div>
+
+        {/* Duplicate Confirmation Dialog */}
+        <AlertDialog open={showDuplicateConfirm} onOpenChange={setShowDuplicateConfirm}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Duplicate Event?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will create a copy of this event as a new draft.
+                <br /><br />
+                The date will be blank and must be set before publishing.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDuplicateCurrentEvent}>
+                Duplicate Event
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </form>
     </Form>
   );
