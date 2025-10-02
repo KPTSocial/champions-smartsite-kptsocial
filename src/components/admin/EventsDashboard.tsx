@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, Plus, Filter, MapPin, Clock, Users, Copy } from 'lucide-react';
+import { Calendar, Plus, Filter, MapPin, Clock, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Event } from '@/services/eventService';
 import EventsStats from './EventsStats';
@@ -15,7 +15,6 @@ import { useToast } from '@/hooks/use-toast';
 const EventsDashboard: React.FC = () => {
   const [showEventForm, setShowEventForm] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [isDuplicating, setIsDuplicating] = useState(false);
   const [view, setView] = useState<'calendar' | 'list'>('calendar');
   const [filters, setFilters] = useState({
     status: 'all',
@@ -56,26 +55,17 @@ const EventsDashboard: React.FC = () => {
 
   const handleCreateEvent = () => {
     setSelectedEvent(null);
-    setIsDuplicating(false);
     setShowEventForm(true);
   };
 
   const handleEditEvent = (event: Event) => {
     setSelectedEvent(event);
-    setIsDuplicating(false);
-    setShowEventForm(true);
-  };
-
-  const handleDuplicateEvent = (event: Event) => {
-    setSelectedEvent(event);
-    setIsDuplicating(true);
     setShowEventForm(true);
   };
 
   const handleEventFormClose = () => {
     setShowEventForm(false);
     setSelectedEvent(null);
-    setIsDuplicating(false);
     refetchEvents();
   };
 
@@ -236,15 +226,6 @@ const EventsDashboard: React.FC = () => {
                     >
                       Edit
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDuplicateEvent(event)}
-                      className="gap-1"
-                    >
-                      <Copy className="h-3 w-3" />
-                      Duplicate
-                    </Button>
                     {event.status === 'draft' && (
                       <Button
                         variant="default"
@@ -291,13 +272,12 @@ const EventsDashboard: React.FC = () => {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {isDuplicating ? 'Duplicate Event' : selectedEvent ? 'Edit Event' : 'Create New Event'}
+              {selectedEvent ? 'Edit Event' : 'Create New Event'}
             </DialogTitle>
           </DialogHeader>
           <EventForm
             event={selectedEvent}
             onClose={handleEventFormClose}
-            isDuplicating={isDuplicating}
           />
         </DialogContent>
       </Dialog>
