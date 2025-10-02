@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Eye, Check, X, Tag } from 'lucide-react';
+import { Eye, Check, X, Tag, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface PhotoBoothPostDialogProps {
@@ -24,6 +25,7 @@ const PhotoBoothPostDialog: React.FC<PhotoBoothPostDialogProps> = ({
 }) => {
   const [tagInput, setTagInput] = useState('');
   const [adminNotes, setAdminNotes] = useState('');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleStatusUpdate = async (status: string) => {
     const result = await onStatusUpdate(post.id, status, adminNotes);
@@ -47,13 +49,12 @@ const PhotoBoothPostDialog: React.FC<PhotoBoothPostDialogProps> = ({
   };
 
   const handleDelete = async () => {
-    if (confirm('Are you sure you want to delete this post?')) {
-      const result = await onDelete(post.id);
-      if (result.success) {
-        toast.success('Post deleted successfully');
-      } else {
-        toast.error(result.error);
-      }
+    const result = await onDelete(post.id);
+    if (result.success) {
+      toast.success('Photo and image permanently deleted');
+      setShowDeleteDialog(false);
+    } else {
+      toast.error(result.error || 'Failed to delete photo');
     }
   };
 
@@ -168,16 +169,46 @@ const PhotoBoothPostDialog: React.FC<PhotoBoothPostDialogProps> = ({
               Reject
             </Button>
             <Button
-              onClick={handleDelete}
+              onClick={() => setShowDeleteDialog(true)}
               size="sm"
               variant="outline"
               className="text-red-600 hover:text-red-700 flex-1 sm:flex-none"
             >
+              <Trash2 className="h-3 w-3 mr-1" />
               Delete
             </Button>
           </div>
         </div>
       </DialogContent>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-destructive" />
+              Delete Photo Permanently?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              <p className="font-medium">This action cannot be undone. This will permanently delete:</p>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li>The image from storage</li>
+                <li>All metadata and tags</li>
+                <li>Upload information</li>
+              </ul>
+              <div className="mt-4 p-3 bg-muted rounded-lg space-y-1">
+                <p className="text-sm"><strong>Photo by:</strong> {post.uploaded_by}</p>
+                <p className="text-sm"><strong>Uploaded:</strong> {new Date(post.created_at).toLocaleDateString()}</p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+              Delete Permanently
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 };

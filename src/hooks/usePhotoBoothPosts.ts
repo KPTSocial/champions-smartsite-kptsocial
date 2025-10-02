@@ -112,12 +112,37 @@ export const usePhotoBoothPosts = (filters: PhotoBoothFilters = {}) => {
 
   const deletePost = async (postId: string) => {
     try {
-      const { error } = await supabase
+      // 1. Get the post to extract image URL
+      const { data: post, error: fetchError } = await supabase
+        .from('photo_booth_posts')
+        .select('image_url')
+        .eq('id', postId)
+        .single();
+      
+      if (fetchError) throw fetchError;
+      
+      // 2. Extract file path from URL and delete from storage
+      if (post?.image_url) {
+        const filePath = extractFilePathFromUrl(post.image_url);
+        if (filePath) {
+          const { error: storageError } = await supabase.storage
+            .from('photos')
+            .remove([filePath]);
+          
+          if (storageError) {
+            console.error('Storage deletion error:', storageError);
+            // Continue with DB deletion even if storage fails
+          }
+        }
+      }
+      
+      // 3. Delete database record
+      const { error: dbError } = await supabase
         .from('photo_booth_posts')
         .delete()
         .eq('id', postId);
-
-      if (error) throw error;
+      
+      if (dbError) throw dbError;
       
       fetchPosts();
       return { success: true };
@@ -127,6 +152,14 @@ export const usePhotoBoothPosts = (filters: PhotoBoothFilters = {}) => {
         error: err instanceof Error ? err.message : 'Failed to delete post' 
       };
     }
+  };
+
+  const extractFilePathFromUrl = (url: string): string | null => {
+    // Extract path from Supabase storage URL
+    // Example URL: https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/photos/photobooth/John-2025-01-02-image.jpg
+    // Extract: photobooth/John-2025-01-02-image.jpg
+    const match = url.match(/\/photos\/(.+)$/);
+    return match ? match[1] : null;
   };
 
   return {
