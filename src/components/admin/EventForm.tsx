@@ -9,13 +9,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
-import { Calendar, Clock, MapPin, Save, Eye, ChevronDown, ChevronUp } from 'lucide-react';
+import { Calendar, Clock, MapPin, Save, Eye, ChevronDown, ChevronUp, Copy } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Event } from '@/services/eventService';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import DuplicateEventDialog from './DuplicateEventDialog';
 
 const eventFormSchema = z.object({
   event_title: z.string().min(1, 'Event title is required'),
@@ -43,10 +46,13 @@ type EventFormData = z.infer<typeof eventFormSchema>;
 interface EventFormProps {
   event?: Event | null;
   onClose: () => void;
+  isDuplicating?: boolean;
 }
 
-const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
+const EventForm: React.FC<EventFormProps> = ({ event, onClose, isDuplicating = false }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
+  const [showDuplicateConfirm, setShowDuplicateConfirm] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -67,12 +73,12 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
     }
   });
 
-  // Populate form if editing existing event
+  // Populate form if editing or duplicating existing event
   useEffect(() => {
     if (event) {
       try {
-        const eventDate = new Date(event.event_date);
-        const formattedDate = format(eventDate, "yyyy-MM-dd'T'HH:mm");
+        // For duplicating, clear the date; for editing, use the existing date
+        const formattedDate = isDuplicating ? '' : format(new Date(event.event_date), "yyyy-MM-dd'T'HH:mm");
         
         form.reset({
           event_title: event.event_title,
@@ -85,8 +91,15 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
           allow_rsvp: event.allow_rsvp,
           rsvp_link: event.rsvp_link || '',
           recurring_pattern: (event.recurring_pattern || 'none') as 'none' | 'weekly' | 'monthly',
-          status: (event.status || 'published') as 'draft' | 'published'
+          status: isDuplicating ? 'draft' : (event.status || 'published') as 'draft' | 'published'
         });
+
+        if (isDuplicating) {
+          toast({
+            title: "Event duplicated!",
+            description: "Set a new date to save this event.",
+          });
+        }
       } catch (error) {
         console.error('Error formatting event date:', error);
         toast({
@@ -96,7 +109,56 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
         });
       }
     }
-  }, [event, form, toast]);
+  }, [event, isDuplicating, form, toast]);
+
+  const handleDuplicateSelected = (selectedEvent: Event) => {
+    try {
+      form.reset({
+        event_title: selectedEvent.event_title,
+        event_date: '', // Clear date - required for duplication
+        event_type: selectedEvent.event_type as 'Live Music' | 'Game Night' | 'Specials' | 'Soccer' | 'NCAA FB',
+        description: selectedEvent.description || '',
+        location: (selectedEvent.location || 'on-site') as 'on-site' | 'off-site' | 'virtual',
+        image_url: selectedEvent.image_url || '',
+        is_featured: selectedEvent.is_featured,
+        allow_rsvp: selectedEvent.allow_rsvp,
+        rsvp_link: selectedEvent.rsvp_link || '',
+        recurring_pattern: (selectedEvent.recurring_pattern || 'none') as 'none' | 'weekly' | 'monthly',
+        status: 'draft' // Always draft for duplicates
+      });
+
+      toast({
+        title: "Event duplicated!",
+        description: "Set a new date to save this event.",
+      });
+    } catch (error) {
+      console.error('Error duplicating event:', error);
+      toast({
+        title: "Error",
+        description: "Failed to duplicate event. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDuplicateCurrent = () => {
+    setShowDuplicateConfirm(true);
+  };
+
+  const confirmDuplicateCurrent = () => {
+    const currentValues = form.getValues();
+    form.reset({
+      ...currentValues,
+      event_date: '', // Clear the date
+      status: 'draft' // Set to draft
+    });
+    
+    setShowDuplicateConfirm(false);
+    toast({
+      title: "Event duplicated!",
+      description: "Set a new date to save this duplicated event.",
+    });
+  };
 
   const onSubmit = async (data: EventFormData) => {
     setIsSubmitting(true);
@@ -134,8 +196,8 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
         status: data.status
       };
 
-      if (event) {
-        // Update existing event
+      if (event && !isDuplicating) {
+        // Update existing event (only if not duplicating)
         const { error } = await supabase
           .from('events')
           .update(eventData)
@@ -148,7 +210,7 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
           description: "The event has been successfully updated.",
         });
       } else {
-        // Create new event
+        // Create new event (for new events or duplicates)
         const { error } = await supabase
           .from('events')
           .insert(eventData);
@@ -156,7 +218,7 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
         if (error) throw error;
 
         toast({
-          title: "Event created",
+          title: isDuplicating ? "Duplicate event created" : "Event created",
           description: data.status === 'published' 
             ? "The event has been created and published to the live calendar."
             : "The event has been saved as a draft.",
@@ -200,8 +262,33 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
   // Mobile version with accordion
   if (isMobile) {
     return (
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            {/* Duplicate Button - Create Mode Only */}
+            {!event && (
+              <div className="flex justify-end">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowDuplicateDialog(true)}
+                        className="gap-2"
+                      >
+                        <Copy className="h-4 w-4" />
+                        Duplicate Event
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Copy details from an existing event</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            )}
           <Accordion type="single" collapsible defaultValue="basic" className="space-y-3">
             {/* Basic Information */}
             <AccordionItem value="basic" className="border rounded-lg">
@@ -463,31 +550,105 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
 
           {/* Form Actions */}
           <div className="flex gap-3 pt-4">
-            <Button type="submit" disabled={isSubmitting} className="flex-1 gap-2">
-              <Save className="h-4 w-4" />
-              {isSubmitting ? 'Saving...' : (event ? 'Update' : 'Create')}
-            </Button>
             <Button type="button" variant="outline" onClick={onClose} className="flex-1">
               Cancel
+            </Button>
+            {event && !isDuplicating && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleDuplicateCurrent}
+                      className="flex-1 gap-2"
+                    >
+                      <Copy className="h-4 w-4" />
+                      Duplicate
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Create a copy of this event</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            <Button type="submit" disabled={isSubmitting} className="flex-1 gap-2">
+              <Save className="h-4 w-4" />
+              {isSubmitting ? 'Saving...' : (event && !isDuplicating ? 'Update' : 'Create')}
             </Button>
           </div>
         </form>
       </Form>
+
+      {/* Duplicate Event Dialog */}
+      <DuplicateEventDialog
+        open={showDuplicateDialog}
+        onOpenChange={setShowDuplicateDialog}
+        onSelectEvent={handleDuplicateSelected}
+      />
+
+      {/* Duplicate Confirmation Dialog */}
+      <AlertDialog open={showDuplicateConfirm} onOpenChange={setShowDuplicateConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Duplicate Event</AlertDialogTitle>
+            <AlertDialogDescription>
+              Do you want to duplicate this event as a new draft?
+              <br /><br />
+              All details will be copied except the date. You'll need to set a new date before saving.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDuplicateCurrent}>
+              Duplicate Event
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
     );
   }
 
   // Desktop version (original)
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Basic Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Basic Information
-            </CardTitle>
-          </CardHeader>
+    <>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* Duplicate Button - Create Mode Only */}
+          {!event && (
+            <div className="flex justify-end">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowDuplicateDialog(true)}
+                      className="gap-2"
+                    >
+                      <Copy className="h-4 w-4" />
+                      Duplicate Event
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Copy details from an existing event to save time</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          )}
+
+          {/* Basic Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                Basic Information
+              </CardTitle>
+            </CardHeader>
           <CardContent className="space-y-4">
             <FormField
               control={form.control}
@@ -775,6 +936,27 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
           >
             Cancel
           </Button>
+          {event && !isDuplicating && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleDuplicateCurrent}
+                    disabled={isSubmitting}
+                    className="gap-2"
+                  >
+                    <Copy className="h-4 w-4" />
+                    Duplicate This Event
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Create a copy of this event as a new draft</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
           <Button
             type="submit"
             disabled={isSubmitting}
@@ -783,7 +965,7 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
             <Save className="h-4 w-4" />
             {isSubmitting 
               ? 'Saving...' 
-              : event 
+              : (event && !isDuplicating)
                 ? 'Update Event' 
                 : 'Create Event'
             }
@@ -791,6 +973,34 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
         </div>
       </form>
     </Form>
+
+    {/* Duplicate Event Dialog */}
+    <DuplicateEventDialog
+      open={showDuplicateDialog}
+      onOpenChange={setShowDuplicateDialog}
+      onSelectEvent={handleDuplicateSelected}
+    />
+
+    {/* Duplicate Confirmation Dialog */}
+    <AlertDialog open={showDuplicateConfirm} onOpenChange={setShowDuplicateConfirm}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Duplicate Event</AlertDialogTitle>
+          <AlertDialogDescription>
+            Do you want to duplicate this event as a new draft?
+            <br /><br />
+            All details will be copied except the date. You'll need to set a new date before saving.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={confirmDuplicateCurrent}>
+            Duplicate Event
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  </>
   );
 };
 
