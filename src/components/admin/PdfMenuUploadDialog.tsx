@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload, CalendarIcon, Loader2, FileText, AlertCircle, CheckCircle2, X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format, addMonths, startOfMonth, endOfMonth } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -20,27 +21,41 @@ interface ParsedMenuItem {
   confidence: number;
 }
 
+interface MenuCategory {
+  id: string;
+  name: string;
+  section: {
+    name: string;
+  };
+}
+
 interface PdfMenuUploadDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  categoryId: string;
+  categories: MenuCategory[];
   onImportComplete: () => void;
+  defaultCategoryId?: string;
+  allowSpecialScheduling?: boolean;
 }
 
 export default function PdfMenuUploadDialog({ 
   open, 
   onOpenChange, 
-  categoryId,
-  onImportComplete 
+  categories,
+  onImportComplete,
+  defaultCategoryId,
+  allowSpecialScheduling = true
 }: PdfMenuUploadDialogProps) {
   const { toast } = useToast();
-  const [step, setStep] = useState<'upload' | 'schedule' | 'review'>('upload');
+  const [step, setStep] = useState<'upload' | 'category' | 'options' | 'review'>('upload');
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>(defaultCategoryId || '');
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [clearExisting, setClearExisting] = useState(false);
   const [markFeatured, setMarkFeatured] = useState(false);
+  const [markAsSpecial, setMarkAsSpecial] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [parsedItems, setParsedItems] = useState<ParsedMenuItem[]>([]);
   const [editedItems, setEditedItems] = useState<ParsedMenuItem[]>([]);
@@ -81,19 +96,10 @@ export default function PdfMenuUploadDialog({
   };
 
   const handleProcessPdf = async () => {
-    if (!pdfFile || !startDate || !endDate) {
+    if (!pdfFile) {
       toast({
-        title: "Missing information",
-        description: "Please select a PDF file and set both start and end dates",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (endDate <= startDate) {
-      toast({
-        title: "Invalid dates",
-        description: "End date must be after start date",
+        title: "Missing file",
+        description: "Please select a PDF file",
         variant: "destructive"
       });
       return;
@@ -158,33 +164,64 @@ export default function PdfMenuUploadDialog({
   };
 
   const handleImport = async () => {
+    if (!selectedCategory) {
+      toast({
+        title: "No category selected",
+        description: "Please select a category before importing",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (markAsSpecial && (!startDate || !endDate)) {
+      toast({
+        title: "Missing dates",
+        description: "Please set both start and end dates for special items",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (markAsSpecial && endDate && startDate && endDate <= startDate) {
+      toast({
+        title: "Invalid dates",
+        description: "End date must be after start date",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setProcessing(true);
     setUploadProgress('Importing items...');
 
     try {
       // Clear existing items if requested
       if (clearExisting) {
-        const { error: deleteError } = await supabase
+        const deleteQuery = supabase
           .from('menu_items')
           .delete()
-          .eq('category_id', categoryId)
-          .eq('is_special', true);
+          .eq('category_id', selectedCategory);
 
+        if (markAsSpecial) {
+          deleteQuery.eq('is_special', true);
+        }
+
+        const { error: deleteError } = await deleteQuery;
         if (deleteError) throw deleteError;
       }
 
       // Prepare items for insertion
       const itemsToInsert = editedItems.map((item, index) => ({
-        category_id: categoryId,
+        category_id: selectedCategory,
         name: item.name,
         description: item.description || null,
         price: item.price || null,
         tags: item.tags.length > 0 ? item.tags : null,
-        is_special: true,
+        is_special: markAsSpecial,
         is_featured: markFeatured,
-        is_available: startDate && startDate <= new Date() ? true : false,
-        special_start_date: startDate ? format(startDate, 'yyyy-MM-dd') : null,
-        special_end_date: endDate ? format(endDate, 'yyyy-MM-dd') : null,
+        is_available: markAsSpecial ? (startDate && startDate <= new Date()) : true,
+        special_start_date: markAsSpecial && startDate ? format(startDate, 'yyyy-MM-dd') : null,
+        special_end_date: markAsSpecial && endDate ? format(endDate, 'yyyy-MM-dd') : null,
         sort_order: index
       }));
 
@@ -220,10 +257,12 @@ export default function PdfMenuUploadDialog({
     setStep('upload');
     setPdfFile(null);
     setPdfUrl('');
+    setSelectedCategory(defaultCategoryId || '');
     setStartDate(undefined);
     setEndDate(undefined);
     setClearExisting(false);
     setMarkFeatured(false);
+    setMarkAsSpecial(false);
     setParsedItems([]);
     setEditedItems([]);
     setUploadProgress('');
@@ -238,9 +277,9 @@ export default function PdfMenuUploadDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Upload PDF Menu for Monthly Specials</DialogTitle>
+          <DialogTitle>Upload PDF Menu</DialogTitle>
           <DialogDescription>
-            Upload a PDF menu to automatically extract and schedule monthly special items
+            Upload a PDF menu to automatically extract and import menu items
           </DialogDescription>
         </DialogHeader>
 
@@ -248,7 +287,7 @@ export default function PdfMenuUploadDialog({
           <div className="space-y-6">
             {/* File Upload */}
             <div className="space-y-2">
-              <Label>Step 1: Upload PDF File</Label>
+              <Label>Upload PDF File</Label>
               <div className="border-2 border-dashed rounded-lg p-8 text-center">
                 <Input
                   type="file"
@@ -279,71 +318,156 @@ export default function PdfMenuUploadDialog({
               </div>
             </div>
 
-            {/* Date Selection */}
-            <div className="space-y-4">
-              <Label>Step 2: Schedule Menu Dates</Label>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Start Date</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !startDate && "text-muted-foreground")}>
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {startDate ? format(startDate, "PPP") : "Pick a date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar mode="single" selected={startDate} onSelect={setStartDate} initialFocus />
-                    </PopoverContent>
-                  </Popover>
-                </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={handleClose}>Cancel</Button>
+              <Button onClick={() => setStep('category')} disabled={!pdfFile}>
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
 
-                <div className="space-y-2">
-                  <Label>End Date</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !endDate && "text-muted-foreground")}>
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {endDate ? format(endDate, "PPP") : "Pick a date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar mode="single" selected={endDate} onSelect={setEndDate} initialFocus />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={activateImmediately}>
-                  Activate Immediately
-                </Button>
-                <Button variant="outline" size="sm" onClick={setNextMonthDates}>
-                  Set to Next Month
-                </Button>
-              </div>
+        {step === 'category' && (
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Label>Select Target Category</Label>
+              <p className="text-sm text-muted-foreground">
+                Choose which category these menu items should be added to
+              </p>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.section.name} - {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            {/* Options */}
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setStep('upload')}>Back</Button>
+              <Button onClick={() => setStep('options')} disabled={!selectedCategory}>
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {step === 'options' && (
+          <div className="space-y-6">
+            {/* Import Options */}
             <div className="space-y-3">
-              <Label>Step 3: Import Options</Label>
+              <Label>Import Settings</Label>
               <div className="flex items-center space-x-2">
-                <Checkbox id="clear" checked={clearExisting} onCheckedChange={(checked) => setClearExisting(checked === true)} />
+                <Checkbox 
+                  id="clear" 
+                  checked={clearExisting} 
+                  onCheckedChange={(checked) => setClearExisting(checked === true)} 
+                />
                 <label htmlFor="clear" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                  Clear existing monthly specials before importing
+                  Replace existing items in selected category
                 </label>
               </div>
               <div className="flex items-center space-x-2">
-                <Checkbox id="featured" checked={markFeatured} onCheckedChange={(checked) => setMarkFeatured(checked === true)} />
+                <Checkbox 
+                  id="featured" 
+                  checked={markFeatured} 
+                  onCheckedChange={(checked) => setMarkFeatured(checked === true)} 
+                />
                 <label htmlFor="featured" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                   Mark all items as featured
                 </label>
               </div>
+              {allowSpecialScheduling && (
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="special" 
+                    checked={markAsSpecial} 
+                    onCheckedChange={(checked) => setMarkAsSpecial(checked === true)} 
+                  />
+                  <label htmlFor="special" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    Mark as Monthly Special
+                  </label>
+                </div>
+              )}
             </div>
 
+            {/* Date Selection - only show if markAsSpecial is true */}
+            {markAsSpecial && (
+              <div className="space-y-4">
+                <Label>Schedule Menu Dates</Label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Start Date</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          className={cn(
+                            "w-full justify-start text-left font-normal", 
+                            !startDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {startDate ? format(startDate, "PPP") : "Pick a date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar 
+                          mode="single" 
+                          selected={startDate} 
+                          onSelect={setStartDate} 
+                          initialFocus 
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>End Date</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          className={cn(
+                            "w-full justify-start text-left font-normal", 
+                            !endDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {endDate ? format(endDate, "PPP") : "Pick a date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar 
+                          mode="single" 
+                          selected={endDate} 
+                          onSelect={setEndDate} 
+                          initialFocus 
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={activateImmediately}>
+                    Activate Immediately
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={setNextMonthDates}>
+                    Set to Next Month
+                  </Button>
+                </div>
+              </div>
+            )}
+
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={handleClose}>Cancel</Button>
-              <Button onClick={handleProcessPdf} disabled={!pdfFile || !startDate || !endDate || processing}>
+              <Button variant="outline" onClick={() => setStep('category')}>Back</Button>
+              <Button onClick={handleProcessPdf} disabled={processing}>
                 {processing ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -408,7 +532,7 @@ export default function PdfMenuUploadDialog({
             </div>
 
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setStep('upload')}>Back</Button>
+              <Button variant="outline" onClick={() => setStep('options')}>Back</Button>
               <Button onClick={handleImport} disabled={processing || editedItems.length === 0}>
                 {processing ? (
                   <>

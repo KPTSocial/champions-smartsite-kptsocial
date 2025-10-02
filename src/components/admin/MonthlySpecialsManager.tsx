@@ -78,6 +78,29 @@ const MonthlySpecialsManager: React.FC = () => {
     }
   });
 
+  // Get all categories for PDF upload
+  const { data: categories } = useQuery({
+    queryKey: ['menu-categories-for-pdf-upload'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('menu_categories')
+        .select(`
+          id,
+          name,
+          section:menu_sections(name)
+        `)
+        .order('section_id')
+        .order('sort_order');
+      
+      if (error) throw error;
+      return data as Array<{
+        id: string;
+        name: string;
+        section: { name: string };
+      }>;
+    }
+  });
+
   // Get all monthly specials
   const { data: monthlySpecials, isLoading } = useQuery({
     queryKey: ['monthly-specials-items'],
@@ -525,7 +548,9 @@ const MonthlySpecialsManager: React.FC = () => {
       <PdfMenuUploadDialog
         open={isPdfUploadOpen}
         onOpenChange={setIsPdfUploadOpen}
-        categoryId={monthlySpecialsCategory?.id || ''}
+        categories={categories || []}
+        defaultCategoryId={monthlySpecialsCategory?.id}
+        allowSpecialScheduling={true}
         onImportComplete={() => {
           queryClient.invalidateQueries({ queryKey: ['monthly-specials-items'] });
         }}

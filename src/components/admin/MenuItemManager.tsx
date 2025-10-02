@@ -10,9 +10,10 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Edit, Trash2, Search, Star, Clock, Eye, EyeOff, Sparkles } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Star, Clock, Eye, EyeOff, Sparkles, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import PdfMenuUploadDialog from './PdfMenuUploadDialog';
 
 interface MenuItem {
   id: string;
@@ -46,6 +47,7 @@ interface MenuCategory {
 
 const MenuItemManager: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isPdfUploadOpen, setIsPdfUploadOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -456,7 +458,26 @@ const MenuItemManager: React.FC = () => {
             ))}
           </SelectContent>
         </Select>
+        <Button 
+          variant="outline" 
+          onClick={() => setIsPdfUploadOpen(true)}
+          className="w-full sm:w-auto"
+        >
+          <Upload className="h-4 w-4 mr-2" />
+          Upload PDF
+        </Button>
       </div>
+
+      {/* PDF Upload Dialog */}
+      <PdfMenuUploadDialog
+        open={isPdfUploadOpen}
+        onOpenChange={setIsPdfUploadOpen}
+        categories={categories || []}
+        onImportComplete={() => {
+          queryClient.invalidateQueries({ queryKey: ['menu-items'] });
+          queryClient.invalidateQueries({ queryKey: ['menuData'] });
+        }}
+      />
 
       {/* Menu Items Grid */}
       <div className="grid gap-4">
