@@ -1,9 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Check, X, Calendar } from 'lucide-react';
+import { Check, X, Calendar, Trash2 } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
 import PhotoBoothPostDialog from './PhotoBoothPostDialog';
 
 interface PhotoBoothPostCardProps {
@@ -19,12 +21,24 @@ const PhotoBoothPostCard: React.FC<PhotoBoothPostCardProps> = ({
   onTagUpdate,
   onDelete
 }) => {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case 'approved': return 'bg-green-100 text-green-800';
       case 'rejected': return 'bg-red-100 text-red-800';
       case 'featured': return 'bg-blue-100 text-blue-800';
       default: return 'bg-yellow-100 text-yellow-800';
+    }
+  };
+
+  const handleDelete = async () => {
+    const result = await onDelete(post.id);
+    if (result.success) {
+      toast.success('Photo and image permanently deleted');
+      setShowDeleteDialog(false);
+    } else {
+      toast.error(result.error || 'Failed to delete photo');
     }
   };
 
@@ -92,8 +106,46 @@ const PhotoBoothPostCard: React.FC<PhotoBoothPostCardProps> = ({
               </Button>
             </>
           )}
+          
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setShowDeleteDialog(true)}
+            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+          >
+            <Trash2 className="h-3 w-3" />
+          </Button>
         </div>
       </CardContent>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-destructive" />
+              Delete Photo Permanently?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              <p className="font-medium">This action cannot be undone. This will permanently delete:</p>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li>The image from storage</li>
+                <li>All metadata and tags</li>
+                <li>Upload information</li>
+              </ul>
+              <div className="mt-4 p-3 bg-muted rounded-lg space-y-1">
+                <p className="text-sm"><strong>Photo by:</strong> {post.uploaded_by}</p>
+                <p className="text-sm"><strong>Uploaded:</strong> {new Date(post.created_at).toLocaleDateString()}</p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+              Delete Permanently
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 };
