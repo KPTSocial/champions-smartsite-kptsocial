@@ -1,8 +1,7 @@
 import React from 'react';
 import { MenuCategory } from '@/types/menu';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Accordion } from '@/components/ui/accordion';
-import MenuItemAccordion from './MenuItemAccordion';
+import MenuItemDisplay from './MenuItemDisplay';
 interface MenuCategoryCardProps {
   category: MenuCategory;
   showDisclaimer?: boolean;
@@ -27,9 +26,9 @@ const MenuCategoryCard: React.FC<MenuCategoryCardProps> = ({
         {category.description}
       </CardHeader>
       <CardContent className="pt-0">
-        <Accordion type="single" collapsible className="space-y-3">
-          {category.items.map(item => <MenuItemAccordion key={item.id} item={item} />)}
-        </Accordion>
+        <div className="divide-y divide-border/30">
+          {category.items.map(item => <MenuItemDisplay key={item.id} item={item} />)}
+        </div>
       </CardContent>
     </Card>;
 };
