@@ -10,7 +10,7 @@ interface MenuItemDisplayProps {
 
 const MenuItemDisplay: React.FC<MenuItemDisplayProps> = ({ item }) => {
   return (
-    <div className="py-4 border-b border-border/30 last:border-0">
+    <div className="py-4 border-b border-border/30 last:border-0 group hover:bg-primary/5 transition-all duration-200 cursor-pointer rounded-lg px-3 -mx-3">
       <div className="flex items-start justify-between gap-4">
         {/* Left: Tags + Name */}
         <div className="flex items-center gap-2 flex-1 flex-wrap">
@@ -23,7 +23,7 @@ const MenuItemDisplay: React.FC<MenuItemDisplayProps> = ({ item }) => {
           {item.tags?.includes('V') && (
             <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/veg_fbwf0q.jpg" alt="Vegetarian" className="w-5 h-5 flex-shrink-0" />
           )}
-          <h4 className="text-lg font-semibold text-foreground">{item.name}</h4>
+          <h4 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors duration-200">{item.name}</h4>
           {item.tags?.includes('NEW') && (
             <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 animate-new-pulse font-bold shadow-lg">
               <Sparkles className="h-3 w-3 mr-1" />
@@ -34,7 +34,7 @@ const MenuItemDisplay: React.FC<MenuItemDisplayProps> = ({ item }) => {
         
         {/* Right: Price */}
         {!item.variants || item.variants.length === 0 ? (
-          <span className="text-lg font-semibold text-foreground whitespace-nowrap">
+          <span className="text-lg font-semibold text-primary whitespace-nowrap">
             {formatCurrency(item.price)}
           </span>
         ) : null}
@@ -53,7 +53,7 @@ const MenuItemDisplay: React.FC<MenuItemDisplayProps> = ({ item }) => {
           {item.variants.map((variant) => (
             <div key={variant.id} className="flex justify-between items-center">
               <span className="text-sm text-muted-foreground">{variant.name}</span>
-              <span className="text-base font-semibold text-foreground">{formatCurrency(variant.price)}</span>
+              <span className="text-base font-semibold text-primary">{formatCurrency(variant.price)}</span>
             </div>
           ))}
         </div>
