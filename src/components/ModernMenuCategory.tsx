@@ -1,6 +1,6 @@
 import React from 'react';
 import { MenuCategory } from '@/types/menu';
-import MenuItemDisplay from './MenuItemDisplay';
+import ModernMenuItem from './ModernMenuItem';
 
 interface ModernMenuCategoryProps {
   category: MenuCategory;
@@ -29,7 +29,7 @@ const ModernMenuCategory: React.FC<ModernMenuCategoryProps> = ({ category, secti
       <div className="bg-background/70 backdrop-blur-sm rounded-lg border border-border/50 p-6">
         <div className="divide-y divide-border/30">
           {category.items.map((item) => (
-            <MenuItemDisplay key={item.id} item={item} />
+            <ModernMenuItem key={item.id} item={item} sectionName={sectionName} />
           ))}
         </div>
       </div>
