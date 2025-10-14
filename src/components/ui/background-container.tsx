@@ -24,6 +24,7 @@ export function BackgroundContainer({
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
         filter: grayscale ? 'grayscale(10%)' : undefined,
       }}
     >
