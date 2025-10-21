@@ -5,10 +5,9 @@ import { toast } from "@/components/ui/use-toast";
 export const MenuPdfDownloadButton = () => {
   const handleDownload = async () => {
     try {
-      // Using original filename from storage (physical file wasn't renamed, only the database record)
-      // The file in storage is still: "Champions - Main Menu Pg.2 Final Fall 2025.pdf"
-      const originalFileName = "Champions - Main Menu Pg.2 Final Fall 2025.pdf";
-      const pdfUrl = `https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/menu-pdfs/${encodeURIComponent(originalFileName)}`;
+      // Using the renamed file from storage
+      const fileName = "champions-menu-fall-2025.pdf";
+      const pdfUrl = `https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/menu-pdfs/${encodeURIComponent(fileName)}`;
       
       const response = await fetch(pdfUrl);
       if (!response.ok) throw new Error("Failed to download PDF");
