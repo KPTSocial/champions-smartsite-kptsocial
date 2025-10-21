@@ -40,7 +40,7 @@ export const MenuPdfDownloadButton = () => {
     <Button
       onClick={handleDownload}
       size="lg"
-      className="fixed bottom-6 right-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 h-14 w-14 md:h-16 md:w-16 z-50"
+      className="absolute bottom-4 right-4 rounded-full shadow-md hover:shadow-lg transition-all duration-300 h-14 w-14 md:h-16 md:w-16 z-10"
       aria-label="Download menu PDF"
     >
       <Download className="h-6 w-6 md:h-7 md:w-7" />

@@ -139,7 +139,7 @@ const Menu = () => {
       />
 
         {/* Enhanced Tab Navigation */}
-        <div className="menu-section lg:rounded-lg p-8 mb-8">
+        <div className="menu-section lg:rounded-lg p-8 mb-8 relative">
           {menuData && (
             <EnhancedMenuTabs
               sections={menuData}
@@ -147,6 +147,7 @@ const Menu = () => {
               onSectionChange={handleSectionChange}
             />
           )}
+          <MenuPdfDownloadButton />
         </div>
         {/* Enhanced Menu Content */}
         <div className="menu-section lg:rounded-lg p-8">
@@ -207,7 +208,6 @@ const Menu = () => {
             </div>
           )}
         </div>
-      <MenuPdfDownloadButton />
     </BackgroundContainer>
   );
 };
