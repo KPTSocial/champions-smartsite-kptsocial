@@ -147,7 +147,7 @@ const Menu = () => {
               onSectionChange={handleSectionChange}
             />
           )}
-          <MenuPdfDownloadButton />
+          {activeSection === 'db2f01ba-7cb1-4221-895d-a63855748272' && <MenuPdfDownloadButton />}
         </div>
         {/* Enhanced Menu Content */}
         <div className="menu-section lg:rounded-lg p-8">
