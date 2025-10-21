@@ -12,6 +12,7 @@ import { BackgroundContainer } from '@/components/ui/background-container';
 import { PageHeader } from '@/components/ui/page-header';
 import { supabase } from '@/integrations/supabase/client';
 import { Separator } from '@/components/ui/separator';
+import { MenuPdfDownloadButton } from '@/components/MenuPdfDownloadButton';
 
 const Menu = () => {
   const [activeSection, setActiveSection] = useState<string>('');
@@ -206,6 +207,7 @@ const Menu = () => {
             </div>
           )}
         </div>
+      <MenuPdfDownloadButton />
     </BackgroundContainer>
   );
 };
