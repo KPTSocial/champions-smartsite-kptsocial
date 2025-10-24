@@ -12,6 +12,7 @@ import { Upload, CalendarIcon, Loader2, FileText, AlertCircle, CheckCircle2, X }
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format, addMonths, startOfMonth, endOfMonth } from "date-fns";
 import { cn } from "@/lib/utils";
+import * as pdfjsLib from 'pdfjs-dist';
 
 interface ParsedMenuItem {
   name: string;
@@ -95,6 +96,24 @@ export default function PdfMenuUploadDialog({
     setEndDate(endOfMonth(new Date()));
   };
 
+  // Convert PDF page to base64 image
+  const convertPdfPageToImage = async (pdf: any, pageNum: number): Promise<string> => {
+    const page = await pdf.getPage(pageNum);
+    const viewport = page.getViewport({ scale: 2.0 });
+    
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    
+    await page.render({
+      canvasContext: context,
+      viewport: viewport
+    }).promise;
+    
+    return canvas.toDataURL('image/png');
+  };
+
   const handleProcessPdf = async () => {
     if (!pdfFile) {
       toast({
@@ -106,27 +125,31 @@ export default function PdfMenuUploadDialog({
     }
 
     setProcessing(true);
-    setUploadProgress('Uploading PDF file...');
+    setUploadProgress('Converting PDF to images...');
 
     try {
-      // Upload PDF to storage
-      const fileName = `monthly-special-${Date.now()}.pdf`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('menu-pdfs')
-        .upload(fileName, pdfFile);
+      // Set up PDF.js worker
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs`;
 
-      if (uploadError) throw uploadError;
+      // Load PDF
+      const arrayBuffer = await pdfFile.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      
+      setUploadProgress(`Converting ${pdf.numPages} pages to images...`);
+      
+      // Convert all pages to images
+      const pageImages: string[] = [];
+      for (let i = 1; i <= pdf.numPages; i++) {
+        setUploadProgress(`Converting page ${i} of ${pdf.numPages}...`);
+        const imageData = await convertPdfPageToImage(pdf, i);
+        pageImages.push(imageData);
+      }
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('menu-pdfs')
-        .getPublicUrl(fileName);
+      setUploadProgress('Parsing menu items from images...');
 
-      setPdfUrl(publicUrl);
-      setUploadProgress('Parsing menu items...');
-
-      // Call edge function to parse PDF
+      // Call edge function with images instead of PDF URL
       const { data: parseData, error: parseError } = await supabase.functions.invoke('parse-menu-pdf', {
-        body: { pdf_url: publicUrl }
+        body: { images: pageImages }
       });
 
       if (parseError) throw parseError;

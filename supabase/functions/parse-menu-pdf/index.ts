@@ -15,61 +15,17 @@ interface ParsedMenuItem {
   confidence: number;
 }
 
-// Helper function to convert PDF page to PNG base64
-async function pdfPageToImage(pdfBytes: Uint8Array, pageNumber: number): Promise<string> {
-  try {
-    // Import PDF.js library
-    const pdfjsLib = await import('https://esm.sh/pdfjs-dist@4.0.379/build/pdf.mjs');
-    
-    // Set worker to null for Deno environment
-    pdfjsLib.GlobalWorkerOptions.workerSrc = null;
-
-    // Load the PDF document
-    const loadingTask = pdfjsLib.getDocument({ data: pdfBytes });
-    const pdf = await loadingTask.promise;
-
-    // Get the specific page
-    const page = await pdf.getPage(pageNumber);
-    
-    // Set scale for better quality (2x for 150 DPI)
-    const scale = 2.0;
-    const viewport = page.getViewport({ scale });
-
-    // Create a canvas (using a mock canvas for Deno)
-    const { createCanvas } = await import('https://deno.land/x/canvas@v1.4.1/mod.ts');
-    const canvas = createCanvas(viewport.width, viewport.height);
-    const context = canvas.getContext('2d');
-
-    // Render the page
-    const renderContext = {
-      canvasContext: context,
-      viewport: viewport,
-    };
-    
-    await page.render(renderContext).promise;
-
-    // Convert canvas to PNG base64
-    const pngData = canvas.toBuffer('image/png');
-    const base64Image = btoa(String.fromCharCode(...new Uint8Array(pngData)));
-    
-    return base64Image;
-  } catch (error) {
-    console.error(`Error converting page ${pageNumber}:`, error);
-    throw error;
-  }
-}
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { pdf_url } = await req.json();
+    const { images } = await req.json();
     
-    if (!pdf_url) {
+    if (!images || !Array.isArray(images) || images.length === 0) {
       return new Response(
-        JSON.stringify({ error: 'PDF URL is required' }),
+        JSON.stringify({ error: 'Images array is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -79,61 +35,17 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY is not configured');
     }
 
-    console.log('Processing PDF from URL:', pdf_url);
-
-    // Download PDF from storage
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    // Extract bucket and path from URL
-    const urlParts = pdf_url.split('/storage/v1/object/public/');
-    if (urlParts.length < 2) {
-      throw new Error('Invalid PDF URL format');
-    }
-    
-    const pathAfterPublic = urlParts[1];
-    const firstSlashIndex = pathAfterPublic.indexOf('/');
-    const bucket = pathAfterPublic.substring(0, firstSlashIndex);
-    const path = pathAfterPublic.substring(firstSlashIndex + 1);
-
-    console.log('Downloading from bucket:', bucket, 'path:', path);
-
-    // Download the PDF
-    const { data: pdfData, error: downloadError } = await supabase.storage
-      .from(bucket)
-      .download(path);
-
-    if (downloadError) {
-      console.error('Error downloading PDF:', downloadError);
-      throw new Error('Failed to download PDF file');
-    }
-
-    // Convert PDF to Uint8Array
-    const arrayBuffer = await pdfData.arrayBuffer();
-    const pdfBytes = new Uint8Array(arrayBuffer);
-
-    console.log('PDF downloaded, size:', arrayBuffer.byteLength, 'bytes');
-
-    // Import PDF.js to get page count
-    const pdfjsLib = await import('https://esm.sh/pdfjs-dist@4.0.379/build/pdf.mjs');
-    pdfjsLib.GlobalWorkerOptions.workerSrc = null;
-    const loadingTask = pdfjsLib.getDocument({ data: pdfBytes });
-    const pdf = await loadingTask.promise;
-    const numPages = pdf.numPages;
-
-    console.log(`PDF has ${numPages} page(s), processing...`);
+    console.log(`Processing ${images.length} page image(s)`);
 
     // Collect all menu items from all pages
     const allItems: ParsedMenuItem[] = [];
 
-    // Process each page
-    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-      console.log(`Processing page ${pageNum}/${numPages}...`);
+    // Process each page image
+    for (let pageNum = 0; pageNum < images.length; pageNum++) {
+      console.log(`Processing page ${pageNum + 1}/${images.length}...`);
       
       try {
-        // Convert PDF page to image
-        const base64Image = await pdfPageToImage(pdfBytes, pageNum);
+        const base64Image = images[pageNum];
 
         // Use OpenAI to parse the page image
         const prompt = `You are a menu parser. Extract all menu items from this restaurant menu page.
@@ -181,7 +93,7 @@ Rules:
                   {
                     type: 'image_url',
                     image_url: {
-                      url: `data:image/png;base64,${base64Image}`
+                      url: base64Image
                     }
                   }
                 ]
@@ -193,14 +105,14 @@ Rules:
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error(`OpenAI API error on page ${pageNum}:`, response.status, errorText);
+          console.error(`OpenAI API error on page ${pageNum + 1}:`, response.status, errorText);
           continue; // Skip this page but continue with others
         }
 
         const data = await response.json();
         const content = data.choices[0].message.content;
         
-        console.log(`OpenAI response for page ${pageNum}:`, content);
+        console.log(`OpenAI response for page ${pageNum + 1}:`, content);
 
         // Parse the JSON response
         try {
@@ -208,26 +120,26 @@ Rules:
           const parsedData = JSON.parse(cleanedContent);
           const pageItems: ParsedMenuItem[] = parsedData.items || [];
           
-          console.log(`Extracted ${pageItems.length} items from page ${pageNum}`);
+          console.log(`Extracted ${pageItems.length} items from page ${pageNum + 1}`);
           allItems.push(...pageItems);
         } catch (parseError) {
-          console.error(`Failed to parse OpenAI response for page ${pageNum}:`, content);
+          console.error(`Failed to parse OpenAI response for page ${pageNum + 1}:`, content);
         }
       } catch (pageError) {
-        console.error(`Error processing page ${pageNum}:`, pageError);
+        console.error(`Error processing page ${pageNum + 1}:`, pageError);
         // Continue with next page
       }
     }
     
-    console.log(`Successfully parsed ${allItems.length} total menu items from ${numPages} page(s)`);
+    console.log(`Successfully parsed ${allItems.length} total menu items from ${images.length} page(s)`);
 
     return new Response(
       JSON.stringify({
         items: allItems,
         total_items: allItems.length,
-        pages_processed: numPages,
+        pages_processed: images.length,
         parsing_notes: allItems.length === 0 
-          ? ['No menu items detected in PDF. Please check the file and try again.']
+          ? ['No menu items detected in images. Please check the file and try again.']
           : []
       }),
       { 
