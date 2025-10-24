@@ -15,6 +15,50 @@ interface ParsedMenuItem {
   confidence: number;
 }
 
+// Helper function to convert PDF page to PNG base64
+async function pdfPageToImage(pdfBytes: Uint8Array, pageNumber: number): Promise<string> {
+  try {
+    // Import PDF.js library
+    const pdfjsLib = await import('https://esm.sh/pdfjs-dist@4.0.379/build/pdf.mjs');
+    
+    // Set worker to null for Deno environment
+    pdfjsLib.GlobalWorkerOptions.workerSrc = null;
+
+    // Load the PDF document
+    const loadingTask = pdfjsLib.getDocument({ data: pdfBytes });
+    const pdf = await loadingTask.promise;
+
+    // Get the specific page
+    const page = await pdf.getPage(pageNumber);
+    
+    // Set scale for better quality (2x for 150 DPI)
+    const scale = 2.0;
+    const viewport = page.getViewport({ scale });
+
+    // Create a canvas (using a mock canvas for Deno)
+    const { createCanvas } = await import('https://deno.land/x/canvas@v1.4.1/mod.ts');
+    const canvas = createCanvas(viewport.width, viewport.height);
+    const context = canvas.getContext('2d');
+
+    // Render the page
+    const renderContext = {
+      canvasContext: context,
+      viewport: viewport,
+    };
+    
+    await page.render(renderContext).promise;
+
+    // Convert canvas to PNG base64
+    const pngData = canvas.toBuffer('image/png');
+    const base64Image = btoa(String.fromCharCode(...new Uint8Array(pngData)));
+    
+    return base64Image;
+  } catch (error) {
+    console.error(`Error converting page ${pageNumber}:`, error);
+    throw error;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -48,8 +92,12 @@ serve(async (req) => {
       throw new Error('Invalid PDF URL format');
     }
     
-    const [bucket, ...pathParts] = urlParts[1].split('/');
-    const path = pathParts.join('/');
+    const pathAfterPublic = urlParts[1];
+    const firstSlashIndex = pathAfterPublic.indexOf('/');
+    const bucket = pathAfterPublic.substring(0, firstSlashIndex);
+    const path = pathAfterPublic.substring(firstSlashIndex + 1);
+
+    console.log('Downloading from bucket:', bucket, 'path:', path);
 
     // Download the PDF
     const { data: pdfData, error: downloadError } = await supabase.storage
@@ -61,14 +109,34 @@ serve(async (req) => {
       throw new Error('Failed to download PDF file');
     }
 
-    // Convert PDF to base64
+    // Convert PDF to Uint8Array
     const arrayBuffer = await pdfData.arrayBuffer();
-    const base64Pdf = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+    const pdfBytes = new Uint8Array(arrayBuffer);
 
     console.log('PDF downloaded, size:', arrayBuffer.byteLength, 'bytes');
 
-    // Use OpenAI to parse the PDF content
-    const prompt = `You are a menu parser. Extract all menu items from this restaurant menu PDF.
+    // Import PDF.js to get page count
+    const pdfjsLib = await import('https://esm.sh/pdfjs-dist@4.0.379/build/pdf.mjs');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = null;
+    const loadingTask = pdfjsLib.getDocument({ data: pdfBytes });
+    const pdf = await loadingTask.promise;
+    const numPages = pdf.numPages;
+
+    console.log(`PDF has ${numPages} page(s), processing...`);
+
+    // Collect all menu items from all pages
+    const allItems: ParsedMenuItem[] = [];
+
+    // Process each page
+    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+      console.log(`Processing page ${pageNum}/${numPages}...`);
+      
+      try {
+        // Convert PDF page to image
+        const base64Image = await pdfPageToImage(pdfBytes, pageNum);
+
+        // Use OpenAI to parse the page image
+        const prompt = `You are a menu parser. Extract all menu items from this restaurant menu page.
 
 For each menu item, extract:
 - name: The dish/item name
@@ -90,70 +158,75 @@ Return ONLY a valid JSON object in this exact format:
 }
 
 Rules:
-- Extract ALL menu items you can find
+- Extract ALL menu items you can find on this page
 - If no description is visible, use empty string ""
 - If price is unclear, use 0
 - Set confidence between 0-1 based on how clear the information is
 - Only include tags that are explicitly shown (GF, V, VG, CF, DF, etc.)
 - Return valid JSON only, no other text`;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'user',
-            content: [
-              { type: 'text', text: prompt },
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openAIApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
               {
-                type: 'image_url',
-                image_url: {
-                  url: `data:application/pdf;base64,${base64Pdf}`
-                }
+                role: 'user',
+                content: [
+                  { type: 'text', text: prompt },
+                  {
+                    type: 'image_url',
+                    image_url: {
+                      url: `data:image/png;base64,${base64Image}`
+                    }
+                  }
+                ]
               }
-            ]
-          }
-        ],
-        max_tokens: 4000,
-      }),
-    });
+            ],
+            max_tokens: 4000,
+          }),
+        });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('OpenAI API error:', response.status, errorText);
-      throw new Error(`OpenAI API error: ${response.status}`);
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`OpenAI API error on page ${pageNum}:`, response.status, errorText);
+          continue; // Skip this page but continue with others
+        }
+
+        const data = await response.json();
+        const content = data.choices[0].message.content;
+        
+        console.log(`OpenAI response for page ${pageNum}:`, content);
+
+        // Parse the JSON response
+        try {
+          const cleanedContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          const parsedData = JSON.parse(cleanedContent);
+          const pageItems: ParsedMenuItem[] = parsedData.items || [];
+          
+          console.log(`Extracted ${pageItems.length} items from page ${pageNum}`);
+          allItems.push(...pageItems);
+        } catch (parseError) {
+          console.error(`Failed to parse OpenAI response for page ${pageNum}:`, content);
+        }
+      } catch (pageError) {
+        console.error(`Error processing page ${pageNum}:`, pageError);
+        // Continue with next page
+      }
     }
-
-    const data = await response.json();
-    const content = data.choices[0].message.content;
     
-    console.log('OpenAI response:', content);
-
-    // Parse the JSON response
-    let parsedData;
-    try {
-      // Remove markdown code blocks if present
-      const cleanedContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      parsedData = JSON.parse(cleanedContent);
-    } catch (parseError) {
-      console.error('Failed to parse OpenAI response:', content);
-      throw new Error('Failed to parse menu items from PDF');
-    }
-
-    const items: ParsedMenuItem[] = parsedData.items || [];
-    
-    console.log(`Successfully parsed ${items.length} menu items`);
+    console.log(`Successfully parsed ${allItems.length} total menu items from ${numPages} page(s)`);
 
     return new Response(
       JSON.stringify({
-        items,
-        total_items: items.length,
-        parsing_notes: items.length === 0 
+        items: allItems,
+        total_items: allItems.length,
+        pages_processed: numPages,
+        parsing_notes: allItems.length === 0 
           ? ['No menu items detected in PDF. Please check the file and try again.']
           : []
       }),
