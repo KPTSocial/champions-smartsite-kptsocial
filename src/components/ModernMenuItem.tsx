@@ -13,8 +13,8 @@ const ModernMenuItem: React.FC<ModernMenuItemProps> = ({ item, sectionName }) =>
                   sectionName?.toLowerCase().includes('beverage') ||
                   sectionName?.toLowerCase().includes('bar');
 
-  const formatPrice = (price: number) => {
-    // Remove unnecessary trailing zeros (e.g., 10.00 → 10, 14.50 → 14.5)
+  const formatPrice = (price: number | null | undefined) => {
+    if (price == null) return '0';
     return price.toFixed(2).replace(/\.?0+$/, '');
   };
 
