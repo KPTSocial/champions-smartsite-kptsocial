@@ -10,9 +10,12 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload, CalendarIcon, Loader2, FileText, ImageIcon, AlertCircle, CheckCircle2, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { format, addMonths, startOfMonth, endOfMonth } from "date-fns";
 import { cn } from "@/lib/utils";
 import * as pdfjsLib from 'pdfjs-dist';
+
+type DuplicateHandling = 'update' | 'skip' | 'fail';
 
 const ACCEPTED_FILE_TYPES = [
   'application/pdf',
@@ -66,6 +69,7 @@ export default function PdfMenuUploadDialog({
   const [clearExisting, setClearExisting] = useState(false);
   const [markFeatured, setMarkFeatured] = useState(false);
   const [markAsSpecial, setMarkAsSpecial] = useState(false);
+  const [duplicateHandling, setDuplicateHandling] = useState<DuplicateHandling>('update');
   const [processing, setProcessing] = useState(false);
   const [parsedItems, setParsedItems] = useState<ParsedMenuItem[]>([]);
   const [editedItems, setEditedItems] = useState<ParsedMenuItem[]>([]);
@@ -286,12 +290,37 @@ export default function PdfMenuUploadDialog({
         sort_order: index
       }));
 
-      // Bulk insert
-      const { error: insertError } = await supabase
-        .from('menu_items')
-        .insert(itemsToInsert);
-
-      if (insertError) throw insertError;
+      // Handle import based on duplicate handling preference
+      if (duplicateHandling === 'update') {
+        // Upsert: update existing items with same name in category
+        const { error: upsertError } = await supabase
+          .from('menu_items')
+          .upsert(itemsToInsert, { 
+            onConflict: 'name,category_id',
+            ignoreDuplicates: false
+          });
+        if (upsertError) throw upsertError;
+      } else if (duplicateHandling === 'skip') {
+        // Skip duplicates: only insert new items
+        const { error: insertError } = await supabase
+          .from('menu_items')
+          .upsert(itemsToInsert, { 
+            onConflict: 'name,category_id',
+            ignoreDuplicates: true
+          });
+        if (insertError) throw insertError;
+      } else {
+        // Fail on duplicates: use regular insert
+        const { error: insertError } = await supabase
+          .from('menu_items')
+          .insert(itemsToInsert);
+        if (insertError) {
+          if (insertError.message.includes('duplicate key')) {
+            throw new Error('Duplicate items found. Use "Update existing" or "Skip duplicates" to handle conflicts.');
+          }
+          throw insertError;
+        }
+      }
 
       toast({
         title: "Import successful",
@@ -323,6 +352,7 @@ export default function PdfMenuUploadDialog({
     setClearExisting(false);
     setMarkFeatured(false);
     setMarkAsSpecial(false);
+    setDuplicateHandling('update');
     setParsedItems([]);
     setEditedItems([]);
     setUploadProgress('');
@@ -477,6 +507,40 @@ export default function PdfMenuUploadDialog({
                 </div>
               )}
             </div>
+
+            {/* Duplicate Handling */}
+            {!clearExisting && (
+              <div className="space-y-3">
+                <Label>How to handle duplicates</Label>
+                <p className="text-sm text-muted-foreground">
+                  Choose what happens if items with the same name already exist
+                </p>
+                <RadioGroup 
+                  value={duplicateHandling} 
+                  onValueChange={(value) => setDuplicateHandling(value as DuplicateHandling)}
+                  className="space-y-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="update" id="dup-update" />
+                    <label htmlFor="dup-update" className="text-sm font-medium leading-none cursor-pointer">
+                      Update existing items (recommended)
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="skip" id="dup-skip" />
+                    <label htmlFor="dup-skip" className="text-sm font-medium leading-none cursor-pointer">
+                      Skip duplicates (only add new items)
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="fail" id="dup-fail" />
+                    <label htmlFor="dup-fail" className="text-sm font-medium leading-none cursor-pointer">
+                      Fail on duplicates (strict mode)
+                    </label>
+                  </div>
+                </RadioGroup>
+              </div>
+            )}
 
             {/* Date Selection - only show if markAsSpecial is true */}
             {markAsSpecial && (
