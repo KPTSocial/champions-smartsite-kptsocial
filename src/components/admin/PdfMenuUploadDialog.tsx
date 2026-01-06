@@ -8,11 +8,21 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, CalendarIcon, Loader2, FileText, AlertCircle, CheckCircle2, X } from "lucide-react";
+import { Upload, CalendarIcon, Loader2, FileText, ImageIcon, AlertCircle, CheckCircle2, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format, addMonths, startOfMonth, endOfMonth } from "date-fns";
 import { cn } from "@/lib/utils";
 import * as pdfjsLib from 'pdfjs-dist';
+
+const ACCEPTED_FILE_TYPES = [
+  'application/pdf',
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif'
+];
+
+const ACCEPTED_EXTENSIONS = '.pdf,.jpg,.jpeg,.png,.webp,.gif';
 
 interface ParsedMenuItem {
   name: string;
@@ -49,8 +59,7 @@ export default function PdfMenuUploadDialog({
 }: PdfMenuUploadDialogProps) {
   const { toast } = useToast();
   const [step, setStep] = useState<'upload' | 'category' | 'options' | 'review'>('upload');
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
-  const [pdfUrl, setPdfUrl] = useState<string>('');
+  const [files, setFiles] = useState<File[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>(defaultCategoryId || '');
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
@@ -63,26 +72,47 @@ export default function PdfMenuUploadDialog({
   const [uploadProgress, setUploadProgress] = useState<string>('');
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.type !== 'application/pdf') {
+    const selectedFiles = Array.from(e.target.files || []);
+    if (selectedFiles.length === 0) return;
+
+    const validFiles: File[] = [];
+    for (const file of selectedFiles) {
+      if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
         toast({
           title: "Invalid file type",
-          description: "Please select a PDF file",
+          description: `${file.name} is not a supported format. Use PDF, JPEG, PNG, WebP, or GIF.`,
           variant: "destructive"
         });
-        return;
+        continue;
       }
       if (file.size > 10 * 1024 * 1024) {
         toast({
           title: "File too large",
-          description: "PDF must be under 10MB",
+          description: `${file.name} exceeds 10MB limit`,
           variant: "destructive"
         });
-        return;
+        continue;
       }
-      setPdfFile(file);
+      validFiles.push(file);
     }
+
+    if (validFiles.length > 0) {
+      setFiles(prev => [...prev, ...validFiles]);
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Convert image file to base64
+  const convertImageToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   };
 
   const setNextMonthDates = () => {
@@ -114,40 +144,48 @@ export default function PdfMenuUploadDialog({
     return canvas.toDataURL('image/png');
   };
 
-  const handleProcessPdf = async () => {
-    if (!pdfFile) {
+  const handleProcessFiles = async () => {
+    if (files.length === 0) {
       toast({
-        title: "Missing file",
-        description: "Please select a PDF file",
+        title: "Missing files",
+        description: "Please select at least one file",
         variant: "destructive"
       });
       return;
     }
 
     setProcessing(true);
-    setUploadProgress('Converting PDF to images...');
+    setUploadProgress('Processing files...');
 
     try {
-      // Set up PDF.js worker
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs`;
-
-      // Load PDF
-      const arrayBuffer = await pdfFile.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-      
-      setUploadProgress(`Converting ${pdf.numPages} pages to images...`);
-      
-      // Convert all pages to images
       const pageImages: string[] = [];
-      for (let i = 1; i <= pdf.numPages; i++) {
-        setUploadProgress(`Converting page ${i} of ${pdf.numPages}...`);
-        const imageData = await convertPdfPageToImage(pdf, i);
-        pageImages.push(imageData);
+
+      for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
+        const file = files[fileIndex];
+        
+        if (file.type === 'application/pdf') {
+          // Handle PDF files
+          setUploadProgress(`Processing PDF ${fileIndex + 1} of ${files.length}...`);
+          
+          pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs`;
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          
+          for (let i = 1; i <= pdf.numPages; i++) {
+            setUploadProgress(`Converting PDF page ${i} of ${pdf.numPages}...`);
+            const imageData = await convertPdfPageToImage(pdf, i);
+            pageImages.push(imageData);
+          }
+        } else {
+          // Handle image files directly
+          setUploadProgress(`Processing image ${fileIndex + 1} of ${files.length}...`);
+          const imageData = await convertImageToBase64(file);
+          pageImages.push(imageData);
+        }
       }
 
       setUploadProgress('Parsing menu items from images...');
 
-      // Call edge function with images instead of PDF URL
       const { data: parseData, error: parseError } = await supabase.functions.invoke('parse-menu-pdf', {
         body: { images: pageImages }
       });
@@ -157,7 +195,7 @@ export default function PdfMenuUploadDialog({
       if (!parseData.items || parseData.items.length === 0) {
         toast({
           title: "No items found",
-          description: "Could not extract menu items from PDF. Please check the file format.",
+          description: "Could not extract menu items. Please check the file format.",
           variant: "destructive"
         });
         setProcessing(false);
@@ -169,15 +207,15 @@ export default function PdfMenuUploadDialog({
       setStep('review');
       
       toast({
-        title: "PDF processed successfully",
+        title: "Files processed successfully",
         description: `Found ${parseData.items.length} menu items`
       });
 
     } catch (error) {
-      console.error('Error processing PDF:', error);
+      console.error('Error processing files:', error);
       toast({
         title: "Processing failed",
-        description: error instanceof Error ? error.message : "Could not process PDF",
+        description: error instanceof Error ? error.message : "Could not process files",
         variant: "destructive"
       });
     } finally {
@@ -278,8 +316,7 @@ export default function PdfMenuUploadDialog({
 
   const handleClose = () => {
     setStep('upload');
-    setPdfFile(null);
-    setPdfUrl('');
+    setFiles([]);
     setSelectedCategory(defaultCategoryId || '');
     setStartDate(undefined);
     setEndDate(undefined);
@@ -300,9 +337,9 @@ export default function PdfMenuUploadDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Upload PDF Menu</DialogTitle>
+          <DialogTitle>Upload Menu File</DialogTitle>
           <DialogDescription>
-            Upload a PDF menu to automatically extract and import menu items
+            Upload PDF or image files to automatically extract and import menu items
           </DialogDescription>
         </DialogHeader>
 
@@ -310,40 +347,62 @@ export default function PdfMenuUploadDialog({
           <div className="space-y-6">
             {/* File Upload */}
             <div className="space-y-2">
-              <Label>Upload PDF File</Label>
+              <Label>Upload Files</Label>
               <div className="border-2 border-dashed rounded-lg p-8 text-center">
                 <Input
                   type="file"
-                  accept=".pdf"
+                  accept={ACCEPTED_EXTENSIONS}
                   onChange={handleFileSelect}
                   className="hidden"
-                  id="pdf-upload"
+                  id="menu-upload"
+                  multiple
                 />
-                <label htmlFor="pdf-upload" className="cursor-pointer">
+                <label htmlFor="menu-upload" className="cursor-pointer">
                   <div className="flex flex-col items-center gap-2">
-                    {pdfFile ? (
-                      <>
-                        <FileText className="h-12 w-12 text-primary" />
-                        <p className="font-medium">{pdfFile.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {(pdfFile.size / 1024 / 1024).toFixed(2)} MB
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="h-12 w-12 text-muted-foreground" />
-                        <p className="font-medium">Click to browse or drag & drop PDF here</p>
-                        <p className="text-sm text-muted-foreground">Maximum file size: 10MB</p>
-                      </>
-                    )}
+                    <Upload className="h-12 w-12 text-muted-foreground" />
+                    <p className="font-medium">Click to browse or drag & drop files here</p>
+                    <p className="text-sm text-muted-foreground">
+                      PDF, JPEG, PNG, WebP, GIF • Max 10MB per file
+                    </p>
                   </div>
                 </label>
               </div>
+
+              {/* Selected files list */}
+              {files.length > 0 && (
+                <div className="space-y-2 mt-4">
+                  <Label>Selected Files ({files.length})</Label>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {files.map((file, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-lg">
+                        <div className="flex items-center gap-2">
+                          {file.type === 'application/pdf' ? (
+                            <FileText className="h-5 w-5 text-primary" />
+                          ) : (
+                            <ImageIcon className="h-5 w-5 text-primary" />
+                          )}
+                          <span className="text-sm font-medium truncate max-w-[200px]">{file.name}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                          </span>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeFile(index)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={handleClose}>Cancel</Button>
-              <Button onClick={() => setStep('category')} disabled={!pdfFile}>
+              <Button onClick={() => setStep('category')} disabled={files.length === 0}>
                 Next
               </Button>
             </div>
@@ -490,7 +549,7 @@ export default function PdfMenuUploadDialog({
 
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setStep('category')}>Back</Button>
-              <Button onClick={handleProcessPdf} disabled={processing}>
+              <Button onClick={handleProcessFiles} disabled={processing}>
                 {processing ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
