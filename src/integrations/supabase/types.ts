@@ -787,18 +787,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      activate_scheduled_menu_items: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      activate_scheduled_menu_items: { Args: never; Returns: undefined }
       get_admin_role: {
         Args: { user_uuid: string }
         Returns: Database["public"]["Enums"]["admin_role"]
       }
-      is_admin: {
-        Args: { user_uuid: string }
-        Returns: boolean
-      }
+      is_admin: { Args: { user_uuid: string }; Returns: boolean }
     }
     Enums: {
       admin_role: "super_admin" | "admin" | "moderator"
