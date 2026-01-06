@@ -3,16 +3,11 @@ import type { Tables } from "@/integrations/supabase/types";
 
 export type Event = Tables<'events'>;
 
+import eventsData from '@/data/events.json';
+
 export const getEvents = async (): Promise<Event[]> => {
-  const { data, error } = await supabase.from('events').select('*');
-
-  if (error) {
-    console.error("Error fetching events from database:", error.message);
-    // Return an empty array to prevent the page from crashing if the table is missing.
-    return [];
-  }
-
-  return data || [];
+  // Return static data for Phase 1 demo
+  return eventsData as unknown as Event[];
 };
 
 export const prepareEventForDuplication = (sourceEvent: Event) => {
@@ -33,7 +28,7 @@ export const createDuplicateEvent = async (
   }
 ): Promise<{ data: Event | null; error: any }> => {
   const duplicateData = prepareEventForDuplication(sourceEvent);
-  
+
   const eventData = {
     ...duplicateData,
     event_date: options.clearDate ? null : (options.newDate || sourceEvent.event_date),

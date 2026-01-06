@@ -1,0 +1,22 @@
+[
+    {
+        "id": "event-1",
+        "event_title": "Trivia Night",
+        "event_date": "2025-06-20T19:00:00Z",
+        "description": "Join us for weekly trivia! Prizes for top 3 teams.",
+        "event_type": "weekly",
+        "image_url": null,
+        "location": "Main Hall",
+        "rsvp_link": null
+    },
+    {
+        "id": "event-2",
+        "event_title": "Live Music: The Rockers",
+        "event_date": "2025-06-21T20:00:00Z",
+        "description": "Live rock classics from The Rockers.",
+        "event_type": "music",
+        "image_url": null,
+        "location": "Patio",
+        "rsvp_link": null
+    }
+]
