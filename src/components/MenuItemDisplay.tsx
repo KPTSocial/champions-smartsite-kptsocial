@@ -15,7 +15,7 @@ const MenuItemDisplay: React.FC<MenuItemDisplayProps> = ({ item }) => {
         {/* Left: Tags + Name */}
         <div className="flex items-center gap-2 flex-1 flex-wrap">
           {item.tags?.includes('CF') && (
-            <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/fav_jvg2qc.jpg" alt="Champ's Favorite" className="w-5 h-5 flex-shrink-0" />
+            <img src="/icons/champions-favorite.png" alt="Champion's Favorite" className="w-5 h-5 flex-shrink-0" />
           )}
           {item.tags?.includes('GF') && (
             <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/gf_tmnou5.jpg" alt="Gluten Friendly" className="w-5 h-5 flex-shrink-0" />
