@@ -20,7 +20,7 @@ const seasonalEvents = [{
   title: "Summer Cornhole League",
   emoji: "🏆",
   description: "Swing into summer competition! Our league runs on Sunday afternoons. Games start at 1 PM.",
-  details: ["June 22 - July 27, 2025"],
+  details: ["Starts Back Up June 2026"],
   cta: {
     text: "Email to Join",
     href: "mailto:champions.sportsbar.grill@gmail.com",
