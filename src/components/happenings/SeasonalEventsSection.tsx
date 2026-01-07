@@ -44,7 +44,7 @@ const seasonalEvents = [{
   description: "The FIFA World Cup is coming, and Champions is where the world meets in Hillsboro. Every match. Every goal. Every unforgettable moment. Planning to watch with a group? World Cup table reservations open soon. Claim your spot early and be part of the action.",
   details: ["June 11 - July 19, 2026", "All matches shown live"],
   cta: {
-    text: "Reserve Your Table",
+    text: "Reservations Coming Soon",
     href: "/reservations",
     icon: Calendar
   },
