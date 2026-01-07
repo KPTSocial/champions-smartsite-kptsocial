@@ -6,6 +6,17 @@ import { getEvents, type Event } from '@/services/eventService';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 const seasonalEvents = [{
+  title: "Winter Olympics 2026",
+  emoji: "🥇",
+  description: "The Winter Olympics are almost here, and Champions is ready for every medal moment. From opening ceremonies to gold-medal finals, this is where Hillsboro gathers to watch the world compete. Table reservations will open soon, so plan ahead and secure your spot.",
+  details: ["February 6 - 22, 2026", "Milano Cortina, Italy"],
+  cta: {
+    text: "Reserve Your Table",
+    href: "/reservations",
+    icon: Calendar
+  },
+  backgroundImage: "https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/photos/Special%20Events/Wolympics2026.jpeg"
+}, {
   title: "Summer Cornhole League",
   emoji: "🏆",
   description: "Swing into summer competition! Our league runs on Sunday afternoons. Games start at 1 PM.",
@@ -56,7 +67,7 @@ export function SeasonalEventsSection() {
   return (
     <section className="mt-24">
       <h2 className="text-3xl md:text-4xl font-bold font-serif text-center mb-12">Seasonal &amp; Special Events</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto justify-items-center">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto justify-items-center">
         {/* Summer Cornhole League */}
         {seasonalEvents.map(event => (
           <EventCard 
