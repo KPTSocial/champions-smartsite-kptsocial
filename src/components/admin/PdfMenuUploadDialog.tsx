@@ -262,13 +262,13 @@ export default function PdfMenuUploadDialog({
     try {
       // Clear existing items if requested
       if (clearExisting) {
-        const deleteQuery = supabase
+        let deleteQuery = supabase
           .from('menu_items')
           .delete()
           .eq('category_id', selectedCategory);
 
         if (markAsSpecial) {
-          deleteQuery.eq('is_special', true);
+          deleteQuery = deleteQuery.eq('is_special', true);
         }
 
         const { error: deleteError } = await deleteQuery;
