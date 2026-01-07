@@ -24,6 +24,20 @@ const Menu = () => {
     retry: false,
   });
 
+  // Fetch site settings for monthly specials filename
+  const { data: siteSettings } = useQuery({
+    queryKey: ['site-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('monthly_specials_url')
+        .eq('id', 1)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // Set up real-time listeners for menu changes
   useEffect(() => {
     const channels = [
@@ -170,10 +184,10 @@ const Menu = () => {
                       {/* Download link for Current Specials */}
                       {section.id === 'de2ef338-ab9a-43ef-8332-c95cb0d549b9' && (
                         <MenuDownloadLink 
-                          fileName="january-2026-specials.png"
-                          downloadName="January-2026-Specials.png"
+                          fileName={siteSettings?.monthly_specials_url || 'january-2026-specials.png'}
+                          downloadName={`${section.description || 'Monthly'}-Specials.${(siteSettings?.monthly_specials_url || 'png').split('.').pop()}`}
                           displayText={`Download ${section.description || 'Monthly'} Menu`}
-                          isLocalFile
+                          isLocalFile={!siteSettings?.monthly_specials_url}
                         />
                       )}
                       

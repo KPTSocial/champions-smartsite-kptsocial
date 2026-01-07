@@ -352,21 +352,41 @@ export default function PdfMenuUploadDialog({
         }
       }
 
-      // If importing Monthly Specials, upload the PDF to storage for public download
+      // If importing Monthly Specials, upload the file to storage for public download
       if (markAsSpecial && files.length > 0) {
-        const pdfFile = files.find(f => f.type === 'application/pdf');
-        if (pdfFile) {
-          const { error: uploadError } = await supabase.storage
-            .from('menu-pdfs')
-            .upload('monthly-specials.pdf', pdfFile, { 
-              upsert: true,
-              contentType: 'application/pdf'
-            });
+        const uploadFile = files[0]; // Use the first file
+        const fileExtension = uploadFile.name.split('.').pop() || 'pdf';
+        
+        // Generate filename based on detected month or current date
+        const monthLabel = detectedMonth || format(new Date(), 'MMMM-yyyy');
+        const sanitizedMonth = monthLabel.toLowerCase().replace(/\s+/g, '-');
+        const newFilename = `${sanitizedMonth}-specials.${fileExtension}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('menu-pdfs')
+          .upload(newFilename, uploadFile, { 
+            upsert: true,
+            contentType: uploadFile.type
+          });
+        
+        if (uploadError) {
+          console.error('Failed to upload monthly specials file:', uploadError);
+        } else {
+          console.log('Monthly specials file uploaded successfully:', newFilename);
           
-          if (uploadError) {
-            console.error('Failed to upload monthly specials PDF:', uploadError);
+          // Update site_settings with the new filename
+          const { error: settingsError } = await supabase
+            .from('site_settings')
+            .update({ 
+              monthly_specials_url: newFilename,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', 1);
+          
+          if (settingsError) {
+            console.error('Failed to update site settings:', settingsError);
           } else {
-            console.log('Monthly specials PDF uploaded successfully');
+            console.log('Site settings updated with new specials filename:', newFilename);
           }
         }
       }
