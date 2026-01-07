@@ -12,7 +12,7 @@ import { BackgroundContainer } from '@/components/ui/background-container';
 import { PageHeader } from '@/components/ui/page-header';
 import { supabase } from '@/integrations/supabase/client';
 import { Separator } from '@/components/ui/separator';
-import { MenuPdfDownloadButton } from '@/components/MenuPdfDownloadButton';
+import { MenuDownloadLink } from '@/components/MenuDownloadLink';
 
 const Menu = () => {
   const [activeSection, setActiveSection] = useState<string>('');
@@ -147,21 +147,6 @@ const Menu = () => {
               onSectionChange={handleSectionChange}
             />
           )}
-          {activeSection === 'db2f01ba-7cb1-4221-895d-a63855748272' && (
-            <MenuPdfDownloadButton 
-              fileName="champions-menu-fall-2025.pdf"
-              downloadName="champions-menu-fall-2025.pdf"
-              label="Download main menu PDF"
-            />
-          )}
-          {activeSection === 'de2ef338-ab9a-43ef-8332-c95cb0d549b9' && (
-            <MenuPdfDownloadButton 
-              fileName="january-2026-specials.png"
-              downloadName="January-2026-Specials.png"
-              label="Download monthly specials"
-              isLocalFile
-            />
-          )}
         </div>
         {/* Enhanced Menu Content */}
         <div className="menu-section lg:rounded-lg p-8">
@@ -176,11 +161,31 @@ const Menu = () => {
                       <h2 className="text-4xl font-serif font-bold text-secondary mb-3">
                         {section.name}
                       </h2>
-                      {section.description && (
+                      {section.description && section.id !== 'de2ef338-ab9a-43ef-8332-c95cb0d549b9' && (
                         <p className="text-muted-foreground max-w-3xl mx-auto">
                           {section.description}
                         </p>
                       )}
+                      
+                      {/* Download link for Current Specials */}
+                      {section.id === 'de2ef338-ab9a-43ef-8332-c95cb0d549b9' && (
+                        <MenuDownloadLink 
+                          fileName="january-2026-specials.png"
+                          downloadName="January-2026-Specials.png"
+                          displayText={`Download ${section.description || 'Monthly'} Menu`}
+                          isLocalFile
+                        />
+                      )}
+                      
+                      {/* Download link for Main Menu */}
+                      {section.id === 'db2f01ba-7cb1-4221-895d-a63855748272' && (
+                        <MenuDownloadLink 
+                          fileName="champions-menu-fall-2025.pdf"
+                          downloadName="Champions-Main-Menu.pdf"
+                          displayText="Download Main Menu"
+                        />
+                      )}
+                      
                       <Separator className="mt-6 max-w-xs mx-auto" />
                     </div>
 
