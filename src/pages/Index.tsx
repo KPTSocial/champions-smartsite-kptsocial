@@ -73,7 +73,7 @@ const Index = () => {
           <div className="text-center">
             <h2 className="text-4xl md:text-5xl font-bold font-serif">A Bar for Champions</h2>
             <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-              We're more than just a sports bar. We're a family friendly community hub with a passion for fresh
+              We're more than just a sports bar. We're a family friendly, community hub with a passion for fresh
               ingredients and unforgettable moments.
             </p>
           </div>
