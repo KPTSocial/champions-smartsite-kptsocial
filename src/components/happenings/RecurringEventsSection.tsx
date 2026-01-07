@@ -31,7 +31,7 @@ const recurringEvents = [{
   title: "Bingo Night",
   emoji: "🍻",
   description: "Bingo with a twist—hosted by local breweries, wineries, or distilleries. Seats fill fast! Call ahead for groups of 5+.",
-  details: ["August: 20th", "September: 3rd & 17th", "October: 1st, 15th & 29th", "November: 12th"],
+  details: ["January: 7th & 21st", "February: 4th & 18th"],
   cta: {
     text: "Reserve a Spot",
     href: "/reservations",
