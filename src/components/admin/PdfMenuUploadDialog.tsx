@@ -352,6 +352,25 @@ export default function PdfMenuUploadDialog({
         }
       }
 
+      // If importing Monthly Specials, upload the PDF to storage for public download
+      if (markAsSpecial && files.length > 0) {
+        const pdfFile = files.find(f => f.type === 'application/pdf');
+        if (pdfFile) {
+          const { error: uploadError } = await supabase.storage
+            .from('menu-pdfs')
+            .upload('monthly-specials.pdf', pdfFile, { 
+              upsert: true,
+              contentType: 'application/pdf'
+            });
+          
+          if (uploadError) {
+            console.error('Failed to upload monthly specials PDF:', uploadError);
+          } else {
+            console.log('Monthly specials PDF uploaded successfully');
+          }
+        }
+      }
+
       toast({
         title: "Import successful",
         description: `${editedItems.length} menu items imported successfully`

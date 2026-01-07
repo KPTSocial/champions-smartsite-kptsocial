@@ -2,11 +2,19 @@ import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 
-export const MenuPdfDownloadButton = () => {
+interface MenuPdfDownloadButtonProps {
+  fileName: string;
+  downloadName: string;
+  label?: string;
+}
+
+export const MenuPdfDownloadButton = ({ 
+  fileName, 
+  downloadName, 
+  label = "Download menu PDF" 
+}: MenuPdfDownloadButtonProps) => {
   const handleDownload = async () => {
     try {
-      // Using the renamed file from storage
-      const fileName = "champions-menu-fall-2025.pdf";
       const pdfUrl = `https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/menu-pdfs/${encodeURIComponent(fileName)}`;
       
       const response = await fetch(pdfUrl);
@@ -16,7 +24,7 @@ export const MenuPdfDownloadButton = () => {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = "champions-menu-fall-2025.pdf";
+      link.download = downloadName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -41,7 +49,7 @@ export const MenuPdfDownloadButton = () => {
       onClick={handleDownload}
       size="lg"
       className="absolute bottom-4 right-4 rounded-full shadow-md hover:shadow-lg transition-all duration-300 h-14 w-14 md:h-16 md:w-16 z-10"
-      aria-label="Download menu PDF"
+      aria-label={label}
     >
       <Download className="h-6 w-6 md:h-7 md:w-7" />
     </Button>
