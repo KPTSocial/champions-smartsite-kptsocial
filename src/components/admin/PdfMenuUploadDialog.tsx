@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -74,13 +74,6 @@ export default function PdfMenuUploadDialog({
   const [parsedItems, setParsedItems] = useState<ParsedMenuItem[]>([]);
   const [editedItems, setEditedItems] = useState<ParsedMenuItem[]>([]);
   const [uploadProgress, setUploadProgress] = useState<string>('');
-
-  // Auto-enable "Replace existing" when marking as monthly special to ensure old specials are removed
-  useEffect(() => {
-    if (markAsSpecial) {
-      setClearExisting(true);
-    }
-  }, [markAsSpecial]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -269,13 +262,13 @@ export default function PdfMenuUploadDialog({
     try {
       // Clear existing items if requested
       if (clearExisting) {
-        let deleteQuery = supabase
+        const deleteQuery = supabase
           .from('menu_items')
           .delete()
           .eq('category_id', selectedCategory);
 
         if (markAsSpecial) {
-          deleteQuery = deleteQuery.eq('is_special', true);
+          deleteQuery.eq('is_special', true);
         }
 
         const { error: deleteError } = await deleteQuery;
