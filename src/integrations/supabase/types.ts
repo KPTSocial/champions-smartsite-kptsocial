@@ -41,6 +41,96 @@ export type Database = {
         }
         Relationships: []
       }
+      _archived_mug_club_members: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          engraved_name: string
+          id: string
+          joined_date: string
+          renewal_date: string | null
+          user_id: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          engraved_name: string
+          id?: string
+          joined_date?: string
+          renewal_date?: string | null
+          user_id: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          engraved_name?: string
+          id?: string
+          joined_date?: string
+          renewal_date?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      _archived_photo_booth_posts: {
+        Row: {
+          admin_notes: string | null
+          approved: boolean
+          approved_at: string | null
+          approved_by: string | null
+          caption: string
+          created_at: string
+          event_id: string | null
+          id: string
+          image_url: string
+          status: string | null
+          tags: string[] | null
+          uploaded_by: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          approved?: boolean
+          approved_at?: string | null
+          approved_by?: string | null
+          caption: string
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          image_url: string
+          status?: string | null
+          tags?: string[] | null
+          uploaded_by: string
+        }
+        Update: {
+          admin_notes?: string | null
+          approved?: boolean
+          approved_at?: string | null
+          approved_by?: string | null
+          caption?: string
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          image_url?: string
+          status?: string | null
+          tags?: string[] | null
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photo_booth_posts_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "photo_booth_posts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       _archived_photo_booth_uploads: {
         Row: {
           ai_caption_requested: boolean
@@ -80,6 +170,36 @@ export type Database = {
           last_name?: string
           uploaded_at?: string
           user_name?: string | null
+        }
+        Relationships: []
+      }
+      _archived_referrals: {
+        Row: {
+          created_at: string | null
+          id: string
+          joined: boolean | null
+          points_awarded: number | null
+          referral_code: string | null
+          referred_email: string
+          referrer_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          joined?: boolean | null
+          points_awarded?: number | null
+          referral_code?: string | null
+          referred_email: string
+          referrer_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          joined?: boolean | null
+          points_awarded?: number | null
+          referral_code?: string | null
+          referred_email?: string
+          referrer_id?: string
         }
         Relationships: []
       }
@@ -132,6 +252,123 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      _archived_social_posts: {
+        Row: {
+          caption: string | null
+          created_at: string | null
+          hashtag: string | null
+          id: string
+          image_url: string | null
+          posted_at: string | null
+          uploaded_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string | null
+          hashtag?: string | null
+          id?: string
+          image_url?: string | null
+          posted_at?: string | null
+          uploaded_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string | null
+          hashtag?: string | null
+          id?: string
+          image_url?: string | null
+          posted_at?: string | null
+          uploaded_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      _archived_user_profiles: {
+        Row: {
+          created_at: string | null
+          id: string
+          referral_code: string | null
+          user_email: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id: string
+          referral_code?: string | null
+          user_email?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          referral_code?: string | null
+          user_email?: string | null
+        }
+        Relationships: []
+      }
+      _archived_vip_applications: {
+        Row: {
+          approved: boolean
+          audience_size: number
+          created_at: string
+          email: string
+          id: string
+          name: string
+          referral_code: string | null
+          social_handle: string
+          updated_at: string
+        }
+        Insert: {
+          approved?: boolean
+          audience_size: number
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          referral_code?: string | null
+          social_handle: string
+          updated_at?: string
+        }
+        Update: {
+          approved?: boolean
+          audience_size?: number
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          referral_code?: string | null
+          social_handle?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      _archived_whiskey_room_members: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          id: string
+          joined_date: string
+          personalized_locker: string | null
+          user_id: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          id?: string
+          joined_date?: string
+          personalized_locker?: string | null
+          user_id: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          id?: string
+          joined_date?: string
+          personalized_locker?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       admin_users: {
         Row: {
@@ -524,126 +761,6 @@ export type Database = {
         }
         Relationships: []
       }
-      mug_club_members: {
-        Row: {
-          active: boolean | null
-          created_at: string | null
-          engraved_name: string
-          id: string
-          joined_date: string
-          renewal_date: string | null
-          user_id: string
-        }
-        Insert: {
-          active?: boolean | null
-          created_at?: string | null
-          engraved_name: string
-          id?: string
-          joined_date?: string
-          renewal_date?: string | null
-          user_id: string
-        }
-        Update: {
-          active?: boolean | null
-          created_at?: string | null
-          engraved_name?: string
-          id?: string
-          joined_date?: string
-          renewal_date?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      photo_booth_posts: {
-        Row: {
-          admin_notes: string | null
-          approved: boolean
-          approved_at: string | null
-          approved_by: string | null
-          caption: string
-          created_at: string
-          event_id: string | null
-          id: string
-          image_url: string
-          status: string | null
-          tags: string[] | null
-          uploaded_by: string
-        }
-        Insert: {
-          admin_notes?: string | null
-          approved?: boolean
-          approved_at?: string | null
-          approved_by?: string | null
-          caption: string
-          created_at?: string
-          event_id?: string | null
-          id?: string
-          image_url: string
-          status?: string | null
-          tags?: string[] | null
-          uploaded_by: string
-        }
-        Update: {
-          admin_notes?: string | null
-          approved?: boolean
-          approved_at?: string | null
-          approved_by?: string | null
-          caption?: string
-          created_at?: string
-          event_id?: string | null
-          id?: string
-          image_url?: string
-          status?: string | null
-          tags?: string[] | null
-          uploaded_by?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "photo_booth_posts_approved_by_fkey"
-            columns: ["approved_by"]
-            isOneToOne: false
-            referencedRelation: "admin_users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "photo_booth_posts_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      referrals: {
-        Row: {
-          created_at: string | null
-          id: string
-          joined: boolean | null
-          points_awarded: number | null
-          referral_code: string | null
-          referred_email: string
-          referrer_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          joined?: boolean | null
-          points_awarded?: number | null
-          referral_code?: string | null
-          referred_email: string
-          referrer_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          joined?: boolean | null
-          points_awarded?: number | null
-          referral_code?: string | null
-          referred_email?: string
-          referrer_id?: string
-        }
-        Relationships: []
-      }
       sauces: {
         Row: {
           description: string | null
@@ -689,123 +806,6 @@ export type Database = {
           specials_end_date?: string | null
           specials_start_date?: string | null
           updated_at?: string | null
-        }
-        Relationships: []
-      }
-      social_posts: {
-        Row: {
-          caption: string | null
-          created_at: string | null
-          hashtag: string | null
-          id: string
-          image_url: string | null
-          posted_at: string | null
-          uploaded_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          caption?: string | null
-          created_at?: string | null
-          hashtag?: string | null
-          id?: string
-          image_url?: string | null
-          posted_at?: string | null
-          uploaded_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          caption?: string | null
-          created_at?: string | null
-          hashtag?: string | null
-          id?: string
-          image_url?: string | null
-          posted_at?: string | null
-          uploaded_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      user_profiles: {
-        Row: {
-          created_at: string | null
-          id: string
-          referral_code: string | null
-          user_email: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id: string
-          referral_code?: string | null
-          user_email?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          referral_code?: string | null
-          user_email?: string | null
-        }
-        Relationships: []
-      }
-      vip_applications: {
-        Row: {
-          approved: boolean
-          audience_size: number
-          created_at: string
-          email: string
-          id: string
-          name: string
-          referral_code: string | null
-          social_handle: string
-          updated_at: string
-        }
-        Insert: {
-          approved?: boolean
-          audience_size: number
-          created_at?: string
-          email: string
-          id?: string
-          name: string
-          referral_code?: string | null
-          social_handle: string
-          updated_at?: string
-        }
-        Update: {
-          approved?: boolean
-          audience_size?: number
-          created_at?: string
-          email?: string
-          id?: string
-          name?: string
-          referral_code?: string | null
-          social_handle?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      whiskey_room_members: {
-        Row: {
-          active: boolean | null
-          created_at: string | null
-          id: string
-          joined_date: string
-          personalized_locker: string | null
-          user_id: string
-        }
-        Insert: {
-          active?: boolean | null
-          created_at?: string | null
-          id?: string
-          joined_date?: string
-          personalized_locker?: string | null
-          user_id: string
-        }
-        Update: {
-          active?: boolean | null
-          created_at?: string | null
-          id?: string
-          joined_date?: string
-          personalized_locker?: string | null
-          user_id?: string
         }
         Relationships: []
       }
