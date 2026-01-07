@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -9,14 +8,11 @@ import Layout from "./components/Layout";
 import ScrollToTop from "./components/ScrollToTop";
 import Index from "./pages/Index";
 import AboutUs from "./pages/AboutUs";
-import PhotoBooth from "./pages/PhotoBooth";
 import Menu from "./pages/Menu";
-import LoyaltyPage from "./pages/LoyaltyPage";
 import Happenings from "./pages/Happenings";
 import Reservations from "./pages/Reservations";
 import NotFound from "./pages/NotFound";
 import AdminLoginPage from "./pages/AdminLoginPage";
-import AdminPhotoBoothPage from "./pages/AdminPhotoBoothPage";
 import AdminMenuPage from "./pages/AdminMenuPage";
 import AdminEventsPage from "./pages/AdminEventsPage";
 
@@ -34,14 +30,11 @@ const App = () => (
           <Route path="/" element={<Layout><Index /></Layout>} />
           <Route path="/about" element={<Layout><AboutUs /></Layout>} />
           <Route path="/happenings" element={<Layout><Happenings /></Layout>} />
-          <Route path="/photo-booth" element={<Layout><PhotoBooth /></Layout>} />
           <Route path="/menu" element={<Layout><Menu /></Layout>} />
-          {/* <Route path="/loyalty" element={<Layout><LoyaltyPage /></Layout>} /> */}
           <Route path="/reservations" element={<Layout><Reservations /></Layout>} />
           
           {/* Admin routes without public layout */}
           <Route path="/admin/login" element={<AdminLoginPage />} />
-          <Route path="/admin/photo-booth" element={<AdminPhotoBoothPage />} />
           <Route path="/admin/menu" element={<AdminMenuPage />} />
           <Route path="/admin/events" element={<AdminEventsPage />} />
           
