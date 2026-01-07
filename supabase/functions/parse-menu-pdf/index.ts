@@ -39,6 +39,7 @@ serve(async (req) => {
 
     // Collect all menu items from all pages
     const allItems: ParsedMenuItem[] = [];
+    let detectedMonth: string | null = null;
 
     // Process each page image
     for (let pageNum = 0; pageNum < images.length; pageNum++) {
@@ -50,6 +51,8 @@ serve(async (req) => {
         // Use OpenAI to parse the page image
         const prompt = `You are a menu parser. Extract all menu items from this restaurant menu page.
 
+IMPORTANT: First, look for any month or date information in the menu title/header (e.g., "January Specials", "February 2026 Menu", etc.). Extract this as "detected_month".
+
 For each menu item, extract:
 - name: The dish/item name
 - description: Brief description of the item
@@ -58,6 +61,7 @@ For each menu item, extract:
 
 Return ONLY a valid JSON object in this exact format:
 {
+  "detected_month": "January 2026",
   "items": [
     {
       "name": "Item Name",
@@ -70,6 +74,8 @@ Return ONLY a valid JSON object in this exact format:
 }
 
 Rules:
+- Extract the month/year from the menu title if present (e.g., "January 2026", "February", etc.)
+- If no month is visible, set detected_month to null
 - Extract ALL menu items you can find on this page
 - If no description is visible, use empty string ""
 - If price is unclear, use 0
@@ -120,6 +126,12 @@ Rules:
           const parsedData = JSON.parse(cleanedContent);
           const pageItems: ParsedMenuItem[] = parsedData.items || [];
           
+          // Capture detected month from first page that has it
+          if (!detectedMonth && parsedData.detected_month) {
+            detectedMonth = parsedData.detected_month;
+            console.log(`Detected month from PDF: ${detectedMonth}`);
+          }
+          
           console.log(`Extracted ${pageItems.length} items from page ${pageNum + 1}`);
           allItems.push(...pageItems);
         } catch (parseError) {
@@ -138,6 +150,7 @@ Rules:
         items: allItems,
         total_items: allItems.length,
         pages_processed: images.length,
+        detected_month: detectedMonth,
         parsing_notes: allItems.length === 0 
           ? ['No menu items detected in images. Please check the file and try again.']
           : []

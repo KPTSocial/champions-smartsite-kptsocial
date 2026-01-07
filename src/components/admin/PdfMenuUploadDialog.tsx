@@ -74,6 +74,7 @@ export default function PdfMenuUploadDialog({
   const [parsedItems, setParsedItems] = useState<ParsedMenuItem[]>([]);
   const [editedItems, setEditedItems] = useState<ParsedMenuItem[]>([]);
   const [uploadProgress, setUploadProgress] = useState<string>('');
+  const [detectedMonth, setDetectedMonth] = useState<string | null>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -208,11 +209,18 @@ export default function PdfMenuUploadDialog({
 
       setParsedItems(parseData.items);
       setEditedItems(parseData.items);
+      
+      // Store detected month from parser
+      if (parseData.detected_month) {
+        setDetectedMonth(parseData.detected_month);
+        console.log('Detected month from PDF:', parseData.detected_month);
+      }
+      
       setStep('review');
       
       toast({
         title: "Files processed successfully",
-        description: `Found ${parseData.items.length} menu items`
+        description: `Found ${parseData.items.length} menu items${parseData.detected_month ? ` for ${parseData.detected_month}` : ''}`
       });
 
     } catch (error) {
@@ -322,6 +330,28 @@ export default function PdfMenuUploadDialog({
         }
       }
 
+      // If importing Monthly Specials and we detected a month, update the section description
+      if (markAsSpecial && detectedMonth) {
+        // Find the parent section for the Monthly Specials category
+        const selectedCat = categories.find(c => c.id === selectedCategory);
+        if (selectedCat) {
+          // Extract just the month name (e.g., "January" from "January 2026")
+          const monthName = detectedMonth.split(' ')[0];
+          
+          // Update the Current Specials section description with the detected month
+          const { error: sectionError } = await supabase
+            .from('menu_sections')
+            .update({ description: monthName })
+            .eq('name', 'Current Specials');
+          
+          if (sectionError) {
+            console.error('Failed to update section description:', sectionError);
+          } else {
+            console.log(`Updated Current Specials section description to: ${monthName}`);
+          }
+        }
+      }
+
       toast({
         title: "Import successful",
         description: `${editedItems.length} menu items imported successfully`
@@ -356,6 +386,7 @@ export default function PdfMenuUploadDialog({
     setParsedItems([]);
     setEditedItems([]);
     setUploadProgress('');
+    setDetectedMonth(null);
     onOpenChange(false);
   };
 
