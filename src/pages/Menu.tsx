@@ -156,9 +156,10 @@ const Menu = () => {
           )}
           {activeSection === 'de2ef338-ab9a-43ef-8332-c95cb0d549b9' && (
             <MenuPdfDownloadButton 
-              fileName="monthly-specials.pdf"
-              downloadName="monthly-specials.pdf"
-              label="Download monthly specials PDF"
+              fileName="january-2026-specials.png"
+              downloadName="January-2026-Specials.png"
+              label="Download monthly specials"
+              isLocalFile
             />
           )}
         </div>
