@@ -1,0 +1,6 @@
+INSERT INTO public.events (event_title, description, event_date, event_type, location, status, allow_rsvp, rsvp_link)
+VALUES
+  ('Bingo Night', 'Bingo with a twist—hosted by local breweries, wineries, or distilleries. Seats fill fast! Call ahead for groups of 5+.', '2026-01-08 02:00:00+00', 'Game Night', 'on-site', 'published', true, '/reservations'),
+  ('Bingo Night', 'Bingo with a twist—hosted by local breweries, wineries, or distilleries. Seats fill fast! Call ahead for groups of 5+.', '2026-01-22 02:00:00+00', 'Game Night', 'on-site', 'published', true, '/reservations'),
+  ('Bingo Night', 'Bingo with a twist—hosted by local breweries, wineries, or distilleries. Seats fill fast! Call ahead for groups of 5+.', '2026-02-05 02:00:00+00', 'Game Night', 'on-site', 'published', true, '/reservations'),
+  ('Bingo Night', 'Bingo with a twist—hosted by local breweries, wineries, or distilleries. Seats fill fast! Call ahead for groups of 5+.', '2026-02-19 02:00:00+00', 'Game Night', 'on-site', 'published', true, '/reservations');
