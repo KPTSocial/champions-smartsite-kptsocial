@@ -6,19 +6,23 @@ interface MenuPdfDownloadButtonProps {
   fileName: string;
   downloadName: string;
   label?: string;
+  isLocalFile?: boolean;
 }
 
 export const MenuPdfDownloadButton = ({ 
   fileName, 
   downloadName, 
-  label = "Download menu PDF" 
+  label = "Download menu PDF",
+  isLocalFile = false
 }: MenuPdfDownloadButtonProps) => {
   const handleDownload = async () => {
     try {
-      const pdfUrl = `https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/menu-pdfs/${encodeURIComponent(fileName)}`;
+      const fileUrl = isLocalFile 
+        ? `/menus/${encodeURIComponent(fileName)}`
+        : `https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/menu-pdfs/${encodeURIComponent(fileName)}`;
       
-      const response = await fetch(pdfUrl);
-      if (!response.ok) throw new Error("Failed to download PDF");
+      const response = await fetch(fileUrl);
+      if (!response.ok) throw new Error("Failed to download file");
       
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
