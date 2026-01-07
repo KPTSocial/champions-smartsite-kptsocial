@@ -147,7 +147,20 @@ const Menu = () => {
               onSectionChange={handleSectionChange}
             />
           )}
-          {activeSection === 'db2f01ba-7cb1-4221-895d-a63855748272' && <MenuPdfDownloadButton />}
+          {activeSection === 'db2f01ba-7cb1-4221-895d-a63855748272' && (
+            <MenuPdfDownloadButton 
+              fileName="champions-menu-fall-2025.pdf"
+              downloadName="champions-menu-fall-2025.pdf"
+              label="Download main menu PDF"
+            />
+          )}
+          {activeSection === 'de2ef338-ab9a-43ef-8332-c95cb0d549b9' && (
+            <MenuPdfDownloadButton 
+              fileName="monthly-specials.pdf"
+              downloadName="monthly-specials.pdf"
+              label="Download monthly specials PDF"
+            />
+          )}
         </div>
         {/* Enhanced Menu Content */}
         <div className="menu-section lg:rounded-lg p-8">
