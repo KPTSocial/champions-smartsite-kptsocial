@@ -28,7 +28,7 @@ import { cn } from '@/lib/utils';
 const eventFormSchema = z.object({
   event_title: z.string().min(1, 'Event title is required'),
   event_date: z.string().optional(),
-  event_type: z.enum(['Live Music', 'Game Night', 'Specials', 'Soccer', 'NCAA FB']),
+  event_type: z.enum(['Live Music', 'Game Night', 'Specials', 'Soccer', 'NCAA FB', 'NBA', 'MLS', 'NWSL', 'Olympics', 'World Cup']),
   description: z.string().optional(),
   location: z.enum(['on-site', 'off-site', 'virtual']).default('on-site'),
   image_url: z.string().url().optional().or(z.literal('')),
@@ -114,7 +114,7 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
         form.reset({
           event_title: event.event_title,
           event_date: formattedDate,
-          event_type: event.event_type as 'Live Music' | 'Game Night' | 'Specials' | 'Soccer' | 'NCAA FB',
+          event_type: event.event_type as 'Live Music' | 'Game Night' | 'Specials' | 'Soccer' | 'NCAA FB' | 'NBA' | 'MLS' | 'NWSL' | 'Olympics' | 'World Cup',
           description: event.description || '',
           location: (event.location || 'on-site') as 'on-site' | 'off-site' | 'virtual',
           image_url: event.image_url || '',
@@ -386,6 +386,11 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
                           <SelectItem value="Specials">Specials</SelectItem>
                           <SelectItem value="Soccer">Soccer</SelectItem>
                           <SelectItem value="NCAA FB">NCAA FB</SelectItem>
+                          <SelectItem value="NBA">NBA</SelectItem>
+                          <SelectItem value="MLS">MLS</SelectItem>
+                          <SelectItem value="NWSL">NWSL</SelectItem>
+                          <SelectItem value="Olympics">Olympics</SelectItem>
+                          <SelectItem value="World Cup">World Cup</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -802,6 +807,11 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
                         <SelectItem value="Specials">Specials</SelectItem>
                         <SelectItem value="Soccer">Soccer</SelectItem>
                         <SelectItem value="NCAA FB">NCAA FB</SelectItem>
+                        <SelectItem value="NBA">NBA</SelectItem>
+                        <SelectItem value="MLS">MLS</SelectItem>
+                        <SelectItem value="NWSL">NWSL</SelectItem>
+                        <SelectItem value="Olympics">Olympics</SelectItem>
+                        <SelectItem value="World Cup">World Cup</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
