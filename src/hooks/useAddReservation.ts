@@ -3,10 +3,20 @@ import { useForm } from "react-hook-form";
 import { toast } from "@/components/ui/use-toast";
 
 import { supabase } from "@/integrations/supabase/client";
-import { Database } from "@/integrations/supabase/types";
 import { ReservationFormData } from "@/lib/validations/reservation";
 
-type ReservationInsert = Database["public"]["Tables"]["reservations"]["Insert"];
+// Define locally since reservations table was archived
+export type ReservationInsert = {
+  full_name: string;
+  email: string;
+  reservation_date: string;
+  reservation_type: "Event" | "Table";
+  party_size: number;
+  phone_number?: string | null;
+  notes?: string | null;
+  event_id?: string | null;
+  requires_confirmation?: boolean | null;
+};
 
 interface MutationData {
   reservationData: ReservationInsert;

@@ -20,18 +20,15 @@ export const submitPhotoBoothForm = async (values: PhotoFormValues) => {
   const publicUrl = await uploadToPhotoBucket(file, userFullName);
   console.log('Photo uploaded to:', publicUrl);
   
-  // Write to Supabase
+  // Write to Supabase using photo_booth_posts table
   const { error } = await supabase
-    .from("photo_booth_uploads")
+    .from("photo_booth_posts")
     .insert([{
-      first_name: values.firstName,
-      last_name: values.lastName,
-      email: values.email,
-      user_name: userFullName,
-      caption: values.caption?.trim() || null,
-      ai_caption_requested: !values.caption?.trim() && values.wantAICaption ? true : false,
-      consent_to_share: values.consent,
+      uploaded_by: userFullName,
+      caption: values.caption?.trim() || `Photo by ${userFullName}`,
       image_url: publicUrl,
+      status: 'pending',
+      approved: false,
     }]);
   
   if (error) {

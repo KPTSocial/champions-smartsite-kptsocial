@@ -7,7 +7,6 @@ import { toZonedTime, fromZonedTime } from "date-fns-tz";
 
 import { reservationSchema, ReservationFormData } from "@/lib/validations/reservation";
 import { useAddReservation } from "@/hooks/useAddReservation";
-import { Database } from "@/integrations/supabase/types";
 import { getEvents, Event } from "@/services/eventService";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
@@ -16,8 +15,7 @@ import { SpecialEventField } from "./reservation-form/SpecialEventField";
 import { ContactFields } from "./reservation-form/ContactFields";
 import { BookingFields } from "./reservation-form/BookingFields";
 import { ConfirmationCallDialog } from "./reservation-form/ConfirmationCallDialog";
-
-type ReservationInsert = Database["public"]["Tables"]["reservations"]["Insert"];
+import { ReservationInsert } from "@/hooks/useAddReservation";
 
 const ReservationForm = () => {
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
