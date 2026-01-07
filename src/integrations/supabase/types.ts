@@ -14,6 +14,125 @@ export type Database = {
   }
   public: {
     Tables: {
+      _archived_loyalty_points: {
+        Row: {
+          created_at: string | null
+          id: string
+          points: number
+          reason: string | null
+          source_referral_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          points: number
+          reason?: string | null
+          source_referral_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          points?: number
+          reason?: string | null
+          source_referral_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      _archived_photo_booth_uploads: {
+        Row: {
+          ai_caption_requested: boolean
+          approved: boolean
+          caption: string | null
+          consent_to_share: boolean
+          email: string
+          first_name: string
+          id: string
+          image_url: string
+          last_name: string
+          uploaded_at: string
+          user_name: string | null
+        }
+        Insert: {
+          ai_caption_requested?: boolean
+          approved?: boolean
+          caption?: string | null
+          consent_to_share?: boolean
+          email?: string
+          first_name?: string
+          id?: string
+          image_url: string
+          last_name?: string
+          uploaded_at?: string
+          user_name?: string | null
+        }
+        Update: {
+          ai_caption_requested?: boolean
+          approved?: boolean
+          caption?: string | null
+          consent_to_share?: boolean
+          email?: string
+          first_name?: string
+          id?: string
+          image_url?: string
+          last_name?: string
+          uploaded_at?: string
+          user_name?: string | null
+        }
+        Relationships: []
+      }
+      _archived_reservations: {
+        Row: {
+          created_at: string
+          email: string
+          event_id: string | null
+          full_name: string
+          id: string
+          notes: string | null
+          party_size: number
+          phone_number: string | null
+          requires_confirmation: boolean | null
+          reservation_date: string
+          reservation_type: Database["public"]["Enums"]["reservation_type"]
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          event_id?: string | null
+          full_name: string
+          id?: string
+          notes?: string | null
+          party_size: number
+          phone_number?: string | null
+          requires_confirmation?: boolean | null
+          reservation_date: string
+          reservation_type: Database["public"]["Enums"]["reservation_type"]
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          event_id?: string | null
+          full_name?: string
+          id?: string
+          notes?: string | null
+          party_size?: number
+          phone_number?: string | null
+          requires_confirmation?: boolean | null
+          reservation_date?: string
+          reservation_type?: Database["public"]["Enums"]["reservation_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_users: {
         Row: {
           active: boolean | null
@@ -205,33 +324,6 @@ export type Database = {
           sort_order?: number
           title?: string
           updated_at?: string
-        }
-        Relationships: []
-      }
-      loyalty_points: {
-        Row: {
-          created_at: string | null
-          id: string
-          points: number
-          reason: string | null
-          source_referral_id: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          points: number
-          reason?: string | null
-          source_referral_id?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          points?: number
-          reason?: string | null
-          source_referral_id?: string | null
-          user_id?: string
         }
         Relationships: []
       }
@@ -522,48 +614,6 @@ export type Database = {
           },
         ]
       }
-      photo_booth_uploads: {
-        Row: {
-          ai_caption_requested: boolean
-          approved: boolean
-          caption: string | null
-          consent_to_share: boolean
-          email: string
-          first_name: string
-          id: string
-          image_url: string
-          last_name: string
-          uploaded_at: string
-          user_name: string | null
-        }
-        Insert: {
-          ai_caption_requested?: boolean
-          approved?: boolean
-          caption?: string | null
-          consent_to_share?: boolean
-          email?: string
-          first_name?: string
-          id?: string
-          image_url: string
-          last_name?: string
-          uploaded_at?: string
-          user_name?: string | null
-        }
-        Update: {
-          ai_caption_requested?: boolean
-          approved?: boolean
-          caption?: string | null
-          consent_to_share?: boolean
-          email?: string
-          first_name?: string
-          id?: string
-          image_url?: string
-          last_name?: string
-          uploaded_at?: string
-          user_name?: string | null
-        }
-        Relationships: []
-      }
       referrals: {
         Row: {
           created_at: string | null
@@ -594,56 +644,6 @@ export type Database = {
         }
         Relationships: []
       }
-      reservations: {
-        Row: {
-          created_at: string
-          email: string
-          event_id: string | null
-          full_name: string
-          id: string
-          notes: string | null
-          party_size: number
-          phone_number: string | null
-          requires_confirmation: boolean | null
-          reservation_date: string
-          reservation_type: Database["public"]["Enums"]["reservation_type"]
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          event_id?: string | null
-          full_name: string
-          id?: string
-          notes?: string | null
-          party_size: number
-          phone_number?: string | null
-          requires_confirmation?: boolean | null
-          reservation_date: string
-          reservation_type: Database["public"]["Enums"]["reservation_type"]
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          event_id?: string | null
-          full_name?: string
-          id?: string
-          notes?: string | null
-          party_size?: number
-          phone_number?: string | null
-          requires_confirmation?: boolean | null
-          reservation_date?: string
-          reservation_type?: Database["public"]["Enums"]["reservation_type"]
-        }
-        Relationships: [
-          {
-            foreignKeyName: "reservations_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       sauces: {
         Row: {
           description: string | null
@@ -662,6 +662,33 @@ export type Database = {
           id?: string
           name?: string
           price?: number | null
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          id: number
+          monthly_specials_label: string | null
+          monthly_specials_url: string | null
+          specials_end_date: string | null
+          specials_start_date: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: number
+          monthly_specials_label?: string | null
+          monthly_specials_url?: string | null
+          specials_end_date?: string | null
+          specials_start_date?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: number
+          monthly_specials_label?: string | null
+          monthly_specials_url?: string | null
+          specials_end_date?: string | null
+          specials_start_date?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
