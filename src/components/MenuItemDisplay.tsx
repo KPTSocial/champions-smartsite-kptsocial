@@ -34,7 +34,7 @@ const MenuItemDisplay: React.FC<MenuItemDisplayProps> = ({ item }) => {
         
         {/* Right: Price */}
         {!item.variants || item.variants.length === 0 ? (
-          <span className="text-lg font-semibold text-primary whitespace-nowrap">
+          <span className="text-base text-muted-foreground whitespace-nowrap">
             {formatCurrency(item.price)}
           </span>
         ) : null}
@@ -53,7 +53,7 @@ const MenuItemDisplay: React.FC<MenuItemDisplayProps> = ({ item }) => {
           {item.variants.map((variant) => (
             <div key={variant.id} className="flex justify-between items-center">
               <span className="text-sm text-muted-foreground">{variant.name}</span>
-              <span className="text-base font-semibold text-primary">{formatCurrency(variant.price)}</span>
+              <span className="text-base text-muted-foreground">{formatCurrency(variant.price)}</span>
             </div>
           ))}
         </div>

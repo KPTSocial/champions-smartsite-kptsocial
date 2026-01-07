@@ -57,19 +57,19 @@ const ModernMenuItem: React.FC<ModernMenuItemProps> = ({ item, sectionName }) =>
               {item.description}
               {/* Only show price after description if no variants */}
               {(!item.variants || item.variants.length === 0) && (
-                <span className="ml-2 font-semibold text-primary">
-                  ${formatPrice(item.price)}
-                </span>
+              <span className="ml-2 text-muted-foreground">
+                ${formatPrice(item.price)}
+              </span>
               )}
             </p>
           ) : (
             /* No description - show price standalone */
             (!item.variants || item.variants.length === 0) ? (
-              <span className="text-sm font-semibold text-primary">
+              <span className="text-sm text-muted-foreground">
                 ${formatPrice(item.price)}
               </span>
             ) : (
-              <span className="text-sm font-semibold text-primary">
+              <span className="text-sm text-muted-foreground">
                 ${formatPrice(Math.min(...item.variants.map(v => v.price)))}
               </span>
             )
@@ -84,7 +84,7 @@ const ModernMenuItem: React.FC<ModernMenuItemProps> = ({ item, sectionName }) =>
                   className="flex items-center gap-2 text-sm bg-secondary/20 rounded-md px-3 py-1.5"
                 >
                   <span className="font-medium text-foreground">{variant.name}</span>
-                  <span className="text-primary font-semibold">${formatPrice(variant.price)}</span>
+                  <span className="text-muted-foreground">${formatPrice(variant.price)}</span>
                 </div>
               ))}
             </div>
