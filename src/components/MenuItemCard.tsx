@@ -11,7 +11,7 @@ const MenuItemCard = ({ item }: { item: MenuItem }) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 flex-wrap">
           {item.tags?.includes('CF') && (
-            <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/fav_jvg2qc.jpg" alt="Champ's Favorite" className="w-6 h-6" />
+            <img src="/icons/champions-favorite.png" alt="Champion's Favorite" className="w-6 h-6" />
           )}
           {item.tags?.includes('GF') && (
             <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/gf_tmnou5.jpg" alt="Gluten Friendly" className="w-6 h-6" />

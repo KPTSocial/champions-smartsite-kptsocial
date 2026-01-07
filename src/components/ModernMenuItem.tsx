@@ -35,9 +35,9 @@ const ModernMenuItem: React.FC<ModernMenuItemProps> = ({ item, sectionName }) =>
                   <Badge 
                     key={tag} 
                     variant="secondary" 
-                    className="text-xs font-medium px-2 py-0.5"
+                    className="text-xs font-medium px-2 py-0.5 flex items-center gap-1"
                   >
-                    {tag === 'CF' && '🫘 CF'}
+                    {tag === 'CF' && <><img src="/icons/champions-favorite.png" alt="Champion's Favorite" className="w-4 h-4" /> CF</>}
                     {tag === 'GF' && '🌾 GF'}
                     {tag === 'V' && '🌱 V'}
                     {tag === 'NEW' && '✨ NEW'}
