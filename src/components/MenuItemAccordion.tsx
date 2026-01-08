@@ -3,7 +3,7 @@ import { MenuItem } from '@/types/menu';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
-import { Sparkles, Crown } from 'lucide-react';
+import { Sparkles, Crown, Wheat, Leaf } from 'lucide-react';
 
 interface MenuItemAccordionProps {
   item: MenuItem;
@@ -18,10 +18,10 @@ const MenuItemAccordion: React.FC<MenuItemAccordionProps> = ({ item }) => {
             <Crown className="w-6 h-6 text-amber-500" />
           )}
           {item.tags?.includes('GF') && (
-            <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/gf_tmnou5.jpg" alt="Gluten Friendly" className="w-6 h-6" />
+            <Wheat className="w-6 h-6 text-amber-600" />
           )}
           {item.tags?.includes('V') && (
-            <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/veg_fbwf0q.jpg" alt="Vegetarian" className="w-6 h-6" />
+            <Leaf className="w-6 h-6 text-green-600" />
           )}
           <span className="flex-1">{item.name}</span>
           {item.tags?.includes('NEW') && (

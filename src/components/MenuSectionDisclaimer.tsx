@@ -1,4 +1,4 @@
-import { Crown } from 'lucide-react';
+import { Crown, Wheat, Leaf } from 'lucide-react';
 
 const MenuSectionDisclaimer = () => {
   return (
@@ -11,12 +11,12 @@ const MenuSectionDisclaimer = () => {
         </div>
         
         <div className="flex items-center gap-2">
-          <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/gf_tmnou5.jpg" alt="Gluten Sensitivity Icon" className="w-6 h-6" />
+          <Wheat className="w-6 h-6 text-amber-600" />
           <span>We will do our best to accommodate gluten sensitivity, but cross-contamination may occur</span>
         </div>
         
         <div className="flex items-center gap-2">
-          <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/veg_fbwf0q.jpg" alt="Vegetarian Option Icon" className="w-6 h-6" />
+          <Leaf className="w-6 h-6 text-green-600" />
           <span>Vegetarian Option</span>
         </div>
         
