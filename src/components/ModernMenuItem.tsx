@@ -1,6 +1,7 @@
 import React from 'react';
 import { MenuItem } from '@/types/menu';
 import { Badge } from '@/components/ui/badge';
+import { Crown } from 'lucide-react';
 
 interface ModernMenuItemProps {
   item: MenuItem;
@@ -37,7 +38,7 @@ const ModernMenuItem: React.FC<ModernMenuItemProps> = ({ item, sectionName }) =>
                     variant="secondary" 
                     className="text-xs font-medium px-2 py-0.5 flex items-center gap-1"
                   >
-                    {tag === 'CF' && <><img src="/icons/champions-favorite.png" alt="Champion's Favorite" className="w-4 h-4" /> CF</>}
+                    {tag === 'CF' && <><Crown className="w-4 h-4 text-amber-500" /> CF</>}
                     {tag === 'GF' && '🌾 GF'}
                     {tag === 'V' && '🌱 V'}
                     {tag === 'NEW' && '✨ NEW'}

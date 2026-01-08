@@ -2,7 +2,7 @@ import React from 'react';
 import { MenuItem } from '@/types/menu';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Crown } from 'lucide-react';
 
 interface MenuItemDisplayProps {
   item: MenuItem;
@@ -15,7 +15,7 @@ const MenuItemDisplay: React.FC<MenuItemDisplayProps> = ({ item }) => {
         {/* Left: Tags + Name */}
         <div className="flex items-center gap-2 flex-1 flex-wrap">
           {item.tags?.includes('CF') && (
-            <img src="/icons/champions-favorite.png" alt="Champion's Favorite" className="w-5 h-5 flex-shrink-0" />
+            <Crown className="w-5 h-5 text-amber-500 flex-shrink-0" />
           )}
           {item.tags?.includes('GF') && (
             <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/gf_tmnou5.jpg" alt="Gluten Friendly" className="w-5 h-5 flex-shrink-0" />
