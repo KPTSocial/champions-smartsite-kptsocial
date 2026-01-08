@@ -3,7 +3,7 @@ import { MenuItem } from '@/types/menu';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Crown } from 'lucide-react';
 
 interface MenuItemAccordionProps {
   item: MenuItem;
@@ -15,7 +15,7 @@ const MenuItemAccordion: React.FC<MenuItemAccordionProps> = ({ item }) => {
       <AccordionTrigger className="px-6 py-4 hover:no-underline">
         <span className="font-semibold text-left flex items-center gap-2 flex-wrap">
           {item.tags?.includes('CF') && (
-            <img src="/icons/champions-favorite.png" alt="Champion's Favorite" className="w-6 h-6" />
+            <Crown className="w-6 h-6 text-amber-500" />
           )}
           {item.tags?.includes('GF') && (
             <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/gf_tmnou5.jpg" alt="Gluten Friendly" className="w-6 h-6" />

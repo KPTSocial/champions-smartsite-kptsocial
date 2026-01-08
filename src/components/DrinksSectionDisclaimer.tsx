@@ -1,3 +1,5 @@
+import { Crown } from 'lucide-react';
+
 interface DrinksSectionDisclaimerProps {
   categoryDescription?: string;
 }
@@ -9,7 +11,7 @@ const DrinksSectionDisclaimer = ({
       <div className="space-y-3 text-sm text-muted-foreground">
         {/* Icon placeholders with text */}
         <div className="flex items-center gap-2">
-          <img src="/icons/champions-favorite.png" alt="Champion's Favorite Icon" className="w-6 h-6" />
+          <Crown className="w-6 h-6 text-amber-500" />
           <span>Champ's Staff Favorite</span>
         </div>
         
