@@ -2,7 +2,7 @@ import React from 'react';
 import { MenuItem } from '@/types/menu';
 import { Badge } from '@/components/ui/badge';
 import { formatCurrency } from '@/lib/utils';
-import { Sparkles, Crown } from 'lucide-react';
+import { Sparkles, Crown, Wheat, Leaf } from 'lucide-react';
 
 interface MenuItemDisplayProps {
   item: MenuItem;
@@ -18,10 +18,10 @@ const MenuItemDisplay: React.FC<MenuItemDisplayProps> = ({ item }) => {
             <Crown className="w-5 h-5 text-amber-500 flex-shrink-0" />
           )}
           {item.tags?.includes('GF') && (
-            <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/gf_tmnou5.jpg" alt="Gluten Friendly" className="w-5 h-5 flex-shrink-0" />
+            <Wheat className="w-5 h-5 text-amber-600 flex-shrink-0" />
           )}
           {item.tags?.includes('V') && (
-            <img src="https://res.cloudinary.com/de3djsvlk/image/upload/v1754249140/veg_fbwf0q.jpg" alt="Vegetarian" className="w-5 h-5 flex-shrink-0" />
+            <Leaf className="w-5 h-5 text-green-600 flex-shrink-0" />
           )}
           <h4 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors duration-200">{item.name}</h4>
           {item.tags?.includes('NEW') && (
