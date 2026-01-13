@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { Button } from '@/components/ui/button';
-import { LogOut, Camera, Calendar, Menu as MenuIcon, Users, X } from 'lucide-react';
+import { LogOut, Calendar, Menu as MenuIcon } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import MobileViewNotice from './MobileViewNotice';
 
@@ -37,8 +37,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const navigationItems = [
     { href: '/admin/menu', icon: MenuIcon, label: 'Menu' },
     { href: '/admin/events', icon: Calendar, label: 'Events' },
-    { href: '/admin/photo-booth', icon: Camera, label: 'Photo Booth' },
-    { href: '/admin/members', icon: Users, label: 'Members' },
   ];
 
   return (
