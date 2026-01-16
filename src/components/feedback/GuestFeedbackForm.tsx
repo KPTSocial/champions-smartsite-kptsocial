@@ -14,6 +14,7 @@ import { sendGuestFeedbackWebhook, formatDateForWebhook } from "@/utils/guestFee
 import { FirstNameField } from "./GuestFeedbackFormFields/FirstNameField";
 import { LastNameField } from "./GuestFeedbackFormFields/LastNameField";
 import { EmailField } from "./GuestFeedbackFormFields/EmailField";
+import { PhoneField } from "./GuestFeedbackFormFields/PhoneField";
 import { VisitDateField } from "./GuestFeedbackFormFields/VisitDateField";
 import { RatingField } from "./GuestFeedbackFormFields/RatingField";
 import { FeedbackField } from "./GuestFeedbackFormFields/FeedbackField";
@@ -26,6 +27,7 @@ export const GuestFeedbackForm = () => {
       firstName: "",
       lastName: "",
       email: "",
+      phone: "",
       visitDate: undefined,
       rating: 5,
       feedback: "",
@@ -53,6 +55,7 @@ export const GuestFeedbackForm = () => {
           {
             name: name,
             email: data.email,
+            phone: data.phone || null,
             visit_date: format(data.visitDate, "yyyy-MM-dd"),
             rating: data.rating,
             feedback: data.feedback,
@@ -73,6 +76,7 @@ export const GuestFeedbackForm = () => {
       const webhookPayload = {
         guestName: name,
         email: data.email,
+        phone: data.phone || undefined,
         visitDate: format(data.visitDate, "yyyy-MM-dd"),
         rating: data.rating,
         feedback: data.feedback,
@@ -138,10 +142,11 @@ export const GuestFeedbackForm = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <FirstNameField />
           <LastNameField />
           <EmailField />
+          <PhoneField />
         </div>
         <VisitDateField />
         <RatingField />

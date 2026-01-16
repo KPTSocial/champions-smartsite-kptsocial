@@ -498,6 +498,7 @@ export type Database = {
           feedback: string
           id: string
           name: string | null
+          phone: string | null
           rating: number
           status: string
           visit_date: string
@@ -510,6 +511,7 @@ export type Database = {
           feedback: string
           id?: string
           name?: string | null
+          phone?: string | null
           rating: number
           status?: string
           visit_date: string
@@ -522,6 +524,7 @@ export type Database = {
           feedback?: string
           id?: string
           name?: string | null
+          phone?: string | null
           rating?: number
           status?: string
           visit_date?: string
