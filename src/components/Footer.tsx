@@ -1,7 +1,62 @@
 import { MapPin, Phone, Mail, Facebook, Instagram } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+
+interface BusinessHour {
+  id: number;
+  day_label: string;
+  open_time: string | null;
+  close_time: string | null;
+  is_closed: boolean;
+  sort_order: number;
+}
+
+interface SpecialHour {
+  id: number;
+  label: string;
+  description: string;
+  is_active: boolean;
+  sort_order: number;
+}
+
+const formatTime = (time: string | null): string => {
+  if (!time) return '';
+  const [hours, minutes] = time.split(':');
+  const hour = parseInt(hours, 10);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const formattedHour = hour % 12 || 12;
+  return minutes === '00' ? `${formattedHour}${ampm}` : `${formattedHour}:${minutes}${ampm}`;
+};
 
 const Footer = () => {
+  const { data: businessHours } = useQuery({
+    queryKey: ['business-hours'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('business_hours')
+        .select('*')
+        .order('sort_order');
+      if (error) throw error;
+      return data as BusinessHour[];
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  const { data: specialHours } = useQuery({
+    queryKey: ['special-hours'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('special_hours')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
+      if (error) throw error;
+      return data as SpecialHour[];
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
   return (
     <footer className="bg-secondary text-secondary-foreground">
       <div className="container py-12 px-4 sm:px-6 lg:px-8">
@@ -89,13 +144,19 @@ const Footer = () => {
           <div>
             <h3 className="font-serif text-lg font-semibold tracking-wider uppercase text-primary">Hours</h3>
             <ul className="mt-4 space-y-2 text-sm text-secondary-foreground/70">
-              <li><span className="font-semibold text-secondary-foreground">Sun:</span> 9AM - 10PM</li>
-              <li><span className="font-semibold text-secondary-foreground">Mon - Tue:</span> 11AM - 10PM</li>
-              <li><span className="font-semibold text-secondary-foreground">Wed - Thu:</span> 11AM - 11PM</li>
-              <li><span className="font-semibold text-secondary-foreground">Fri:</span> 11AM - 12AM</li>
-              <li><span className="font-semibold text-secondary-foreground">Sat:</span> 11AM - 11PM</li>
-              <li className="pt-2 text-accent"><span className="font-bold">Brunch:</span> Daily 11AM - 2PM</li>
-              <li className="text-accent"><span className="font-bold">Happy Hour:</span> Daily 2:30PM - 5:30PM</li>
+              {businessHours?.map((hour) => (
+                <li key={hour.id}>
+                  <span className="font-semibold text-secondary-foreground">{hour.day_label}:</span>{' '}
+                  {hour.is_closed 
+                    ? 'Closed' 
+                    : `${formatTime(hour.open_time)} - ${formatTime(hour.close_time)}`}
+                </li>
+              ))}
+              {specialHours?.map((hour) => (
+                <li key={hour.id} className="pt-2 text-accent">
+                  <span className="font-bold">{hour.label}:</span> {hour.description}
+                </li>
+              ))}
             </ul>
           </div>
           
