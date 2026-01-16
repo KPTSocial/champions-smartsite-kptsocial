@@ -2,6 +2,7 @@
 interface GuestFeedbackWebhookPayload {
   guestName: string;
   email: string;
+  phone?: string;
   visitDate: string;
   rating: number;
   feedback: string;
