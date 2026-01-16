@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminMenuPage from "./pages/AdminMenuPage";
 import AdminEventsPage from "./pages/AdminEventsPage";
+import AdminSettingsPage from "./pages/AdminSettingsPage";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin/menu" element={<AdminMenuPage />} />
           <Route path="/admin/events" element={<AdminEventsPage />} />
+          <Route path="/admin/settings" element={<AdminSettingsPage />} />
           
           {/* 404 */}
           <Route path="*" element={<Layout><NotFound /></Layout>} />

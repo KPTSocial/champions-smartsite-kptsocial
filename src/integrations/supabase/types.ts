@@ -400,6 +400,36 @@ export type Database = {
         }
         Relationships: []
       }
+      business_hours: {
+        Row: {
+          close_time: string | null
+          day_label: string
+          id: number
+          is_closed: boolean | null
+          open_time: string | null
+          sort_order: number
+          updated_at: string | null
+        }
+        Insert: {
+          close_time?: string | null
+          day_label: string
+          id?: number
+          is_closed?: boolean | null
+          open_time?: string | null
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Update: {
+          close_time?: string | null
+          day_label?: string
+          id?: number
+          is_closed?: boolean | null
+          open_time?: string | null
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           allow_rsvp: boolean
@@ -805,6 +835,33 @@ export type Database = {
           monthly_specials_url?: string | null
           specials_end_date?: string | null
           specials_start_date?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      special_hours: {
+        Row: {
+          description: string
+          id: number
+          is_active: boolean | null
+          label: string
+          sort_order: number
+          updated_at: string | null
+        }
+        Insert: {
+          description: string
+          id?: number
+          is_active?: boolean | null
+          label: string
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Update: {
+          description?: string
+          id?: number
+          is_active?: boolean | null
+          label?: string
+          sort_order?: number
           updated_at?: string | null
         }
         Relationships: []
