@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Plus, Edit, Trash2, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 
 interface MenuCategory {
   id: string;
@@ -136,6 +137,27 @@ const MenuCategoryManager: React.FC = () => {
     }
   });
 
+  const reorderMutation = useMutation({
+    mutationFn: async (updates: { id: string; sort_order: number }[]) => {
+      for (const update of updates) {
+        const { error } = await supabase
+          .from('menu_categories')
+          .update({ sort_order: update.sort_order })
+          .eq('id', update.id);
+        
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['menu-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['menuData'] });
+      toast.success('Categories reordered successfully');
+    },
+    onError: (error: any) => {
+      toast.error(`Error reordering categories: ${error.message}`);
+    }
+  });
+
   const resetForm = () => {
     setFormData({ name: '', description: '', section_id: '', sort_order: 0 });
     setEditingCategory(null);
@@ -170,17 +192,47 @@ const MenuCategoryManager: React.FC = () => {
     }
   };
 
+  const handleDragEnd = (result: DropResult) => {
+    const { destination, source, draggableId } = result;
+
+    // Dropped outside a valid droppable or in the same position
+    if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) {
+      return;
+    }
+
+    // Only allow reordering within the same section
+    if (destination.droppableId !== source.droppableId) {
+      toast.error('Categories can only be reordered within the same section');
+      return;
+    }
+
+    const sectionId = source.droppableId;
+    const sectionCategories = categories?.filter(c => c.section_id === sectionId) || [];
+    
+    // Create a new array with the reordered categories
+    const reordered = Array.from(sectionCategories);
+    const [movedItem] = reordered.splice(source.index, 1);
+    reordered.splice(destination.index, 0, movedItem);
+
+    // Calculate new sort orders
+    const updates = reordered.map((category, index) => ({
+      id: category.id,
+      sort_order: index + 1
+    }));
+
+    reorderMutation.mutate(updates);
+  };
+
   if (isLoading) {
     return <div className="animate-pulse">Loading categories...</div>;
   }
 
-  // Group categories by section
-  const categoriesBySection = categories?.reduce((acc, category) => {
-    const sectionName = category.section?.name || 'Unknown Section';
-    if (!acc[sectionName]) {
-      acc[sectionName] = [];
+  // Group categories by section_id for proper droppable areas
+  const categoriesBySectionId = categories?.reduce((acc, category) => {
+    if (!acc[category.section_id]) {
+      acc[category.section_id] = [];
     }
-    acc[sectionName].push(category);
+    acc[category.section_id].push(category);
     return acc;
   }, {} as Record<string, MenuCategory[]>) || {};
 
@@ -249,49 +301,80 @@ const MenuCategoryManager: React.FC = () => {
         </Dialog>
       </div>
 
-      <div className="space-y-6">
-        {Object.entries(categoriesBySection).map(([sectionName, sectionCategories]) => (
-          <div key={sectionName}>
-            <h3 className="text-lg font-semibold mb-3 text-gray-700">{sectionName}</h3>
-            <div className="grid gap-3">
-              {sectionCategories.map((category) => (
-                <Card key={category.id}>
-                  <CardHeader className="py-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <GripVertical className="h-4 w-4 text-gray-400" />
-                        <div>
-                          <CardTitle className="text-base">{category.name}</CardTitle>
-                          {category.description && (
-                            <CardDescription className="text-sm">{category.description}</CardDescription>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <div className="space-y-6">
+          {sections?.map((section) => {
+            const sectionCategories = categoriesBySectionId[section.id] || [];
+            return (
+              <div key={section.id}>
+                <h3 className="text-lg font-semibold mb-3 text-muted-foreground">{section.name}</h3>
+                <Droppable droppableId={section.id}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className={`grid gap-3 min-h-[50px] rounded-lg transition-colors ${
+                        snapshot.isDraggingOver ? 'bg-accent/50' : ''
+                      }`}
+                    >
+                      {sectionCategories.map((category, index) => (
+                        <Draggable key={category.id} draggableId={category.id} index={index}>
+                          {(provided, snapshot) => (
+                            <Card
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              className={`transition-shadow ${
+                                snapshot.isDragging ? 'shadow-lg opacity-90' : ''
+                              }`}
+                            >
+                              <CardHeader className="py-3">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <div
+                                      {...provided.dragHandleProps}
+                                      className="cursor-grab active:cursor-grabbing"
+                                    >
+                                      <GripVertical className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                                    </div>
+                                    <div>
+                                      <CardTitle className="text-base">{category.name}</CardTitle>
+                                      {category.description && (
+                                        <CardDescription className="text-sm">{category.description}</CardDescription>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleEdit(category)}
+                                    >
+                                      <Edit className="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleDelete(category.id)}
+                                      className="text-destructive hover:text-destructive"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </CardHeader>
+                            </Card>
                           )}
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEdit(category)}
-                        >
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDelete(category.id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
                     </div>
-                  </CardHeader>
-                </Card>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+                  )}
+                </Droppable>
+              </div>
+            );
+          })}
+        </div>
+      </DragDropContext>
     </div>
   );
 };
