@@ -101,3 +101,9 @@
 .animate-new-pulse {
   animation: new-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+/* Speakable content marker for voice assistants */
+.speakable-content {
+  /* This class is a semantic marker for AI voice systems */
+  /* No visual styling needed - maintains existing appearance */
+}
