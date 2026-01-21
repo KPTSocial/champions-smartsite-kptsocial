@@ -13,6 +13,9 @@ import { PageHeader } from '@/components/ui/page-header';
 import { supabase } from '@/integrations/supabase/client';
 import { Separator } from '@/components/ui/separator';
 import { MenuDownloadLink } from '@/components/MenuDownloadLink';
+import { BreadcrumbSchema } from '@/components/seo/BreadcrumbSchema';
+import { SpeakableSchema } from '@/components/seo/SpeakableSchema';
+import { BUSINESS_DATA } from '@/lib/seo-constants';
 
 const Menu = () => {
   const [activeSection, setActiveSection] = useState<string>('');
@@ -142,106 +145,121 @@ const Menu = () => {
   }
 
   return (
-    <BackgroundContainer
-      backgroundImage="https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/photos/Menu/A7304939.jpg"
-      className="py-16 md:py-24"
-      grayscale={true}
-    >
-      <PageHeader
-        title="Our Menu"
-        description="Seasonally Inspired Ingredients. Bold Flavors. Explore our selection of hand-crafted dishes, curated in-house year-round."
+    <>
+      {/* SEO Schema Markup */}
+      <BreadcrumbSchema
+        items={[
+          { name: "Home", url: BUSINESS_DATA.url },
+          { name: "Menu", url: `${BUSINESS_DATA.url}/menu` }
+        ]}
       />
+      <SpeakableSchema
+        headline="Champions Sports Bar & Grill Menu"
+        description="Seasonally inspired ingredients and bold flavors. Explore our selection of hand-crafted dishes, craft beers, and signature cocktails."
+        cssSelectors={[".speakable-content"]}
+      />
+      
+      <BackgroundContainer
+        backgroundImage="https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/photos/Menu/A7304939.jpg"
+        className="py-16 md:py-24"
+        grayscale={true}
+      >
+        <PageHeader
+          title="Our Menu"
+          description="Seasonally Inspired Ingredients. Bold Flavors. Explore our selection of hand-crafted dishes, curated in-house year-round."
+        />
 
-        {/* Enhanced Tab Navigation */}
-        <div className="menu-section lg:rounded-lg p-8 mb-8 relative">
-          {menuData && (
-            <EnhancedMenuTabs
-              sections={menuData}
-              activeSection={activeSection}
-              onSectionChange={handleSectionChange}
-            />
-          )}
-        </div>
-        {/* Enhanced Menu Content */}
-        <div className="menu-section lg:rounded-lg p-8">
-          {filteredMenuData && filteredMenuData.length > 0 ? (
-            <div className="space-y-20">
-              {filteredMenuData
-                .filter(section => !activeSection || section.id === activeSection)
-                .map(section => (
-                  <section key={section.id} id={section.name.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-20">
-                    {/* Section Header */}
-                    <div className="text-center mb-8">
-                      <h2 className="text-4xl font-serif font-bold text-secondary mb-3">
-                        {section.name}
-                      </h2>
-                      {section.description && section.id !== 'de2ef338-ab9a-43ef-8332-c95cb0d549b9' && (
-                        <p className="text-muted-foreground max-w-3xl mx-auto">
-                          {section.description}
-                        </p>
-                      )}
-                      
-                      {/* Download link for Current Specials */}
-                      {section.id === 'de2ef338-ab9a-43ef-8332-c95cb0d549b9' && (
-                        <MenuDownloadLink 
-                          fileName={siteSettings?.monthly_specials_url || 'january-2026-specials.png'}
-                          downloadName={`${section.description || 'Monthly'}-Specials.${(siteSettings?.monthly_specials_url || 'png').split('.').pop()}`}
-                          displayText={`Download ${section.description || 'Monthly'} Menu`}
-                          isLocalFile={!siteSettings?.monthly_specials_url}
-                        />
-                      )}
-                      
-                      {/* Download link for Main Menu */}
-                      {section.id === 'db2f01ba-7cb1-4221-895d-a63855748272' && (
-                        <MenuDownloadLink 
-                          fileName="champions-menu-fall-2025.pdf"
-                          downloadName="Champions-Main-Menu.pdf"
-                          displayText="Download Main Menu"
-                        />
-                      )}
-                      
-                      <Separator className="mt-6 max-w-xs mx-auto" />
-                    </div>
-
-                    {/* Categories Grid */}
-                    <div className="space-y-8">
-                      {section.categories.map((category) => (
-                        <ModernMenuCategory
-                          key={category.id}
-                          category={category}
-                          sectionName={section.name}
-                        />
-                      ))}
-                    </div>
-
-                    {/* Section Disclaimer */}
-                    {section.categories.length > 0 && (
-                      <div className="mt-8">
-                        {section.name?.toLowerCase().includes('drink') || 
-                         section.name?.toLowerCase().includes('beverage') || 
-                         section.name?.toLowerCase().includes('bar') ? (
-                          <DrinksSectionDisclaimer categoryDescription={section.description} />
-                        ) : (
-                          <FoodSectionDisclaimer categoryDescription={section.description} />
+          {/* Enhanced Tab Navigation */}
+          <div className="menu-section lg:rounded-lg p-8 mb-8 relative">
+            {menuData && (
+              <EnhancedMenuTabs
+                sections={menuData}
+                activeSection={activeSection}
+                onSectionChange={handleSectionChange}
+              />
+            )}
+          </div>
+          {/* Enhanced Menu Content */}
+          <div className="menu-section lg:rounded-lg p-8">
+            {filteredMenuData && filteredMenuData.length > 0 ? (
+              <div className="space-y-20">
+                {filteredMenuData
+                  .filter(section => !activeSection || section.id === activeSection)
+                  .map(section => (
+                    <section key={section.id} id={section.name.toLowerCase().replace(/\s+/g, '-')} className="scroll-mt-20">
+                      {/* Section Header */}
+                      <div className="text-center mb-8">
+                        <h2 className="text-4xl font-serif font-bold text-secondary mb-3 speakable-content">
+                          {section.name}
+                        </h2>
+                        {section.description && section.id !== 'de2ef338-ab9a-43ef-8332-c95cb0d549b9' && (
+                          <p className="text-muted-foreground max-w-3xl mx-auto">
+                            {section.description}
+                          </p>
                         )}
+                        
+                        {/* Download link for Current Specials */}
+                        {section.id === 'de2ef338-ab9a-43ef-8332-c95cb0d549b9' && (
+                          <MenuDownloadLink 
+                            fileName={siteSettings?.monthly_specials_url || 'january-2026-specials.png'}
+                            downloadName={`${section.description || 'Monthly'}-Specials.${(siteSettings?.monthly_specials_url || 'png').split('.').pop()}`}
+                            displayText={`Download ${section.description || 'Monthly'} Menu`}
+                            isLocalFile={!siteSettings?.monthly_specials_url}
+                          />
+                        )}
+                        
+                        {/* Download link for Main Menu */}
+                        {section.id === 'db2f01ba-7cb1-4221-895d-a63855748272' && (
+                          <MenuDownloadLink 
+                            fileName="champions-menu-fall-2025.pdf"
+                            downloadName="Champions-Main-Menu.pdf"
+                            displayText="Download Main Menu"
+                          />
+                        )}
+                        
+                        <Separator className="mt-6 max-w-xs mx-auto" />
                       </div>
-                    )}
-                  </section>
-                ))}
-              {/* Show global disclaimer when viewing all sections */}
-              {!activeSection && filteredMenuData.length > 1 && (
-                <div className="mt-16">
-                  <FoodSectionDisclaimer />
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="text-center py-16">
-              <p className="text-2xl text-muted-foreground">Please select a menu type and category to view items.</p>
-            </div>
-          )}
-        </div>
-    </BackgroundContainer>
+
+                      {/* Categories Grid */}
+                      <div className="space-y-8">
+                        {section.categories.map((category) => (
+                          <ModernMenuCategory
+                            key={category.id}
+                            category={category}
+                            sectionName={section.name}
+                          />
+                        ))}
+                      </div>
+
+                      {/* Section Disclaimer */}
+                      {section.categories.length > 0 && (
+                        <div className="mt-8">
+                          {section.name?.toLowerCase().includes('drink') || 
+                           section.name?.toLowerCase().includes('beverage') || 
+                           section.name?.toLowerCase().includes('bar') ? (
+                            <DrinksSectionDisclaimer categoryDescription={section.description} />
+                          ) : (
+                            <FoodSectionDisclaimer categoryDescription={section.description} />
+                          )}
+                        </div>
+                      )}
+                    </section>
+                  ))}
+                {/* Show global disclaimer when viewing all sections */}
+                {!activeSection && filteredMenuData.length > 1 && (
+                  <div className="mt-16">
+                    <FoodSectionDisclaimer />
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <p className="text-2xl text-muted-foreground">Please select a menu type and category to view items.</p>
+              </div>
+            )}
+          </div>
+      </BackgroundContainer>
+    </>
   );
 };
 
