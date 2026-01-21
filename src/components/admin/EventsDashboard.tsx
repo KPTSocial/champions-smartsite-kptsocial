@@ -9,9 +9,9 @@ import EventsStats from './EventsStats';
 import EventsFilters from './EventsFilters';
 import EventForm from './EventForm';
 import EventCalendarAdmin from './EventCalendarAdmin';
+import { SeasonalCardsManager } from './SeasonalCardsManager';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-
 const EventsDashboard: React.FC = () => {
   const [showEventForm, setShowEventForm] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -266,6 +266,9 @@ const EventsDashboard: React.FC = () => {
           )}
         </div>
       )}
+
+      {/* Seasonal & Special Event Cards Section */}
+      <SeasonalCardsManager />
 
       {/* Event Form Dialog */}
       <Dialog open={showEventForm} onOpenChange={setShowEventForm}>

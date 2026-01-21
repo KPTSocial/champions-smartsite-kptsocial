@@ -815,6 +815,57 @@ export type Database = {
         }
         Relationships: []
       }
+      seasonal_event_cards: {
+        Row: {
+          background_image_url: string | null
+          created_at: string
+          cta_external: boolean
+          cta_href: string
+          cta_icon: string
+          cta_text: string
+          description: string
+          details: string[] | null
+          emoji: string
+          id: string
+          is_visible: boolean
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          background_image_url?: string | null
+          created_at?: string
+          cta_external?: boolean
+          cta_href?: string
+          cta_icon?: string
+          cta_text?: string
+          description: string
+          details?: string[] | null
+          emoji?: string
+          id?: string
+          is_visible?: boolean
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          background_image_url?: string | null
+          created_at?: string
+          cta_external?: boolean
+          cta_href?: string
+          cta_icon?: string
+          cta_text?: string
+          description?: string
+          details?: string[] | null
+          emoji?: string
+          id?: string
+          is_visible?: boolean
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           id: number
