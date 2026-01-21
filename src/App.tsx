@@ -17,6 +17,7 @@ import AdminMenuPage from "./pages/AdminMenuPage";
 import AdminEventsPage from "./pages/AdminEventsPage";
 import AdminSettingsPage from "./pages/AdminSettingsPage";
 import AdminFeedbackPage from "./pages/AdminFeedbackPage";
+import AdminGuidePage from "./pages/AdminGuidePage";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
           <Route path="/admin/events" element={<AdminEventsPage />} />
           <Route path="/admin/feedback" element={<AdminFeedbackPage />} />
           <Route path="/admin/settings" element={<AdminSettingsPage />} />
+          <Route path="/admin/guide" element={<AdminGuidePage />} />
           
           {/* 404 */}
           <Route path="*" element={<Layout><NotFound /></Layout>} />
