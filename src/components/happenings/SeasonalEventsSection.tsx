@@ -1,56 +1,28 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Mail, Calendar, MapPin, Phone } from 'lucide-react';
+import { Mail, Calendar, MapPin, Phone, ExternalLink, LucideIcon } from 'lucide-react';
 import { EventCard } from './EventCard';
 import { getEvents, type Event } from '@/services/eventService';
+import { getSeasonalCardsPublic, SeasonalEventCard } from '@/services/seasonalCardService';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
-const seasonalEvents = [{
-  title: "Winter Olympics 2026",
-  emoji: "🥇",
-  description: "The Winter Olympics are almost here, and Champions is ready for every medal moment. From opening ceremonies to gold-medal finals, this is where Hillsboro gathers to watch the world compete. Table reservations will open soon, so plan ahead and secure your spot.",
-  details: ["February 6 - 22, 2026", "Milano Cortina, Italy"],
-  cta: {
-    text: "Reserve Your Table",
-    href: "/reservations",
-    icon: Calendar
-  },
-  backgroundImage: "https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/photos/Special%20Events/Wolympics2026.jpeg"
-}, {
-  title: "Summer Cornhole League",
-  emoji: "🏆",
-  description: "Swing into summer competition! Our league runs on Sunday afternoons. Games start at 1 PM.",
-  details: ["Starts Back Up June 2026"],
-  cta: {
-    text: "Email to Join",
-    href: "mailto:champions.sportsbar.grill@gmail.com",
-    icon: Mail
-  },
-  backgroundImage: "https://res.cloudinary.com/de3djsvlk/image/upload/v1753120007/summer_cornhole_xbikfm.jpg"
-}, {
-  title: "Sunday Breakfast & NFL Games",
-  emoji: "🏈",
-  description: "Join us for Sunday breakfast from 9am-12pm throughout football season! Start your game day right with a hearty breakfast.",
-  details: ["Every Sunday during Football Season", "Breakfast: 9am - 12pm", "All Packers games with sound"],
-  cta: {
-    text: "Call for Game Placement",
-    href: "tel:+15037476063",
-    icon: Phone
-  },
-  backgroundImage: "https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/photos/Special%20Events/Gemini_Generated_Image_mjg6qomjg6qomjg6.png"
-}, {
-  title: "FIFA World Cup 2026",
-  emoji: "⚽",
-  description: "The FIFA World Cup is coming, and Champions is where the world meets in Hillsboro. Every match. Every goal. Every unforgettable moment. Planning to watch with a group? World Cup table reservations open soon. Claim your spot early and be part of the action.",
-  details: ["June 11 - July 19, 2026", "All matches shown live"],
-  cta: {
-    text: "Reservations Coming Soon",
-    href: "/reservations",
-    icon: Calendar
-  },
-  backgroundImage: "https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/photos/Special%20Events/FIFA2026.jpeg"
-}];
+
+// Map icon names to Lucide components
+const iconMap: Record<string, LucideIcon> = {
+  calendar: Calendar,
+  mail: Mail,
+  phone: Phone,
+  'external-link': ExternalLink,
+};
+
 export function SeasonalEventsSection() {
+  // Fetch seasonal cards from database
+  const { data: seasonalCards = [], isLoading: cardsLoading } = useQuery<SeasonalEventCard[]>({
+    queryKey: ['seasonal-cards-public'],
+    queryFn: getSeasonalCardsPublic,
+    staleTime: 30 * 1000,
+  });
+
   const { data: events = [] } = useQuery<Event[]>({
     queryKey: ['seasonal-sports-events'],
     queryFn: getEvents,
@@ -64,20 +36,30 @@ export function SeasonalEventsSection() {
     new Date(event.event_date) >= new Date()
   ).slice(0, 3); // Show top 3 upcoming featured sports events
 
+  // Don't show section if no cards and no sports events
+  if (!cardsLoading && seasonalCards.length === 0 && sportsEvents.length === 0) {
+    return null;
+  }
+
   return (
     <section className="mt-24">
       <h2 className="text-3xl md:text-4xl font-bold font-serif text-center mb-12">Seasonal &amp; Special Events</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto justify-items-center">
-        {/* Summer Cornhole League */}
-        {seasonalEvents.map(event => (
+        {/* Seasonal Event Cards from Database */}
+        {seasonalCards.map(card => (
           <EventCard 
-            key={event.title} 
-            title={event.title} 
-            emoji={event.emoji} 
-            description={event.description} 
-            details={event.details} 
-            cta={event.cta} 
-            backgroundImage={event.backgroundImage} 
+            key={card.id} 
+            title={card.title} 
+            emoji={card.emoji} 
+            description={card.description} 
+            details={card.details} 
+            cta={{
+              text: card.cta_text,
+              href: card.cta_href,
+              icon: iconMap[card.cta_icon] || Calendar,
+              external: card.cta_external,
+            }} 
+            backgroundImage={card.background_image_url || undefined} 
             className="w-full" 
             style={{
               backgroundPosition: 'center 20%'
