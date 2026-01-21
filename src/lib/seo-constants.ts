@@ -45,7 +45,7 @@ export const BUSINESS_DATA = {
   },
 
   // Digital Presence
-  url: "https://champions-smartsite.lovable.app",
+  url: "https://www.championssportsbarandgrill.com",
   social: {
     facebook: "https://www.facebook.com/people/Champions-Sports-Bar-Grill/100063835066138/",
     instagram: "https://www.instagram.com/champs_hillsboro/"

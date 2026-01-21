@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://championsbar.com/sitemap.xml
+Sitemap: https://www.championssportsbarandgrill.com/sitemap.xml

@@ -6,31 +6,31 @@
         xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   
   <url>
-    <loc>https://championsbar.com/</loc>
+    <loc>https://www.championssportsbarandgrill.com/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   
   <url>
-    <loc>https://championsbar.com/menu</loc>
+    <loc>https://www.championssportsbarandgrill.com/menu</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
-    <loc>https://championsbar.com/happenings</loc>
+    <loc>https://www.championssportsbarandgrill.com/happenings</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
-    <loc>https://championsbar.com/about</loc>
+    <loc>https://www.championssportsbarandgrill.com/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
-    <loc>https://championsbar.com/reservations</loc>
+    <loc>https://www.championssportsbarandgrill.com/reservations</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
