@@ -150,7 +150,7 @@
       "acceptsReservations": true,
       "menu": "https://www.championssportsbarandgrill.com/menu",
       "hasMenu": "https://www.championssportsbarandgrill.com/menu",
-      "paymentAccepted": "Cash, Credit Card, Debit Card, Mobile Payment",
+      "paymentAccepted": ["Cash", "Credit Card", "Debit Card", "Mobile Payment"],
       "currenciesAccepted": "USD",
       "amenityFeature": [
         {"@type": "LocationFeatureSpecification", "name": "14 Big Screen TVs", "value": true},
@@ -186,7 +186,15 @@
         "MLB Extra Innings",
         "Portland Trail Blazers Games",
         "World Cup Viewing",
-        "Winter Olympics Coverage"
+        "Winter Olympics Coverage",
+        "American Pub Food",
+        "Craft Cocktails",
+        "Local Wine Selection",
+        "Hillsboro Community Hub",
+        "Sports Bar Near Intel Campus",
+        "Sports Bar Near Nike Headquarters",
+        "Tanasbourne Area Dining",
+        "Washington County Sports Bars"
       ],
       "sameAs": [
         "https://www.facebook.com/people/Champions-Sports-Bar-Grill/100063835066138/",
@@ -204,7 +212,11 @@
               "description": "Daily drink and food specials from 2:30 PM to 5:30 PM every day"
             },
             "availabilityStarts": "14:30",
-            "availabilityEnds": "17:30"
+            "availabilityEnds": "17:30",
+            "availableAtOrFrom": {
+              "@type": "Place",
+              "name": "Champions Sports Bar & Grill"
+            }
           }
         ]
       },
@@ -329,12 +341,12 @@
     {
       "@context": "https://schema.org",
       "@type": "EventSeries",
-      "name": "Weekly Trivia Night",
-      "description": "Test your knowledge at Champions Sports Bar's weekly trivia night with prizes, drink specials, and a fun competitive atmosphere. Hosted by Last Call Trivia every Tuesday.",
+      "name": "Weekly Trivia Night at Champions",
+      "description": "Test your knowledge at Champions Sports Bar & Grill's weekly trivia night. Every Tuesday at 6 PM featuring prizes, drink specials, and a fun competitive atmosphere. Teams welcome!",
       "eventSchedule": {
         "@type": "Schedule",
         "repeatFrequency": "P1W",
-        "byDay": "http://schema.org/Tuesday",
+        "byDay": "https://schema.org/Tuesday",
         "startTime": "18:00",
         "endTime": "20:00"
       },
@@ -352,7 +364,8 @@
       "organizer": {
         "@type": "Organization",
         "name": "Champions Sports Bar & Grill",
-        "url": "https://www.championssportsbarandgrill.com"
+        "url": "https://www.championssportsbarandgrill.com",
+        "telephone": "+15037476063"
       },
       "performer": {
         "@type": "PerformingGroup",
@@ -375,12 +388,12 @@
     {
       "@context": "https://schema.org",
       "@type": "EventSeries",
-      "name": "Bingo Night",
-      "description": "Join us for Bingo at Champions Sports Bar with cash prizes, special deals, and community fun. Held every other Wednesday at 6 PM - check our Happenings page for upcoming dates.",
+      "name": "Bingo Night at Champions",
+      "description": "Join us for Bingo at Champions Sports Bar every other Wednesday at 6 PM. Vendor prizes, special drink deals, and community fun. Check our calendar for upcoming dates - next session February 4th, 2026.",
       "eventSchedule": {
         "@type": "Schedule",
         "repeatFrequency": "P2W",
-        "byDay": "http://schema.org/Wednesday",
+        "byDay": "https://schema.org/Wednesday",
         "startTime": "18:00",
         "endTime": "20:00"
       },
@@ -398,7 +411,8 @@
       "organizer": {
         "@type": "Organization",
         "name": "Champions Sports Bar & Grill",
-        "url": "https://www.championssportsbarandgrill.com"
+        "url": "https://www.championssportsbarandgrill.com",
+        "telephone": "+15037476063"
       },
       "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
       "eventStatus": "https://schema.org/EventScheduled",
