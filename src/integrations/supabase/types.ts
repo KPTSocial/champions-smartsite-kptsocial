@@ -550,6 +550,7 @@ export type Database = {
           parent_event_id: string | null
           recurring_pattern: string | null
           rsvp_link: string | null
+          show_as_homepage_banner: boolean | null
           status: string | null
         }
         Insert: {
@@ -566,6 +567,7 @@ export type Database = {
           parent_event_id?: string | null
           recurring_pattern?: string | null
           rsvp_link?: string | null
+          show_as_homepage_banner?: boolean | null
           status?: string | null
         }
         Update: {
@@ -582,6 +584,7 @@ export type Database = {
           parent_event_id?: string | null
           recurring_pattern?: string | null
           rsvp_link?: string | null
+          show_as_homepage_banner?: boolean | null
           status?: string | null
         }
         Relationships: [

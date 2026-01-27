@@ -33,6 +33,7 @@ const eventFormSchema = z.object({
   location: z.enum(['on-site', 'off-site', 'virtual']).default('on-site'),
   image_url: z.string().url().optional().or(z.literal('')),
   is_featured: z.boolean().default(false),
+  show_as_homepage_banner: z.boolean().default(false),
   allow_rsvp: z.boolean().default(false),
   rsvp_link: z.string().optional(),
   recurring_pattern: z.enum(['none', 'weekly', 'monthly']).default('none'),
@@ -97,6 +98,7 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
       location: 'on-site',
       image_url: '',
       is_featured: false,
+      show_as_homepage_banner: false,
       allow_rsvp: false,
       rsvp_link: '',
       recurring_pattern: 'none',
@@ -119,6 +121,7 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
           location: (event.location || 'on-site') as 'on-site' | 'off-site' | 'virtual',
           image_url: event.image_url || '',
           is_featured: event.is_featured,
+          show_as_homepage_banner: (event as any).show_as_homepage_banner || false,
           allow_rsvp: event.allow_rsvp,
           rsvp_link: event.rsvp_link || '',
           recurring_pattern: (event.recurring_pattern || 'none') as 'none' | 'weekly' | 'monthly',
@@ -178,6 +181,7 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
         location: data.location,
         image_url: data.image_url || null,
         is_featured: data.is_featured,
+        show_as_homepage_banner: data.show_as_homepage_banner,
         allow_rsvp: data.allow_rsvp,
         rsvp_link: data.allow_rsvp ? (data.rsvp_link || null) : null,
         recurring_pattern: data.recurring_pattern === 'none' ? null : data.recurring_pattern,
@@ -496,6 +500,22 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
                       <div className="space-y-0.5">
                         <FormLabel>Featured Event</FormLabel>
                         <FormDescription>Display prominently on homepage</FormDescription>
+                      </div>
+                      <FormControl>
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="show_as_homepage_banner"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+                      <div className="space-y-0.5">
+                        <FormLabel>Homepage Alert Banner</FormLabel>
+                        <FormDescription>Display as an alert banner below the homepage hero</FormDescription>
                       </div>
                       <FormControl>
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -937,6 +957,29 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
                 )}
               />
 
+              <FormField
+                control={form.control}
+                name="show_as_homepage_banner"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+                    <div className="space-y-0.5">
+                      <FormLabel>Homepage Alert Banner</FormLabel>
+                      <FormDescription>
+                        Display as an alert banner below the homepage hero
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField
                 control={form.control}
                 name="allow_rsvp"
