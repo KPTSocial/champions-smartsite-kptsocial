@@ -400,6 +400,111 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_content: {
+        Row: {
+          ai_provider: string
+          assistant_id: string | null
+          assistant_name: string | null
+          content: string | null
+          content_type: string
+          cost_estimate: number | null
+          created_at: string | null
+          id: string
+          images: Json | null
+          metadata: Json | null
+          niche: string
+          prompt: string | null
+          status: string | null
+          title: string | null
+          tokens_used: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          ai_provider: string
+          assistant_id?: string | null
+          assistant_name?: string | null
+          content?: string | null
+          content_type: string
+          cost_estimate?: number | null
+          created_at?: string | null
+          id?: string
+          images?: Json | null
+          metadata?: Json | null
+          niche: string
+          prompt?: string | null
+          status?: string | null
+          title?: string | null
+          tokens_used?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          ai_provider?: string
+          assistant_id?: string | null
+          assistant_name?: string | null
+          content?: string | null
+          content_type?: string
+          cost_estimate?: number | null
+          created_at?: string | null
+          id?: string
+          images?: Json | null
+          metadata?: Json | null
+          niche?: string
+          prompt?: string | null
+          status?: string | null
+          title?: string | null
+          tokens_used?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      ai_usage_tracking: {
+        Row: {
+          ai_provider: string
+          assistant_id: string | null
+          content_type: string | null
+          cost: number | null
+          created_at: string | null
+          error_message: string | null
+          execution_time_ms: number | null
+          id: string
+          niche: string | null
+          session_id: string | null
+          success: boolean | null
+          tokens_input: number | null
+          tokens_output: number | null
+        }
+        Insert: {
+          ai_provider: string
+          assistant_id?: string | null
+          content_type?: string | null
+          cost?: number | null
+          created_at?: string | null
+          error_message?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          niche?: string | null
+          session_id?: string | null
+          success?: boolean | null
+          tokens_input?: number | null
+          tokens_output?: number | null
+        }
+        Update: {
+          ai_provider?: string
+          assistant_id?: string | null
+          content_type?: string | null
+          cost?: number | null
+          created_at?: string | null
+          error_message?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          niche?: string | null
+          session_id?: string | null
+          success?: boolean | null
+          tokens_input?: number | null
+          tokens_output?: number | null
+        }
+        Relationships: []
+      }
       business_hours: {
         Row: {
           close_time: string | null
@@ -791,6 +896,48 @@ export type Database = {
           id?: string
           name?: string
           sort_order?: number
+        }
+        Relationships: []
+      }
+      niche_configurations: {
+        Row: {
+          active: boolean | null
+          content_templates: Json | null
+          created_at: string | null
+          display_name: string | null
+          id: string
+          image_categories: Json | null
+          niche: string
+          preferred_ai_provider: string | null
+          primary_assistant: string | null
+          secondary_assistant: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          content_templates?: Json | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string
+          image_categories?: Json | null
+          niche: string
+          preferred_ai_provider?: string | null
+          primary_assistant?: string | null
+          secondary_assistant?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          content_templates?: Json | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string
+          image_categories?: Json | null
+          niche?: string
+          preferred_ai_provider?: string | null
+          primary_assistant?: string | null
+          secondary_assistant?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
