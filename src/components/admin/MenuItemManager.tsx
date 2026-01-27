@@ -10,10 +10,11 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Edit, Trash2, Search, Star, Clock, Eye, EyeOff, Sparkles, Upload } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Star, Clock, Eye, EyeOff, Sparkles, Upload, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import PdfMenuUploadDialog from './PdfMenuUploadDialog';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 
 interface MenuItem {
   id: string;
@@ -171,6 +172,27 @@ const MenuItemManager: React.FC = () => {
     }
   });
 
+  const reorderMutation = useMutation({
+    mutationFn: async (updates: { id: string; sort_order: number }[]) => {
+      for (const update of updates) {
+        const { error } = await supabase
+          .from('menu_items')
+          .update({ sort_order: update.sort_order })
+          .eq('id', update.id);
+        
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['menu-items'] });
+      queryClient.invalidateQueries({ queryKey: ['menuData'] });
+      toast.success('Items reordered successfully');
+    },
+    onError: (error: any) => {
+      toast.error(`Error reordering items: ${error.message}`);
+    }
+  });
+
   const resetForm = () => {
     setFormData({
       name: '',
@@ -259,6 +281,46 @@ const MenuItemManager: React.FC = () => {
     const matchesCategory = selectedCategory === 'all' || item.category_id === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // Group items by category for drag-and-drop
+  const itemsByCategory = filteredItems?.reduce((acc, item) => {
+    const categoryId = item.category_id;
+    if (!acc[categoryId]) {
+      acc[categoryId] = [];
+    }
+    acc[categoryId].push(item);
+    return acc;
+  }, {} as Record<string, MenuItem[]>) || {};
+
+  const handleDragEnd = (result: DropResult) => {
+    const { destination, source } = result;
+
+    if (!destination || 
+        (destination.droppableId === source.droppableId && 
+         destination.index === source.index)) {
+      return;
+    }
+
+    // Only allow reordering within the same category
+    if (destination.droppableId !== source.droppableId) {
+      toast.error('Items can only be reordered within the same category');
+      return;
+    }
+
+    const categoryId = source.droppableId;
+    const categoryItems = itemsByCategory[categoryId] || [];
+    
+    const reordered = Array.from(categoryItems);
+    const [movedItem] = reordered.splice(source.index, 1);
+    reordered.splice(destination.index, 0, movedItem);
+
+    const updates = reordered.map((item, index) => ({
+      id: item.id,
+      sort_order: index + 1
+    }));
+
+    reorderMutation.mutate(updates);
+  };
 
   if (isLoading) {
     return <div className="animate-pulse">Loading menu items...</div>;
@@ -479,96 +541,137 @@ const MenuItemManager: React.FC = () => {
         }}
       />
 
-      {/* Menu Items Grid */}
-      <div className="grid gap-4">
-        {filteredItems?.map((item) => (
-          <Card key={item.id} className={!item.is_available ? 'opacity-60' : ''}>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CardTitle className="text-lg">{item.name}</CardTitle>
-                    {item.price && (
-                      <Badge variant="secondary">${item.price}</Badge>
-                    )}
-                    {item.is_featured && (
-                      <Badge variant="default">
-                        <Star className="h-3 w-3 mr-1" />
-                        Featured
-                      </Badge>
-                    )}
-                    {item.is_special && (
-                      <Badge variant="destructive">
-                        <Clock className="h-3 w-3 mr-1" />
-                        Special
-                      </Badge>
-                    )}
-                    {item.tags?.includes('NEW') && (
-                      <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 animate-pulse">
-                        <Sparkles className="h-3 w-3 mr-1" />
-                        NEW
-                      </Badge>
-                    )}
-                  </div>
-                  {item.description && (
-                    <CardDescription>{item.description}</CardDescription>
+      {/* Menu Items Grid with Drag and Drop */}
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <div className="space-y-6">
+          {Object.entries(itemsByCategory).map(([categoryId, categoryItems]) => {
+            const categoryInfo = categories?.find(c => c.id === categoryId);
+            return (
+              <div key={categoryId}>
+                <h3 className="text-lg font-semibold mb-3 text-muted-foreground flex items-center gap-2">
+                  {categoryInfo?.section.name} - {categoryInfo?.name}
+                  <span className="text-sm font-normal">({categoryItems.length} items)</span>
+                </h3>
+                <Droppable droppableId={categoryId}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className={`grid gap-4 min-h-[50px] rounded-lg p-2 transition-colors ${
+                        snapshot.isDraggingOver ? 'bg-accent/50' : ''
+                      }`}
+                    >
+                      {categoryItems.map((item, index) => (
+                        <Draggable key={item.id} draggableId={item.id} index={index}>
+                          {(provided, snapshot) => (
+                            <Card
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              className={`${!item.is_available ? 'opacity-60' : ''} ${
+                                snapshot.isDragging ? 'shadow-lg ring-2 ring-primary/50' : ''
+                              }`}
+                            >
+                              <CardHeader>
+                                <div className="flex items-start justify-between">
+                                  <div className="flex items-start gap-3 flex-1">
+                                    <div
+                                      {...provided.dragHandleProps}
+                                      className="cursor-grab active:cursor-grabbing mt-1 p-1 hover:bg-accent rounded"
+                                    >
+                                      <GripVertical className="h-4 w-4 text-muted-foreground" />
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                                        <CardTitle className="text-lg">{item.name}</CardTitle>
+                                        {item.price && (
+                                          <Badge variant="secondary">${item.price}</Badge>
+                                        )}
+                                        {item.is_featured && (
+                                          <Badge variant="default">
+                                            <Star className="h-3 w-3 mr-1" />
+                                            Featured
+                                          </Badge>
+                                        )}
+                                        {item.is_special && (
+                                          <Badge variant="destructive">
+                                            <Clock className="h-3 w-3 mr-1" />
+                                            Special
+                                          </Badge>
+                                        )}
+                                        {item.tags?.includes('NEW') && (
+                                          <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 animate-pulse">
+                                            <Sparkles className="h-3 w-3 mr-1" />
+                                            NEW
+                                          </Badge>
+                                        )}
+                                      </div>
+                                      {item.description && (
+                                        <CardDescription>{item.description}</CardDescription>
+                                      )}
+                                      {item.tags && item.tags.filter(t => t !== 'NEW').length > 0 && (
+                                        <div className="flex gap-1 mt-2">
+                                          {item.tags.filter(t => t !== 'NEW').map((tag, tagIndex) => (
+                                            <Badge key={tagIndex} variant="outline" className="text-xs">
+                                              {tag}
+                                            </Badge>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => toggleNewTag(item)}
+                                      className={item.tags?.includes('NEW') ? 'text-orange-600' : ''}
+                                      title={item.tags?.includes('NEW') ? 'Remove NEW tag' : 'Mark as NEW'}
+                                    >
+                                      <Sparkles className="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => toggleAvailability(item)}
+                                      className={item.is_available ? 'text-green-600' : 'text-red-600'}
+                                    >
+                                      {item.is_available ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+                                    </Button>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleEdit(item)}
+                                    >
+                                      <Edit className="h-3 w-3" />
+                                    </Button>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => handleDelete(item.id)}
+                                      className="text-red-600 hover:text-red-700"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </CardHeader>
+                            </Card>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
                   )}
-                  <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                    <span>{item.category?.section?.name} - {item.category?.name}</span>
-                    {item.tags && item.tags.length > 0 && (
-                      <div className="flex gap-1">
-                        {item.tags.map((tag, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => toggleNewTag(item)}
-                    className={item.tags?.includes('NEW') ? 'text-orange-600' : ''}
-                    title={item.tags?.includes('NEW') ? 'Remove NEW tag' : 'Mark as NEW'}
-                  >
-                    <Sparkles className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => toggleAvailability(item)}
-                    className={item.is_available ? 'text-green-600' : 'text-red-600'}
-                  >
-                    {item.is_available ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEdit(item)}
-                  >
-                    <Edit className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDelete(item.id)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </div>
+                </Droppable>
               </div>
-            </CardHeader>
-          </Card>
-        ))}
-      </div>
+            );
+          })}
+        </div>
+      </DragDropContext>
 
-      {filteredItems?.length === 0 && (
+      {Object.keys(itemsByCategory).length === 0 && (
         <div className="text-center py-12">
-          <p className="text-gray-500">No menu items found matching your criteria.</p>
+          <p className="text-muted-foreground">No menu items found matching your criteria.</p>
         </div>
       )}
     </div>
