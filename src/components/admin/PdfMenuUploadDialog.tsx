@@ -6,10 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, CalendarIcon, Loader2, FileText, ImageIcon, AlertCircle, CheckCircle2, X } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Upload, CalendarIcon, Loader2, FileText, ImageIcon, AlertCircle, CheckCircle2, X, Check, ChevronsUpDown } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { format, addMonths, startOfMonth, endOfMonth } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -75,6 +75,19 @@ export default function PdfMenuUploadDialog({
   const [editedItems, setEditedItems] = useState<ParsedMenuItem[]>([]);
   const [uploadProgress, setUploadProgress] = useState<string>('');
   const [detectedMonth, setDetectedMonth] = useState<string | null>(null);
+  const [categorySearchOpen, setCategorySearchOpen] = useState(false);
+
+  // Group categories by section for better organization in the combobox
+  const groupedCategories = categories?.reduce((acc, category) => {
+    const sectionName = category.section.name;
+    if (!acc[sectionName]) {
+      acc[sectionName] = [];
+    }
+    acc[sectionName].push(category);
+    return acc;
+  }, {} as Record<string, MenuCategory[]>) || {};
+
+  const selectedCategoryData = categories?.find(c => c.id === selectedCategory);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -514,20 +527,53 @@ export default function PdfMenuUploadDialog({
             <div className="space-y-2">
               <Label>Select Target Category</Label>
               <p className="text-sm text-muted-foreground">
-                Choose which category these menu items should be added to
+                Type to search or select which category these menu items should be added to
               </p>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.section.name} - {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover open={categorySearchOpen} onOpenChange={setCategorySearchOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={categorySearchOpen}
+                    className="w-full justify-between"
+                  >
+                    {selectedCategoryData
+                      ? `${selectedCategoryData.section.name} - ${selectedCategoryData.name}`
+                      : "Search categories..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search categories..." />
+                    <CommandList>
+                      <CommandEmpty>No category found.</CommandEmpty>
+                      {Object.entries(groupedCategories).map(([sectionName, cats]) => (
+                        <CommandGroup key={sectionName} heading={sectionName}>
+                          {cats.map((category) => (
+                            <CommandItem
+                              key={category.id}
+                              value={`${category.section.name} ${category.name}`}
+                              onSelect={() => {
+                                setSelectedCategory(category.id);
+                                setCategorySearchOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  selectedCategory === category.id ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              {category.name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      ))}
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div className="flex justify-end gap-2">
