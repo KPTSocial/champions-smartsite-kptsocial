@@ -7,6 +7,7 @@ import SpotOnLoyaltyWidget from "@/components/loyalty/SpotOnLoyaltyWidget";
 import { SpeakableSchema } from "@/components/seo/SpeakableSchema";
 import { FAQSchema } from "@/components/seo/FAQSchema";
 import { HOMEPAGE_FAQS, BUSINESS_DATA } from "@/lib/seo-constants";
+import HomepageAlertBanner from "@/components/HomepageAlertBanner";
 
 const Index = () => {
   const { data: headerMedia, isLoading: isHeaderLoading, error } = useHeaderMedia();
@@ -80,6 +81,9 @@ const Index = () => {
             </div>
           </div>
         </section>
+
+        {/* Alert Banner for Closures/Private Events */}
+        <HomepageAlertBanner />
 
         <section className="py-16 md:py-24 bg-background">
           <div className="container px-4">
