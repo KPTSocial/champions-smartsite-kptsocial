@@ -244,6 +244,21 @@ export function CalendarWithEventSlots({
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="font-medium">{event.event_title}</div>
+                    
+                    {/* Sponsored By */}
+                    {(event as any).sponsored_by && (
+                      <div className="text-primary text-xs font-medium">
+                        🍺 Sponsored by {(event as any).sponsored_by}
+                      </div>
+                    )}
+                    
+                    {/* Theme */}
+                    {(event as any).theme && (
+                      <div className="text-accent-foreground text-xs font-medium">
+                        ✨ {(event as any).theme}
+                      </div>
+                    )}
+                    
                     <div className="text-muted-foreground text-xs">
                       {event.event_date && formatEventTime(event.event_date, event.event_title)}
                       {event.event_type && ` • ${event.event_type}`}

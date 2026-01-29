@@ -551,7 +551,9 @@ export type Database = {
           recurring_pattern: string | null
           rsvp_link: string | null
           show_as_homepage_banner: boolean | null
+          sponsored_by: string | null
           status: string | null
+          theme: string | null
         }
         Insert: {
           allow_rsvp?: boolean
@@ -568,7 +570,9 @@ export type Database = {
           recurring_pattern?: string | null
           rsvp_link?: string | null
           show_as_homepage_banner?: boolean | null
+          sponsored_by?: string | null
           status?: string | null
+          theme?: string | null
         }
         Update: {
           allow_rsvp?: boolean
@@ -585,7 +589,9 @@ export type Database = {
           recurring_pattern?: string | null
           rsvp_link?: string | null
           show_as_homepage_banner?: boolean | null
+          sponsored_by?: string | null
           status?: string | null
+          theme?: string | null
         }
         Relationships: [
           {
