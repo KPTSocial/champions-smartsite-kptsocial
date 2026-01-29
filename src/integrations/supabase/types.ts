@@ -1024,6 +1024,10 @@ export type Database = {
       }
       site_settings: {
         Row: {
+          about_text: string | null
+          about_title: string | null
+          hero_subtitle: string | null
+          hero_title: string | null
           id: number
           monthly_specials_label: string | null
           monthly_specials_url: string | null
@@ -1032,6 +1036,10 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          about_text?: string | null
+          about_title?: string | null
+          hero_subtitle?: string | null
+          hero_title?: string | null
           id?: number
           monthly_specials_label?: string | null
           monthly_specials_url?: string | null
@@ -1040,6 +1048,10 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          about_text?: string | null
+          about_title?: string | null
+          hero_subtitle?: string | null
+          hero_title?: string | null
           id?: number
           monthly_specials_label?: string | null
           monthly_specials_url?: string | null
