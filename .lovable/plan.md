@@ -1,263 +1,248 @@
 
-
-## Add Paginated Events List for Draft/Cancelled/Archived Status Filters
+## Add "Sponsored By" and "Theme" Fields to Bingo & Trivia Events
 
 ### Overview
-When the admin selects "Draft", "Cancelled", or "Archived" from the status filter dropdown, display a paginated list of those events in the right sidebar, positioned between the selected date's event card and the Status Guide card. This makes it easy to find and manage events in these statuses without scrolling through the calendar month by month.
+Add two new optional fields to events: **Sponsored By** (for vendor sponsorships) and **Theme** (for special themed events). These fields are per-event/per-date specific, allowing owners to assign different sponsors or themes to individual Bingo and Trivia nights. The display only changes when these fields have values.
 
 ---
 
-### Current Layout
+### How It Works
 
 ```text
 ┌─────────────────────────────────────────────────────────────────┐
-│  [Status ▼] [Type ▼] [Location ▼] [Date ▼]    [Calendar] [List] │
+│  Example: 3 Different Bingo Nights                              │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│  ┌─────────────────────────────────┐  ┌───────────────────────┐ │
-│  │                                 │  │ Wed, Jan 29, 2026     │ │
-│  │        Events Calendar          │  │                       │ │
-│  │       (with date picker)        │  │ No events for today   │ │
-│  │                                 │  │                       │ │
-│  │                                 │  └───────────────────────┘ │
-│  │                                 │                            │
-│  │     [Create New Event]          │  ┌───────────────────────┐ │
-│  │                                 │  │ Status Guide          │ │
-│  └─────────────────────────────────┘  │ • Published           │ │
-│                                       │ • Draft               │ │
-│                                       │ • Cancelled           │ │
-│                                       └───────────────────────┘ │
+│  Jan 15 - Bingo Night                                           │
+│  Sponsored By: Stickmen Brewing                                 │
+│  Theme: (empty - not displayed)                                 │
+│                                                                 │
+│  Jan 29 - Bingo Night                                           │
+│  Sponsored By: Rugged Winery                                    │
+│  Theme: Valentine's Day Special                                 │
+│                                                                 │
+│  Feb 12 - Bingo Night                                           │
+│  Sponsored By: (empty - not displayed)                          │
+│  Theme: (empty - not displayed)                                 │
+│                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-### Proposed Layout (when Draft/Cancelled/Archived filter is active)
+### Database Changes
+
+Add two new nullable columns to the `events` table:
+
+```sql
+ALTER TABLE events
+ADD COLUMN sponsored_by TEXT DEFAULT NULL,
+ADD COLUMN theme TEXT DEFAULT NULL;
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `sponsored_by` | TEXT | Vendor/sponsor name (e.g., "Stickmen Brewing", "Rugged Winery") |
+| `theme` | TEXT | Special theme name (e.g., "Valentine's Day Special", "St. Patrick's Day") |
+
+---
+
+### Admin Form Updates
+
+Add new input fields in the Event Form for Bingo and Trivia events:
 
 ```text
 ┌─────────────────────────────────────────────────────────────────┐
-│  [Draft ▼] [Type ▼] [Location ▼] [Date ▼]     [Calendar] [List] │
+│  Event Form                                                     │
 ├─────────────────────────────────────────────────────────────────┤
+│  Event Title: [Bingo Night                              ]       │
+│  Date & Time: [2026-02-12 18:00                        ]       │
+│  Event Type:  [Game Night ▼]                                    │
 │                                                                 │
-│  ┌─────────────────────────────────┐  ┌───────────────────────┐ │
-│  │                                 │  │ Wed, Jan 29, 2026     │ │
-│  │        Events Calendar          │  │ No events for today   │ │
-│  │       (with date picker)        │  └───────────────────────┘ │
-│  │                                 │                            │
-│  │                                 │  ┌───────────────────────┐ │
-│  │                                 │  │ Draft Events (34)     │ │
-│  │     [Create New Event]          │  ├───────────────────────┤ │
-│  │                                 │  │ Trivia Night          │ │
-│  └─────────────────────────────────┘  │ Jan 15 • Game Night   │ │
-│                                       │ [Edit] [Publish] [Del]│ │
-│                                       ├───────────────────────┤ │
-│                                       │ Super Bowl Party      │ │
-│                                       │ Feb 9 • Specials      │ │
-│                                       │ [Edit] [Publish] [Del]│ │
-│                                       ├───────────────────────┤ │
-│                                       │ ... 8 more items ...  │ │
-│                                       ├───────────────────────┤ │
-│                                       │  ◀ Page 1 of 4  ▶     │ │
-│                                       └───────────────────────┘ │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  Sponsorship & Theme (Optional)                         │   │
+│  ├─────────────────────────────────────────────────────────┤   │
+│  │  Sponsored By: [Stickmen Brewing              ]         │   │
+│  │  Hint: Brewery, winery, or vendor sponsoring this event │   │
+│  │                                                         │   │
+│  │  Theme: [Valentine's Day Special              ]         │   │
+│  │  Hint: Special theme for this event                     │   │
+│  └─────────────────────────────────────────────────────────┘   │
 │                                                                 │
-│                                       ┌───────────────────────┐ │
-│                                       │ Status Guide          │ │
-│                                       └───────────────────────┘ │
+│  Description: [Join us for Bingo Night!                 ]       │
+│  ...                                                            │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-### Features
+### Public Calendar Display
 
-1. **Conditional Display**: Only shows when filter is set to `draft`, `cancelled`, or `archived`
-2. **Paginated List**: 10 events per page with page navigation
-3. **Event Cards**: Each event shows:
-   - Title
-   - Date and event type
-   - Action buttons (Edit, Publish for drafts, Delete)
-4. **Page Controls**: Shows "Page X of Y" with previous/next buttons
-5. **Empty State**: Message when no events match the filter
+When a user views an event on the public calendar, sponsor/theme info appears below the title:
+
+**Without Sponsor/Theme (current behavior):**
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│  Bingo Night                                                    │
+│  6:00 PM PT • Game Night                                        │
+│  Bingo with a twist—hosted by local breweries...                │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**With Sponsor:**
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│  Bingo Night                                                    │
+│  🍺 Sponsored by Stickmen Brewing                               │
+│  6:00 PM PT • Game Night                                        │
+│  Bingo with a twist—hosted by local breweries...                │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**With Theme:**
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│  Bingo Night                                                    │
+│  💕 Valentine's Day Special                                     │
+│  6:00 PM PT • Game Night                                        │
+│  Bingo with a twist—hosted by local breweries...                │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**With Both:**
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│  Bingo Night                                                    │
+│  🍺 Sponsored by Stickmen Brewing                               │
+│  💕 Valentine's Day Special                                     │
+│  6:00 PM PT • Game Night                                        │
+│  Bingo with a twist—hosted by local breweries...                │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
 ### Implementation Details
 
-#### File to Modify
+#### 1. Database Migration
 
-**`src/components/admin/EventCalendarAdmin.tsx`**
+**New columns for events table:**
+- `sponsored_by` - nullable text field for vendor name
+- `theme` - nullable text field for theme name
 
-#### Changes
-
-1. **Add new props** to receive filter status and event handlers:
-   ```typescript
-   interface EventCalendarAdminProps {
-     events: Event[];
-     onEditEvent: (event: Event) => void;
-     onDeleteEvent: (eventId: string) => void;
-     onPublishEvent: (eventId: string) => void;
-     onCreateEvent: () => void;
-     statusFilter?: string; // NEW: current status filter value
-   }
-   ```
-
-2. **Add pagination state** inside the component:
-   ```typescript
-   const [filteredPage, setFilteredPage] = useState(1);
-   const ITEMS_PER_PAGE = 10;
-   ```
-
-3. **Reset page when filter changes**:
-   ```typescript
-   useEffect(() => {
-     setFilteredPage(1);
-   }, [statusFilter]);
-   ```
-
-4. **Calculate filtered events list**:
-   ```typescript
-   const showFilteredList = statusFilter === 'draft' || 
-                            statusFilter === 'cancelled' || 
-                            statusFilter === 'archived';
-   
-   const filteredEvents = showFilteredList 
-     ? events.filter(e => e.status === statusFilter)
-       .sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime())
-     : [];
-   
-   const totalPages = Math.ceil(filteredEvents.length / ITEMS_PER_PAGE);
-   const paginatedEvents = filteredEvents.slice(
-     (filteredPage - 1) * ITEMS_PER_PAGE,
-     filteredPage * ITEMS_PER_PAGE
-   );
-   ```
-
-5. **Add the filtered events list card** between the selected date card and Status Guide card:
-   ```typescript
-   {showFilteredList && (
-     <Card>
-       <CardHeader className="pb-3">
-         <CardTitle className="text-base capitalize flex items-center justify-between">
-           <span>{statusFilter} Events ({filteredEvents.length})</span>
-         </CardTitle>
-       </CardHeader>
-       <CardContent className="space-y-3">
-         {paginatedEvents.length === 0 ? (
-           <p className="text-muted-foreground text-sm text-center py-4">
-             No {statusFilter} events found
-           </p>
-         ) : (
-           <>
-             {paginatedEvents.map((event) => (
-               <div key={event.id} className="p-3 border rounded-lg">
-                 <div className="flex items-start justify-between gap-2 mb-2">
-                   <h4 className="font-medium text-sm">{event.event_title}</h4>
-                   <Badge variant={getStatusVariant(event.status || 'draft')}>
-                     {event.status}
-                   </Badge>
-                 </div>
-                 <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
-                   <span>{format(new Date(event.event_date), 'MMM d, yyyy')}</span>
-                   <span>•</span>
-                   <span>{event.event_type}</span>
-                 </div>
-                 <div className="flex items-center gap-2">
-                   <Button variant="outline" size="sm" onClick={() => onEditEvent(event)}>
-                     Edit
-                   </Button>
-                   {event.status === 'draft' && (
-                     <Button size="sm" onClick={() => onPublishEvent(event.id)}>
-                       Publish
-                     </Button>
-                   )}
-                   <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(event.id)}>
-                     Delete
-                   </Button>
-                 </div>
-               </div>
-             ))}
-             
-             {/* Pagination */}
-             {totalPages > 1 && (
-               <div className="flex items-center justify-center gap-2 pt-3 border-t">
-                 <Button
-                   variant="outline"
-                   size="sm"
-                   onClick={() => setFilteredPage(p => Math.max(1, p - 1))}
-                   disabled={filteredPage === 1}
-                 >
-                   <ChevronLeft className="h-4 w-4" />
-                 </Button>
-                 <span className="text-sm text-muted-foreground">
-                   Page {filteredPage} of {totalPages}
-                 </span>
-                 <Button
-                   variant="outline"
-                   size="sm"
-                   onClick={() => setFilteredPage(p => Math.min(totalPages, p + 1))}
-                   disabled={filteredPage === totalPages}
-                 >
-                   <ChevronRight className="h-4 w-4" />
-                 </Button>
-               </div>
-             )}
-           </>
-         )}
-       </CardContent>
-     </Card>
-   )}
-   ```
-
-#### File to Modify
-
-**`src/components/admin/EventsDashboard.tsx`**
-
-Pass the status filter to EventCalendarAdmin:
-```typescript
-<EventCalendarAdmin
-  events={events}
-  onEditEvent={handleEditEvent}
-  onDeleteEvent={handleDeleteEvent}
-  onPublishEvent={handlePublishEvent}
-  onCreateEvent={handleCreateEvent}
-  statusFilter={filters.status}  // NEW
-/>
-```
-
----
-
-### Files to Modify
+#### 2. Files to Modify
 
 | File | Changes |
 |------|---------|
-| `src/components/admin/EventCalendarAdmin.tsx` | Add pagination state, filtered events logic, and new list card UI |
-| `src/components/admin/EventsDashboard.tsx` | Pass `filters.status` prop to EventCalendarAdmin |
+| `src/components/admin/EventForm.tsx` | Add sponsored_by and theme input fields to the form schema and UI |
+| `src/components/ui/calendar-with-event-slots.tsx` | Display sponsor and theme info when present on an event |
+| `src/components/admin/EventCalendarAdmin.tsx` | Show sponsor/theme badges in admin event cards |
 
----
+#### 3. EventForm.tsx Changes
 
-### Pagination Example
+**Update form schema:**
+```typescript
+const eventFormSchema = z.object({
+  // ... existing fields
+  sponsored_by: z.string().optional(),
+  theme: z.string().optional(),
+});
+```
 
-For 34 draft events:
-- **Page 1**: Events 1-10
-- **Page 2**: Events 11-20
-- **Page 3**: Events 21-30
-- **Page 4**: Events 31-34
+**Add new form fields:**
+```typescript
+<FormField
+  control={form.control}
+  name="sponsored_by"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Sponsored By</FormLabel>
+      <FormControl>
+        <Input placeholder="e.g., Stickmen Brewing" {...field} />
+      </FormControl>
+      <FormDescription>
+        Brewery, winery, or vendor sponsoring this event (optional)
+      </FormDescription>
+    </FormItem>
+  )}
+/>
 
-```text
-┌─────────────────────────────────────┐
-│ Draft Events (34)                   │
-├─────────────────────────────────────┤
-│ • Trivia Night - Jan 15             │
-│ • Super Bowl Party - Feb 9          │
-│ • ... (8 more)                      │
-├─────────────────────────────────────┤
-│   [◀]  Page 1 of 4  [▶]             │
-└─────────────────────────────────────┘
+<FormField
+  control={form.control}
+  name="theme"
+  render={({ field }) => (
+    <FormItem>
+      <FormLabel>Theme</FormLabel>
+      <FormControl>
+        <Input placeholder="e.g., Valentine's Day Special" {...field} />
+      </FormControl>
+      <FormDescription>
+        Special theme for this event (optional)
+      </FormDescription>
+    </FormItem>
+  )}
+/>
+```
+
+#### 4. calendar-with-event-slots.tsx Changes
+
+**Update event display:**
+```typescript
+<div className="flex-1 min-w-0">
+  <div className="font-medium">{event.event_title}</div>
+  
+  {/* NEW: Sponsored By */}
+  {event.sponsored_by && (
+    <div className="text-primary text-xs font-medium">
+      🍺 Sponsored by {event.sponsored_by}
+    </div>
+  )}
+  
+  {/* NEW: Theme */}
+  {event.theme && (
+    <div className="text-accent-foreground text-xs font-medium">
+      ✨ {event.theme}
+    </div>
+  )}
+  
+  <div className="text-muted-foreground text-xs">
+    {formatEventTime(event.event_date)} • {event.event_type}
+  </div>
+</div>
 ```
 
 ---
 
-### No Database Changes Required
+### Use Case Example
 
-This is a frontend-only feature that uses the existing events data.
+**Scenario:** The owners have 30 different vendors wanting to sponsor Bingo nights throughout the year.
 
+1. **Setup:**
+   - Create individual Bingo Night events for each Wednesday
+   - Each event has its own date in the database
+
+2. **Assigning Sponsors:**
+   - Open Event Form for "Bingo Night - Jan 15"
+   - Enter "Stickmen Brewing" in Sponsored By field
+   - Save
+
+3. **Assigning Themes:**
+   - Open Event Form for "Bingo Night - Feb 12"
+   - Enter "Valentine's Day Special" in Theme field
+   - Enter "Local Winery" in Sponsored By field
+   - Save
+
+4. **Result:**
+   - Each Bingo Night displays its unique sponsor/theme
+   - Events without sponsors show normal display
+   - Public calendar shows the extra info when available
+
+---
+
+### Technical Notes
+
+- Both fields are optional and nullable
+- Display only changes when fields have non-empty values
+- Works with existing event duplication workflow
+- No changes needed to the recurring events logic
+- TypeScript types will auto-update after migration
