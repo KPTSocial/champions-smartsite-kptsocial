@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useHeaderMedia } from "@/hooks/useHeaderMedia";
 import { useHomepageContent } from "@/hooks/useHomepageContent";
+import { useHomepageSettings } from "@/hooks/useHomepageSettings";
 import VideoHeader from "@/components/VideoHeader";
 import SpotOnLoyaltyWidget from "@/components/loyalty/SpotOnLoyaltyWidget";
 import { SpeakableSchema } from "@/components/seo/SpeakableSchema";
@@ -11,8 +12,8 @@ import HomepageAlertBanner from "@/components/HomepageAlertBanner";
 
 const Index = () => {
   const { data: headerMedia, isLoading: isHeaderLoading, error } = useHeaderMedia();
-
   const { data: homepageContent, isLoading: isContentLoading, error: contentError } = useHomepageContent();
+  const { data: homepageSettings } = useHomepageSettings();
 
   // Debug logging to track data loading
   console.log("Header media data:", headerMedia);
@@ -50,11 +51,10 @@ const Index = () => {
 
           <div className="relative z-20 container px-4 py-8 flex flex-col justify-center hero-content">
             <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold drop-shadow-lg speakable-content">
-              Hillsboro's Sports Bar & Flavor Hub
+              {homepageSettings?.hero_title || "Hillsboro's Sports Bar & Flavor Hub"}
             </h1>
             <p className="mt-4 text-lg md:text-xl max-w-3xl mx-auto drop-shadow-md speakable-content">
-              Experience the thrill of the game and the taste of locally-sourced, PNW cuisine. Welcome to your new
-              favorite spot.
+              {homepageSettings?.hero_subtitle || "Experience the thrill of the game and the taste of locally-sourced, PNW cuisine. Welcome to your new favorite spot."}
             </p>
             <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto">
               <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
@@ -88,10 +88,11 @@ const Index = () => {
         <section className="py-16 md:py-24 bg-background">
           <div className="container px-4">
             <div className="text-center">
-              <h2 className="text-4xl md:text-5xl font-bold font-serif speakable-content">A Bar for Champions</h2>
+              <h2 className="text-4xl md:text-5xl font-bold font-serif speakable-content">
+                {homepageSettings?.about_title || "A Bar for Champions"}
+              </h2>
               <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto speakable-content">
-                We're more than just a sports bar. We're a family friendly, community hub with a passion for fresh
-                ingredients and unforgettable moments.
+                {homepageSettings?.about_text || "We're more than just a sports bar. We're a family friendly, community hub with a passion for fresh ingredients and unforgettable moments."}
               </p>
             </div>
 

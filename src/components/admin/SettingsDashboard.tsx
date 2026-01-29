@@ -7,8 +7,9 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Clock } from 'lucide-react';
+import { Clock, Home } from 'lucide-react';
 import HoursOfOperationManager from './HoursOfOperationManager';
+import HomepageTextManager from './HomepageTextManager';
 
 const SettingsDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('hours');
@@ -21,8 +22,12 @@ const SettingsDashboard: React.FC = () => {
       icon: Clock,
       content: <HoursOfOperationManager />,
     },
-    // Future settings sections can be added here
-    // { value: 'contact', label: 'Contact Info', icon: Phone, content: <ContactInfoManager /> },
+    {
+      value: 'homepage',
+      label: 'Homepage Text',
+      icon: Home,
+      content: <HomepageTextManager />,
+    },
   ];
 
   return (
