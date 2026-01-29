@@ -1,11 +1,11 @@
 // EventCalendarAdmin - Calendar interface for admin events management
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Event } from '@/services/eventService';
 import { Calendar } from '@/components/ui/calendar';
-import { Plus, Edit, Trash2, Eye, MapPin, Clock } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, MapPin, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format, isSameDay } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import {
@@ -25,17 +25,45 @@ interface EventCalendarAdminProps {
   onDeleteEvent: (eventId: string) => void;
   onPublishEvent: (eventId: string) => void;
   onCreateEvent: () => void;
+  statusFilter?: string;
 }
+
+const ITEMS_PER_PAGE = 10;
 
 const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({ 
   events, 
   onEditEvent, 
   onDeleteEvent, 
   onPublishEvent, 
-  onCreateEvent 
+  onCreateEvent,
+  statusFilter = 'all'
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
+  const [filteredPage, setFilteredPage] = useState(1);
+
+  // Reset page when filter changes
+  useEffect(() => {
+    setFilteredPage(1);
+  }, [statusFilter]);
+
+  // Check if we should show the filtered events list
+  const showFilteredList = statusFilter === 'draft' || 
+                           statusFilter === 'cancelled' || 
+                           statusFilter === 'archived';
+
+  // Get filtered events for the sidebar list
+  const filteredStatusEvents = showFilteredList 
+    ? events
+        .filter(e => e.status === statusFilter)
+        .sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime())
+    : [];
+
+  const totalPages = Math.ceil(filteredStatusEvents.length / ITEMS_PER_PAGE);
+  const paginatedEvents = filteredStatusEvents.slice(
+    (filteredPage - 1) * ITEMS_PER_PAGE,
+    filteredPage * ITEMS_PER_PAGE
+  );
 
   // Get events for the selected date
   const eventsForSelectedDate = events.filter(event =>
@@ -241,6 +269,82 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
             )}
           </CardContent>
         </Card>
+
+        {/* Filtered Events List - Shows when Draft/Cancelled/Archived filter is active */}
+        {showFilteredList && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base capitalize flex items-center justify-between">
+                <span>{statusFilter} Events ({filteredStatusEvents.length})</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {paginatedEvents.length === 0 ? (
+                <p className="text-muted-foreground text-sm text-center py-4">
+                  No {statusFilter} events found
+                </p>
+              ) : (
+                <>
+                  {paginatedEvents.map((event) => (
+                    <div key={event.id} className="p-3 border rounded-lg">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <h4 className="font-medium text-sm">{event.event_title}</h4>
+                        <Badge variant={getStatusVariant(event.status || 'draft')} className="shrink-0 text-xs">
+                          {event.status}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
+                        <span>{format(new Date(event.event_date), 'MMM d, yyyy')}</span>
+                        <span>•</span>
+                        <span>{event.event_type}</span>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => onEditEvent(event)}>
+                          Edit
+                        </Button>
+                        {event.status === 'draft' && (
+                          <Button size="sm" className="h-7 text-xs" onClick={() => onPublishEvent(event.id)}>
+                            Publish
+                          </Button>
+                        )}
+                        <Button variant="destructive" size="sm" className="h-7 text-xs" onClick={() => handleDeleteClick(event.id)}>
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 pt-3 border-t">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-8 p-0"
+                        onClick={() => setFilteredPage(p => Math.max(1, p - 1))}
+                        disabled={filteredPage === 1}
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <span className="text-sm text-muted-foreground">
+                        Page {filteredPage} of {totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 w-8 p-0"
+                        onClick={() => setFilteredPage(p => Math.min(totalPages, p + 1))}
+                        disabled={filteredPage === totalPages}
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Enhanced Legend - Hidden on Mobile */}
         <Card className="hidden lg:block">
