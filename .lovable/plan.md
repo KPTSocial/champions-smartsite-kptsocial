@@ -1,30 +1,56 @@
 
-## Add "Sponsored By" and "Theme" Fields to Bingo & Trivia Events
+
+## Add Homepage Text Editor to Admin Settings
 
 ### Overview
-Add two new optional fields to events: **Sponsored By** (for vendor sponsorships) and **Theme** (for special themed events). These fields are per-event/per-date specific, allowing owners to assign different sponsors or themes to individual Bingo and Trivia nights. The display only changes when these fields have values.
+Enable the owner to edit homepage text from the Admin Settings page. This will allow updating:
+
+1. **Hero Section Title**: "Hillsboro's Sports Bar & Flavor Hub"
+2. **Hero Section Subtitle**: "Experience the thrill of the game and the taste of locally-sourced, PNW cuisine. Welcome to your new favorite spot."
+3. **About Section Title**: "A Bar for Champions"
+4. **About Section Subtitle**: "We're more than just a sports bar. We're a family friendly, community hub with a passion for fresh ingredients and unforgettable moments."
 
 ---
 
-### How It Works
+### Current vs New Flow
 
 ```text
+CURRENT STATE:
 ┌─────────────────────────────────────────────────────────────────┐
-│  Example: 3 Different Bingo Nights                              │
+│  Homepage (Index.tsx)                                           │
 ├─────────────────────────────────────────────────────────────────┤
+│  Hero Section:                                                  │
+│    "Hillsboro's Sports Bar & Flavor Hub"       ← HARDCODED     │
+│    "Experience the thrill of..."                ← HARDCODED     │
 │                                                                 │
-│  Jan 15 - Bingo Night                                           │
-│  Sponsored By: Stickmen Brewing                                 │
-│  Theme: (empty - not displayed)                                 │
+│  About Section:                                                 │
+│    "A Bar for Champions"                        ← HARDCODED     │
+│    "We're more than just..."                    ← HARDCODED     │
+└─────────────────────────────────────────────────────────────────┘
+
+NEW STATE:
+┌─────────────────────────────────────────────────────────────────┐
+│  Admin Settings > Homepage Text                                 │
+├─────────────────────────────────────────────────────────────────┤
+│  Hero Title:    [Hillsboro's Sports Bar & Flavor Hub    ]       │
+│  Hero Subtitle: [Experience the thrill of the game...   ]       │
 │                                                                 │
-│  Jan 29 - Bingo Night                                           │
-│  Sponsored By: Rugged Winery                                    │
-│  Theme: Valentine's Day Special                                 │
+│  About Title:   [A Bar for Champions                     ]       │
+│  About Text:    [We're more than just a sports bar...    ]       │
 │                                                                 │
-│  Feb 12 - Bingo Night                                           │
-│  Sponsored By: (empty - not displayed)                          │
-│  Theme: (empty - not displayed)                                 │
+│                                         [Save All Changes]       │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  Homepage (Index.tsx)                                           │
+├─────────────────────────────────────────────────────────────────┤
+│  Hero Section:                                                  │
+│    {heroTitle from database}                    ← DYNAMIC       │
+│    {heroSubtitle from database}                 ← DYNAMIC       │
 │                                                                 │
+│  About Section:                                                 │
+│    {aboutTitle from database}                   ← DYNAMIC       │
+│    {aboutText from database}                    ← DYNAMIC       │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -32,217 +58,175 @@ Add two new optional fields to events: **Sponsored By** (for vendor sponsorships
 
 ### Database Changes
 
-Add two new nullable columns to the `events` table:
+Add 4 new columns to the existing `site_settings` table:
 
 ```sql
-ALTER TABLE events
-ADD COLUMN sponsored_by TEXT DEFAULT NULL,
-ADD COLUMN theme TEXT DEFAULT NULL;
+ALTER TABLE site_settings
+ADD COLUMN hero_title TEXT DEFAULT 'Hillsboro''s Sports Bar & Flavor Hub',
+ADD COLUMN hero_subtitle TEXT DEFAULT 'Experience the thrill of the game and the taste of locally-sourced, PNW cuisine. Welcome to your new favorite spot.',
+ADD COLUMN about_title TEXT DEFAULT 'A Bar for Champions',
+ADD COLUMN about_text TEXT DEFAULT 'We''re more than just a sports bar. We''re a family friendly, community hub with a passion for fresh ingredients and unforgettable moments.';
 ```
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `sponsored_by` | TEXT | Vendor/sponsor name (e.g., "Stickmen Brewing", "Rugged Winery") |
-| `theme` | TEXT | Special theme name (e.g., "Valentine's Day Special", "St. Patrick's Day") |
-
----
-
-### Admin Form Updates
-
-Add new input fields in the Event Form for Bingo and Trivia events:
-
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│  Event Form                                                     │
-├─────────────────────────────────────────────────────────────────┤
-│  Event Title: [Bingo Night                              ]       │
-│  Date & Time: [2026-02-12 18:00                        ]       │
-│  Event Type:  [Game Night ▼]                                    │
-│                                                                 │
-│  ┌─────────────────────────────────────────────────────────┐   │
-│  │  Sponsorship & Theme (Optional)                         │   │
-│  ├─────────────────────────────────────────────────────────┤   │
-│  │  Sponsored By: [Stickmen Brewing              ]         │   │
-│  │  Hint: Brewery, winery, or vendor sponsoring this event │   │
-│  │                                                         │   │
-│  │  Theme: [Valentine's Day Special              ]         │   │
-│  │  Hint: Special theme for this event                     │   │
-│  └─────────────────────────────────────────────────────────┘   │
-│                                                                 │
-│  Description: [Join us for Bingo Night!                 ]       │
-│  ...                                                            │
-└─────────────────────────────────────────────────────────────────┘
-```
-
----
-
-### Public Calendar Display
-
-When a user views an event on the public calendar, sponsor/theme info appears below the title:
-
-**Without Sponsor/Theme (current behavior):**
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│  Bingo Night                                                    │
-│  6:00 PM PT • Game Night                                        │
-│  Bingo with a twist—hosted by local breweries...                │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-**With Sponsor:**
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│  Bingo Night                                                    │
-│  🍺 Sponsored by Stickmen Brewing                               │
-│  6:00 PM PT • Game Night                                        │
-│  Bingo with a twist—hosted by local breweries...                │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-**With Theme:**
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│  Bingo Night                                                    │
-│  💕 Valentine's Day Special                                     │
-│  6:00 PM PT • Game Night                                        │
-│  Bingo with a twist—hosted by local breweries...                │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-**With Both:**
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│  Bingo Night                                                    │
-│  🍺 Sponsored by Stickmen Brewing                               │
-│  💕 Valentine's Day Special                                     │
-│  6:00 PM PT • Game Night                                        │
-│  Bingo with a twist—hosted by local breweries...                │
-└─────────────────────────────────────────────────────────────────┘
-```
+| Column | Type | Default Value | Purpose |
+|--------|------|---------------|---------|
+| `hero_title` | TEXT | "Hillsboro's Sports Bar & Flavor Hub" | Main headline in hero section |
+| `hero_subtitle` | TEXT | "Experience the thrill..." | Subheadline in hero section |
+| `about_title` | TEXT | "A Bar for Champions" | Section heading below hero |
+| `about_text` | TEXT | "We're more than just..." | Section description below hero |
 
 ---
 
 ### Implementation Details
 
-#### 1. Database Migration
+#### 1. New Admin Component
 
-**New columns for events table:**
-- `sponsored_by` - nullable text field for vendor name
-- `theme` - nullable text field for theme name
+Create `src/components/admin/HomepageTextManager.tsx`:
 
-#### 2. Files to Modify
-
-| File | Changes |
-|------|---------|
-| `src/components/admin/EventForm.tsx` | Add sponsored_by and theme input fields to the form schema and UI |
-| `src/components/ui/calendar-with-event-slots.tsx` | Display sponsor and theme info when present on an event |
-| `src/components/admin/EventCalendarAdmin.tsx` | Show sponsor/theme badges in admin event cards |
-
-#### 3. EventForm.tsx Changes
-
-**Update form schema:**
-```typescript
-const eventFormSchema = z.object({
-  // ... existing fields
-  sponsored_by: z.string().optional(),
-  theme: z.string().optional(),
-});
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│  Homepage Text                                                  │
+│  Edit the text displayed on the homepage                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │  Hero Section                                               ││
+│  │  The main banner area visitors see first                    ││
+│  ├─────────────────────────────────────────────────────────────┤│
+│  │  Hero Title                                                 ││
+│  │  [Hillsboro's Sports Bar & Flavor Hub                 ]     ││
+│  │  The main headline (recommended: 5-8 words)                 ││
+│  │                                                             ││
+│  │  Hero Subtitle                                              ││
+│  │  ┌─────────────────────────────────────────────────────┐   ││
+│  │  │ Experience the thrill of the game and the taste of │   ││
+│  │  │ locally-sourced, PNW cuisine. Welcome to your new  │   ││
+│  │  │ favorite spot.                                      │   ││
+│  │  └─────────────────────────────────────────────────────┘   ││
+│  │  Welcoming message below the title (1-2 sentences)          ││
+│  └─────────────────────────────────────────────────────────────┘│
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │  About Section                                              ││
+│  │  The section below the hero with feature cards              ││
+│  ├─────────────────────────────────────────────────────────────┤│
+│  │  Section Title                                              ││
+│  │  [A Bar for Champions                                 ]     ││
+│  │  Headline for the feature cards section                     ││
+│  │                                                             ││
+│  │  Section Description                                        ││
+│  │  ┌─────────────────────────────────────────────────────┐   ││
+│  │  │ We're more than just a sports bar. We're a family  │   ││
+│  │  │ friendly, community hub with a passion for fresh   │   ││
+│  │  │ ingredients and unforgettable moments.              │   ││
+│  │  └─────────────────────────────────────────────────────┘   ││
+│  │  Description that appears under the section title           ││
+│  └─────────────────────────────────────────────────────────────┘│
+│                                                                 │
+│                                         [Save All Changes]       │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-**Add new form fields:**
-```typescript
-<FormField
-  control={form.control}
-  name="sponsored_by"
-  render={({ field }) => (
-    <FormItem>
-      <FormLabel>Sponsored By</FormLabel>
-      <FormControl>
-        <Input placeholder="e.g., Stickmen Brewing" {...field} />
-      </FormControl>
-      <FormDescription>
-        Brewery, winery, or vendor sponsoring this event (optional)
-      </FormDescription>
-    </FormItem>
-  )}
-/>
+Features:
+- Input field for Hero Title
+- Textarea for Hero Subtitle
+- Input field for About Title
+- Textarea for About Description
+- Single "Save All Changes" button
+- Loading states and success/error toasts
+- Character recommendations for optimal display
 
-<FormField
-  control={form.control}
-  name="theme"
-  render={({ field }) => (
-    <FormItem>
-      <FormLabel>Theme</FormLabel>
-      <FormControl>
-        <Input placeholder="e.g., Valentine's Day Special" {...field} />
-      </FormControl>
-      <FormDescription>
-        Special theme for this event (optional)
-      </FormDescription>
-    </FormItem>
-  )}
-/>
+#### 2. Update Settings Dashboard
+
+Add new tab/section to `src/components/admin/SettingsDashboard.tsx`:
+
+```typescript
+const sections = [
+  {
+    value: 'hours',
+    label: 'Hours of Operation',
+    icon: Clock,
+    content: <HoursOfOperationManager />,
+  },
+  {
+    value: 'homepage',
+    label: 'Homepage Text',
+    icon: Home,
+    content: <HomepageTextManager />,
+  },
+];
 ```
 
-#### 4. calendar-with-event-slots.tsx Changes
+#### 3. New Custom Hook
 
-**Update event display:**
+Create `src/hooks/useHomepageSettings.ts`:
+
 ```typescript
-<div className="flex-1 min-w-0">
-  <div className="font-medium">{event.event_title}</div>
-  
-  {/* NEW: Sponsored By */}
-  {event.sponsored_by && (
-    <div className="text-primary text-xs font-medium">
-      🍺 Sponsored by {event.sponsored_by}
-    </div>
-  )}
-  
-  {/* NEW: Theme */}
-  {event.theme && (
-    <div className="text-accent-foreground text-xs font-medium">
-      ✨ {event.theme}
-    </div>
-  )}
-  
-  <div className="text-muted-foreground text-xs">
-    {formatEventTime(event.event_date)} • {event.event_type}
-  </div>
-</div>
+export interface HomepageSettings {
+  hero_title: string;
+  hero_subtitle: string;
+  about_title: string;
+  about_text: string;
+}
+
+export const useHomepageSettings = () => {
+  return useQuery({
+    queryKey: ['homepage-settings'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('hero_title, hero_subtitle, about_title, about_text')
+        .eq('id', 1)
+        .single();
+      // Return with fallback defaults
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+};
+```
+
+#### 4. Update Homepage
+
+Update `src/pages/Index.tsx` to fetch and display dynamic text:
+
+```typescript
+const { data: homepageSettings } = useHomepageSettings();
+
+// Hero Section
+<h1>{homepageSettings?.hero_title || "Hillsboro's Sports Bar & Flavor Hub"}</h1>
+<p>{homepageSettings?.hero_subtitle || "Experience the thrill..."}</p>
+
+// About Section
+<h2>{homepageSettings?.about_title || "A Bar for Champions"}</h2>
+<p>{homepageSettings?.about_text || "We're more than just..."}</p>
 ```
 
 ---
 
-### Use Case Example
+### Files to Create/Modify
 
-**Scenario:** The owners have 30 different vendors wanting to sponsor Bingo nights throughout the year.
-
-1. **Setup:**
-   - Create individual Bingo Night events for each Wednesday
-   - Each event has its own date in the database
-
-2. **Assigning Sponsors:**
-   - Open Event Form for "Bingo Night - Jan 15"
-   - Enter "Stickmen Brewing" in Sponsored By field
-   - Save
-
-3. **Assigning Themes:**
-   - Open Event Form for "Bingo Night - Feb 12"
-   - Enter "Valentine's Day Special" in Theme field
-   - Enter "Local Winery" in Sponsored By field
-   - Save
-
-4. **Result:**
-   - Each Bingo Night displays its unique sponsor/theme
-   - Events without sponsors show normal display
-   - Public calendar shows the extra info when available
+| File | Action | Description |
+|------|--------|-------------|
+| `supabase/migrations/...` | Create | Add 4 columns to site_settings |
+| `src/components/admin/HomepageTextManager.tsx` | Create | New admin component for editing text |
+| `src/hooks/useHomepageSettings.ts` | Create | Hook to fetch homepage settings |
+| `src/components/admin/SettingsDashboard.tsx` | Modify | Add "Homepage Text" tab/section |
+| `src/pages/Index.tsx` | Modify | Use dynamic text from database |
+| `src/integrations/supabase/types.ts` | Auto-update | Types regenerated after migration |
 
 ---
 
-### Technical Notes
+### User Experience
 
-- Both fields are optional and nullable
-- Display only changes when fields have non-empty values
-- Works with existing event duplication workflow
-- No changes needed to the recurring events logic
-- TypeScript types will auto-update after migration
+1. Owner navigates to **Admin > Settings**
+2. Clicks on **"Homepage Text"** tab
+3. Edits any of the 4 text fields
+4. Clicks **"Save All Changes"**
+5. Homepage immediately shows updated text
+
+---
+
+### Fallback Behavior
+
+If database values are empty or null, the homepage will display the original hardcoded text. This ensures the site never shows blank content.
+
