@@ -15,36 +15,26 @@ export const MenuPdfDownloadButton = ({
   label = "Download menu PDF",
   isLocalFile = false
 }: MenuPdfDownloadButtonProps) => {
-  const handleDownload = async () => {
-    try {
-      const fileUrl = isLocalFile 
-        ? `/menus/${encodeURIComponent(fileName)}`
-        : `https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/menu-pdfs/${encodeURIComponent(fileName)}`;
-      
-      const response = await fetch(fileUrl);
-      if (!response.ok) throw new Error("Failed to download file");
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = downloadName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      
+  const handleDownload = () => {
+    const fileUrl = isLocalFile 
+      ? `${window.location.origin}/menus/${encodeURIComponent(fileName)}`
+      : `https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/menu-pdfs/${encodeURIComponent(fileName)}`;
+    
+    // Open in new tab - works on all devices including iOS
+    const newWindow = window.open(fileUrl, '_blank', 'noopener,noreferrer');
+    
+    if (newWindow) {
       toast({
-        title: "Download started",
-        description: "Your menu PDF is downloading...",
+        title: "Opening menu",
+        description: "Your menu is opening in a new tab.",
       });
-    } catch (error) {
-      console.error("Download error:", error);
+    } else {
+      // Fallback if popup blocked
       toast({
-        title: "Download failed",
-        description: "Could not download the menu. Please try again.",
-        variant: "destructive",
+        title: "Opening menu",
+        description: "If the menu doesn't open, please allow popups for this site.",
       });
+      window.location.href = fileUrl;
     }
   };
 
