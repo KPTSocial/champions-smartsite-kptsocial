@@ -183,6 +183,7 @@ const EventsDashboard: React.FC = () => {
           onDeleteEvent={handleDeleteEvent}
           onPublishEvent={handlePublishEvent}
           onCreateEvent={handleCreateEvent}
+          statusFilter={filters.status}
         />
       ) : (
         <div className="grid gap-4">
