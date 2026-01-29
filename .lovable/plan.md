@@ -1,209 +1,263 @@
 
 
-## Fix iOS Menu Downloads with "Open in New Tab" Behavior
+## Add Paginated Events List for Draft/Cancelled/Archived Status Filters
 
-### The Problem
-
-The current download implementation uses `fetch()` + `createObjectURL()` + programmatic `<a>` click, which has known issues on iOS Safari and other iOS browsers:
-
-1. **iOS Safari blocks programmatic blob downloads** - The `download` attribute on dynamically created links doesn't work reliably
-2. **CORS restrictions on iOS** - Fetching files can trigger CORS issues that don't occur on desktop
-3. **User leaves the page** - Downloads replace the current page instead of opening in a new tab
-
-### Solution Overview
-
-Replace the complex blob-based download with a simpler, more iOS-compatible approach:
-1. **Use a direct link with `target="_blank"`** to open files in a new tab
-2. **Detect iOS devices** and use `window.open()` as a fallback
-3. **Keep users on the menu page** while the file opens in a new tab
+### Overview
+When the admin selects "Draft", "Cancelled", or "Archived" from the status filter dropdown, display a paginated list of those events in the right sidebar, positioned between the selected date's event card and the Status Guide card. This makes it easy to find and manage events in these statuses without scrolling through the calendar month by month.
 
 ---
 
-### Current Implementation
+### Current Layout
 
-```typescript
-// Current approach - problematic on iOS
-const handleDownload = async () => {
-  const response = await fetch(fileUrl);
-  const blob = await response.blob();
-  const url = window.URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = downloadName;  // ❌ Doesn't work on iOS
-  link.click();
-};
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│  [Status ▼] [Type ▼] [Location ▼] [Date ▼]    [Calendar] [List] │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌─────────────────────────────────┐  ┌───────────────────────┐ │
+│  │                                 │  │ Wed, Jan 29, 2026     │ │
+│  │        Events Calendar          │  │                       │ │
+│  │       (with date picker)        │  │ No events for today   │ │
+│  │                                 │  │                       │ │
+│  │                                 │  └───────────────────────┘ │
+│  │                                 │                            │
+│  │     [Create New Event]          │  ┌───────────────────────┐ │
+│  │                                 │  │ Status Guide          │ │
+│  └─────────────────────────────────┘  │ • Published           │ │
+│                                       │ • Draft               │ │
+│                                       │ • Cancelled           │ │
+│                                       └───────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
 ```
-
-**Issues:**
-- `download` attribute is ignored on iOS Safari
-- Blob URLs may not open correctly
-- User navigates away from menu page
 
 ---
 
-### New Implementation
+### Proposed Layout (when Draft/Cancelled/Archived filter is active)
 
-```typescript
-// iOS-compatible approach with new tab
-const handleDownload = () => {
-  const fileUrl = isLocalFile 
-    ? `/menus/${encodeURIComponent(fileName)}`
-    : `https://supabase.../menu-pdfs/${encodeURIComponent(fileName)}`;
-  
-  // Open in new tab - works on all platforms including iOS
-  window.open(fileUrl, '_blank', 'noopener,noreferrer');
-  
-  toast({
-    title: "Opening menu",
-    description: "Your menu is opening in a new tab...",
-  });
-};
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│  [Draft ▼] [Type ▼] [Location ▼] [Date ▼]     [Calendar] [List] │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌─────────────────────────────────┐  ┌───────────────────────┐ │
+│  │                                 │  │ Wed, Jan 29, 2026     │ │
+│  │        Events Calendar          │  │ No events for today   │ │
+│  │       (with date picker)        │  └───────────────────────┘ │
+│  │                                 │                            │
+│  │                                 │  ┌───────────────────────┐ │
+│  │                                 │  │ Draft Events (34)     │ │
+│  │     [Create New Event]          │  ├───────────────────────┤ │
+│  │                                 │  │ Trivia Night          │ │
+│  └─────────────────────────────────┘  │ Jan 15 • Game Night   │ │
+│                                       │ [Edit] [Publish] [Del]│ │
+│                                       ├───────────────────────┤ │
+│                                       │ Super Bowl Party      │ │
+│                                       │ Feb 9 • Specials      │ │
+│                                       │ [Edit] [Publish] [Del]│ │
+│                                       ├───────────────────────┤ │
+│                                       │ ... 8 more items ...  │ │
+│                                       ├───────────────────────┤ │
+│                                       │  ◀ Page 1 of 4  ▶     │ │
+│                                       └───────────────────────┘ │
+│                                                                 │
+│                                       ┌───────────────────────┐ │
+│                                       │ Status Guide          │ │
+│                                       └───────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-**Benefits:**
-- Works on iOS Safari, Chrome, and Firefox
-- User stays on the menu page
-- File opens in new tab for viewing/saving
-- Native iOS share sheet can be used to save the file
+---
+
+### Features
+
+1. **Conditional Display**: Only shows when filter is set to `draft`, `cancelled`, or `archived`
+2. **Paginated List**: 10 events per page with page navigation
+3. **Event Cards**: Each event shows:
+   - Title
+   - Date and event type
+   - Action buttons (Edit, Publish for drafts, Delete)
+4. **Page Controls**: Shows "Page X of Y" with previous/next buttons
+5. **Empty State**: Message when no events match the filter
 
 ---
 
 ### Implementation Details
 
-#### Files to Modify
+#### File to Modify
+
+**`src/components/admin/EventCalendarAdmin.tsx`**
+
+#### Changes
+
+1. **Add new props** to receive filter status and event handlers:
+   ```typescript
+   interface EventCalendarAdminProps {
+     events: Event[];
+     onEditEvent: (event: Event) => void;
+     onDeleteEvent: (eventId: string) => void;
+     onPublishEvent: (eventId: string) => void;
+     onCreateEvent: () => void;
+     statusFilter?: string; // NEW: current status filter value
+   }
+   ```
+
+2. **Add pagination state** inside the component:
+   ```typescript
+   const [filteredPage, setFilteredPage] = useState(1);
+   const ITEMS_PER_PAGE = 10;
+   ```
+
+3. **Reset page when filter changes**:
+   ```typescript
+   useEffect(() => {
+     setFilteredPage(1);
+   }, [statusFilter]);
+   ```
+
+4. **Calculate filtered events list**:
+   ```typescript
+   const showFilteredList = statusFilter === 'draft' || 
+                            statusFilter === 'cancelled' || 
+                            statusFilter === 'archived';
+   
+   const filteredEvents = showFilteredList 
+     ? events.filter(e => e.status === statusFilter)
+       .sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime())
+     : [];
+   
+   const totalPages = Math.ceil(filteredEvents.length / ITEMS_PER_PAGE);
+   const paginatedEvents = filteredEvents.slice(
+     (filteredPage - 1) * ITEMS_PER_PAGE,
+     filteredPage * ITEMS_PER_PAGE
+   );
+   ```
+
+5. **Add the filtered events list card** between the selected date card and Status Guide card:
+   ```typescript
+   {showFilteredList && (
+     <Card>
+       <CardHeader className="pb-3">
+         <CardTitle className="text-base capitalize flex items-center justify-between">
+           <span>{statusFilter} Events ({filteredEvents.length})</span>
+         </CardTitle>
+       </CardHeader>
+       <CardContent className="space-y-3">
+         {paginatedEvents.length === 0 ? (
+           <p className="text-muted-foreground text-sm text-center py-4">
+             No {statusFilter} events found
+           </p>
+         ) : (
+           <>
+             {paginatedEvents.map((event) => (
+               <div key={event.id} className="p-3 border rounded-lg">
+                 <div className="flex items-start justify-between gap-2 mb-2">
+                   <h4 className="font-medium text-sm">{event.event_title}</h4>
+                   <Badge variant={getStatusVariant(event.status || 'draft')}>
+                     {event.status}
+                   </Badge>
+                 </div>
+                 <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
+                   <span>{format(new Date(event.event_date), 'MMM d, yyyy')}</span>
+                   <span>•</span>
+                   <span>{event.event_type}</span>
+                 </div>
+                 <div className="flex items-center gap-2">
+                   <Button variant="outline" size="sm" onClick={() => onEditEvent(event)}>
+                     Edit
+                   </Button>
+                   {event.status === 'draft' && (
+                     <Button size="sm" onClick={() => onPublishEvent(event.id)}>
+                       Publish
+                     </Button>
+                   )}
+                   <Button variant="destructive" size="sm" onClick={() => handleDeleteClick(event.id)}>
+                     Delete
+                   </Button>
+                 </div>
+               </div>
+             ))}
+             
+             {/* Pagination */}
+             {totalPages > 1 && (
+               <div className="flex items-center justify-center gap-2 pt-3 border-t">
+                 <Button
+                   variant="outline"
+                   size="sm"
+                   onClick={() => setFilteredPage(p => Math.max(1, p - 1))}
+                   disabled={filteredPage === 1}
+                 >
+                   <ChevronLeft className="h-4 w-4" />
+                 </Button>
+                 <span className="text-sm text-muted-foreground">
+                   Page {filteredPage} of {totalPages}
+                 </span>
+                 <Button
+                   variant="outline"
+                   size="sm"
+                   onClick={() => setFilteredPage(p => Math.min(totalPages, p + 1))}
+                   disabled={filteredPage === totalPages}
+                 >
+                   <ChevronRight className="h-4 w-4" />
+                 </Button>
+               </div>
+             )}
+           </>
+         )}
+       </CardContent>
+     </Card>
+   )}
+   ```
+
+#### File to Modify
+
+**`src/components/admin/EventsDashboard.tsx`**
+
+Pass the status filter to EventCalendarAdmin:
+```typescript
+<EventCalendarAdmin
+  events={events}
+  onEditEvent={handleEditEvent}
+  onDeleteEvent={handleDeleteEvent}
+  onPublishEvent={handlePublishEvent}
+  onCreateEvent={handleCreateEvent}
+  statusFilter={filters.status}  // NEW
+/>
+```
+
+---
+
+### Files to Modify
 
 | File | Changes |
 |------|---------|
-| `src/components/MenuDownloadLink.tsx` | Replace blob download with `window.open()` |
-| `src/components/MenuPdfDownloadButton.tsx` | Replace blob download with `window.open()` |
-
-#### MenuDownloadLink.tsx Changes
-
-**Before (lines 17-47):**
-```typescript
-const handleDownload = async () => {
-  try {
-    const fileUrl = isLocalFile 
-      ? `/menus/${encodeURIComponent(fileName)}`
-      : `https://.../${encodeURIComponent(fileName)}`;
-    
-    const response = await fetch(fileUrl);
-    if (!response.ok) throw new Error("Failed to download file");
-    
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = downloadName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-    
-    toast({ ... });
-  } catch (error) { ... }
-};
-```
-
-**After:**
-```typescript
-const handleDownload = () => {
-  const fileUrl = isLocalFile 
-    ? `${window.location.origin}/menus/${encodeURIComponent(fileName)}`
-    : `https://hqgdbufmokvrsydajdfr.supabase.co/storage/v1/object/public/menu-pdfs/${encodeURIComponent(fileName)}`;
-  
-  // Open in new tab - works on all devices including iOS
-  const newWindow = window.open(fileUrl, '_blank', 'noopener,noreferrer');
-  
-  if (newWindow) {
-    toast({
-      title: "Opening menu",
-      description: "Your menu is opening in a new tab.",
-    });
-  } else {
-    // Fallback if popup blocked - use direct navigation
-    toast({
-      title: "Opening menu",
-      description: "If the menu doesn't open, please allow popups for this site.",
-    });
-    // Alternative: create a visible link for manual click
-    window.location.href = fileUrl;
-  }
-};
-```
-
-#### MenuPdfDownloadButton.tsx Changes
-
-Apply the same `window.open()` approach to this component.
+| `src/components/admin/EventCalendarAdmin.tsx` | Add pagination state, filtered events logic, and new list card UI |
+| `src/components/admin/EventsDashboard.tsx` | Pass `filters.status` prop to EventCalendarAdmin |
 
 ---
 
-### Why This Works on iOS
+### Pagination Example
 
-1. **`window.open()` with `_blank`** - iOS Safari allows this for user-initiated actions
-2. **Direct file URL** - No CORS issues, no blob conversion needed
-3. **Native handling** - iOS displays PDFs natively with share/save options
-4. **Image files** - Open in new tab where users can long-press to save
+For 34 draft events:
+- **Page 1**: Events 1-10
+- **Page 2**: Events 11-20
+- **Page 3**: Events 21-30
+- **Page 4**: Events 31-34
 
----
-
-### User Experience
-
-**Desktop:**
-```text
-User clicks "Download Main Menu"
-    → New tab opens with PDF
-    → Browser shows PDF with download option
-    → User can return to menu page in original tab
-```
-
-**iOS Safari:**
-```text
-User taps "Download Main Menu"
-    → New tab opens with PDF in native viewer
-    → iOS share button allows "Save to Files" or "Save Image"
-    → User returns to menu page by switching tabs
-```
-
----
-
-### Visual Comparison
-
-**Before (iOS):**
 ```text
 ┌─────────────────────────────────────┐
-│  Download Main Menu                  │
-│         ↓                            │
-│  [Nothing happens / Page replaced]   │
+│ Draft Events (34)                   │
+├─────────────────────────────────────┤
+│ • Trivia Night - Jan 15             │
+│ • Super Bowl Party - Feb 9          │
+│ • ... (8 more)                      │
+├─────────────────────────────────────┤
+│   [◀]  Page 1 of 4  [▶]             │
 └─────────────────────────────────────┘
 ```
-
-**After (iOS):**
-```text
-┌─────────────────────────────────────┐
-│  Download Main Menu                  │
-│         ↓                            │
-│  ┌─────────────────┐  ┌────────────┐│
-│  │ Menu Page (tab1)│  │ PDF (tab2) ││
-│  │ (stays open)    │  │ (new tab)  ││
-│  └─────────────────┘  └────────────┘│
-│                       ↳ Save to Files│
-└─────────────────────────────────────┘
-```
-
----
-
-### Toast Message Updates
-
-| Action | Old Message | New Message |
-|--------|-------------|-------------|
-| Success | "Download started" | "Opening menu" |
-| Description | "Your menu is downloading..." | "Your menu is opening in a new tab." |
-| Fallback | - | "If the menu doesn't open, please allow popups for this site." |
 
 ---
 
 ### No Database Changes Required
 
-This is a frontend-only fix that changes how download links behave.
+This is a frontend-only feature that uses the existing events data.
 
