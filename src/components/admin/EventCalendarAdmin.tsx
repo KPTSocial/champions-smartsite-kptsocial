@@ -200,6 +200,22 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
                       </Badge>
                     </div>
 
+                    {/* Sponsor & Theme badges */}
+                    {((event as any).sponsored_by || (event as any).theme) && (
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {(event as any).sponsored_by && (
+                          <Badge variant="outline" className="text-xs bg-primary/10">
+                            🍺 {(event as any).sponsored_by}
+                          </Badge>
+                        )}
+                        {(event as any).theme && (
+                          <Badge variant="outline" className="text-xs bg-accent/10">
+                            ✨ {(event as any).theme}
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+
                     {/* Event details */}
                     <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                       <div className="flex items-center gap-1.5">
@@ -293,6 +309,21 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
                           {event.status}
                         </Badge>
                       </div>
+                      {/* Sponsor & Theme badges in filtered list */}
+                      {((event as any).sponsored_by || (event as any).theme) && (
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {(event as any).sponsored_by && (
+                            <Badge variant="outline" className="text-xs bg-primary/10">
+                              🍺 {(event as any).sponsored_by}
+                            </Badge>
+                          )}
+                          {(event as any).theme && (
+                            <Badge variant="outline" className="text-xs bg-accent/10">
+                              ✨ {(event as any).theme}
+                            </Badge>
+                          )}
+                        </div>
+                      )}
                       <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
                         <span>{format(new Date(event.event_date), 'MMM d, yyyy')}</span>
                         <span>•</span>

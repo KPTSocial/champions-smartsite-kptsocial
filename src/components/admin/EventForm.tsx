@@ -37,7 +37,9 @@ const eventFormSchema = z.object({
   allow_rsvp: z.boolean().default(false),
   rsvp_link: z.string().optional(),
   recurring_pattern: z.enum(['none', 'weekly', 'monthly']).default('none'),
-  status: z.enum(['draft', 'published']).default('draft')
+  status: z.enum(['draft', 'published']).default('draft'),
+  sponsored_by: z.string().optional(),
+  theme: z.string().optional()
 }).superRefine((data, ctx) => {
   // If status is published, event_date is required and must be valid
   if (data.status === 'published') {
@@ -102,7 +104,9 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
       allow_rsvp: false,
       rsvp_link: '',
       recurring_pattern: 'none',
-      status: 'draft'
+      status: 'draft',
+      sponsored_by: '',
+      theme: ''
     }
   });
 
@@ -125,7 +129,9 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
           allow_rsvp: event.allow_rsvp,
           rsvp_link: event.rsvp_link || '',
           recurring_pattern: (event.recurring_pattern || 'none') as 'none' | 'weekly' | 'monthly',
-          status: (event.status || 'published') as 'draft' | 'published'
+          status: (event.status || 'published') as 'draft' | 'published',
+          sponsored_by: (event as any).sponsored_by || '',
+          theme: (event as any).theme || ''
         });
       } catch (error) {
         console.error('Error formatting event date:', error);
@@ -185,7 +191,9 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
         allow_rsvp: data.allow_rsvp,
         rsvp_link: data.allow_rsvp ? (data.rsvp_link || null) : null,
         recurring_pattern: data.recurring_pattern === 'none' ? null : data.recurring_pattern,
-        status: data.status
+        status: data.status,
+        sponsored_by: data.sponsored_by || null,
+        theme: data.theme || null
       };
 
       if (event) {
@@ -555,6 +563,50 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
                     )}
                   />
                 )}
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Sponsorship & Theme */}
+            <AccordionItem value="sponsorship" className="border rounded-lg">
+              <AccordionTrigger className="px-4 hover:no-underline">
+                <div className="flex items-center gap-2 font-medium">
+                  🍺 Sponsorship & Theme
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 space-y-4">
+                <FormField
+                  control={form.control}
+                  name="sponsored_by"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Sponsored By</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Stickmen Brewing" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Brewery, winery, or vendor sponsoring this event (optional)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="theme"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Theme</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Valentine's Day Special" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        Special theme for this event (optional)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </AccordionContent>
             </AccordionItem>
 
@@ -1020,6 +1072,52 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
                 )}
               />
             )}
+          </CardContent>
+        </Card>
+
+        {/* Sponsorship & Theme */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              🍺 Sponsorship & Theme
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="sponsored_by"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Sponsored By</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Stickmen Brewing" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Brewery, winery, or vendor sponsoring this event
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="theme"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Theme</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Valentine's Day Special" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Special theme for this event
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </CardContent>
         </Card>
 
