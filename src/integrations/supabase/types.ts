@@ -1113,6 +1113,7 @@ export type Database = {
         | "NWSL"
         | "Olympics"
         | "World Cup"
+        | "WNBA"
       reservation_type: "Event" | "Table"
     }
     CompositeTypes: {
@@ -1253,6 +1254,7 @@ export const Constants = {
         "NWSL",
         "Olympics",
         "World Cup",
+        "WNBA",
       ],
       reservation_type: ["Event", "Table"],
     },
