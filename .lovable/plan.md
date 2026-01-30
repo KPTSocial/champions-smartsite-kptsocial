@@ -1,232 +1,84 @@
 
 
-## Add Homepage Text Editor to Admin Settings
+## Add Portland Fire (WNBA) Team Support
 
 ### Overview
-Enable the owner to edit homepage text from the Admin Settings page. This will allow updating:
-
-1. **Hero Section Title**: "Hillsboro's Sports Bar & Flavor Hub"
-2. **Hero Section Subtitle**: "Experience the thrill of the game and the taste of locally-sourced, PNW cuisine. Welcome to your new favorite spot."
-3. **About Section Title**: "A Bar for Champions"
-4. **About Section Subtitle**: "We're more than just a sports bar. We're a family friendly, community hub with a passion for fresh ingredients and unforgettable moments."
+Add WNBA as a new event type category and include the Portland Fire as a pre-configured team in the Season Schedule Uploader feature.
 
 ---
 
-### Current vs New Flow
+### Changes Required
 
-```text
-CURRENT STATE:
-┌─────────────────────────────────────────────────────────────────┐
-│  Homepage (Index.tsx)                                           │
-├─────────────────────────────────────────────────────────────────┤
-│  Hero Section:                                                  │
-│    "Hillsboro's Sports Bar & Flavor Hub"       ← HARDCODED     │
-│    "Experience the thrill of..."                ← HARDCODED     │
-│                                                                 │
-│  About Section:                                                 │
-│    "A Bar for Champions"                        ← HARDCODED     │
-│    "We're more than just..."                    ← HARDCODED     │
-└─────────────────────────────────────────────────────────────────┘
-
-NEW STATE:
-┌─────────────────────────────────────────────────────────────────┐
-│  Admin Settings > Homepage Text                                 │
-├─────────────────────────────────────────────────────────────────┤
-│  Hero Title:    [Hillsboro's Sports Bar & Flavor Hub    ]       │
-│  Hero Subtitle: [Experience the thrill of the game...   ]       │
-│                                                                 │
-│  About Title:   [A Bar for Champions                     ]       │
-│  About Text:    [We're more than just a sports bar...    ]       │
-│                                                                 │
-│                                         [Save All Changes]       │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│  Homepage (Index.tsx)                                           │
-├─────────────────────────────────────────────────────────────────┤
-│  Hero Section:                                                  │
-│    {heroTitle from database}                    ← DYNAMIC       │
-│    {heroSubtitle from database}                 ← DYNAMIC       │
-│                                                                 │
-│  About Section:                                                 │
-│    {aboutTitle from database}                   ← DYNAMIC       │
-│    {aboutText from database}                    ← DYNAMIC       │
-└─────────────────────────────────────────────────────────────────┘
-```
-
----
-
-### Database Changes
-
-Add 4 new columns to the existing `site_settings` table:
+#### 1. Database Migration - Add WNBA to Event Type Enum
 
 ```sql
-ALTER TABLE site_settings
-ADD COLUMN hero_title TEXT DEFAULT 'Hillsboro''s Sports Bar & Flavor Hub',
-ADD COLUMN hero_subtitle TEXT DEFAULT 'Experience the thrill of the game and the taste of locally-sourced, PNW cuisine. Welcome to your new favorite spot.',
-ADD COLUMN about_title TEXT DEFAULT 'A Bar for Champions',
-ADD COLUMN about_text TEXT DEFAULT 'We''re more than just a sports bar. We''re a family friendly, community hub with a passion for fresh ingredients and unforgettable moments.';
+ALTER TYPE event_type ADD VALUE IF NOT EXISTS 'WNBA';
 ```
 
-| Column | Type | Default Value | Purpose |
-|--------|------|---------------|---------|
-| `hero_title` | TEXT | "Hillsboro's Sports Bar & Flavor Hub" | Main headline in hero section |
-| `hero_subtitle` | TEXT | "Experience the thrill..." | Subheadline in hero section |
-| `about_title` | TEXT | "A Bar for Champions" | Section heading below hero |
-| `about_text` | TEXT | "We're more than just..." | Section description below hero |
+This adds WNBA alongside the existing categories:
+- Live Music, Game Night, Specials
+- NCAA FB, Soccer
+- NBA, MLS, NWSL, Olympics, World Cup
+- **WNBA** (new)
 
----
+#### 2. Update EventForm.tsx - Add WNBA Option
 
-### Implementation Details
-
-#### 1. New Admin Component
-
-Create `src/components/admin/HomepageTextManager.tsx`:
+Update the Zod schema and dropdown selects to include WNBA:
 
 ```text
-┌─────────────────────────────────────────────────────────────────┐
-│  Homepage Text                                                  │
-│  Edit the text displayed on the homepage                        │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  ┌─────────────────────────────────────────────────────────────┐│
-│  │  Hero Section                                               ││
-│  │  The main banner area visitors see first                    ││
-│  ├─────────────────────────────────────────────────────────────┤│
-│  │  Hero Title                                                 ││
-│  │  [Hillsboro's Sports Bar & Flavor Hub                 ]     ││
-│  │  The main headline (recommended: 5-8 words)                 ││
-│  │                                                             ││
-│  │  Hero Subtitle                                              ││
-│  │  ┌─────────────────────────────────────────────────────┐   ││
-│  │  │ Experience the thrill of the game and the taste of │   ││
-│  │  │ locally-sourced, PNW cuisine. Welcome to your new  │   ││
-│  │  │ favorite spot.                                      │   ││
-│  │  └─────────────────────────────────────────────────────┘   ││
-│  │  Welcoming message below the title (1-2 sentences)          ││
-│  └─────────────────────────────────────────────────────────────┘│
-│                                                                 │
-│  ┌─────────────────────────────────────────────────────────────┐│
-│  │  About Section                                              ││
-│  │  The section below the hero with feature cards              ││
-│  ├─────────────────────────────────────────────────────────────┤│
-│  │  Section Title                                              ││
-│  │  [A Bar for Champions                                 ]     ││
-│  │  Headline for the feature cards section                     ││
-│  │                                                             ││
-│  │  Section Description                                        ││
-│  │  ┌─────────────────────────────────────────────────────┐   ││
-│  │  │ We're more than just a sports bar. We're a family  │   ││
-│  │  │ friendly, community hub with a passion for fresh   │   ││
-│  │  │ ingredients and unforgettable moments.              │   ││
-│  │  └─────────────────────────────────────────────────────┘   ││
-│  │  Description that appears under the section title           ││
-│  └─────────────────────────────────────────────────────────────┘│
-│                                                                 │
-│                                         [Save All Changes]       │
-└─────────────────────────────────────────────────────────────────┘
+Current enum in EventForm.tsx (line 31):
+['Live Music', 'Game Night', 'Specials', 'Soccer', 'NCAA FB', 
+ 'NBA', 'MLS', 'NWSL', 'Olympics', 'World Cup']
+
+Updated to include:
+['Live Music', 'Game Night', 'Specials', 'Soccer', 'NCAA FB', 
+ 'NBA', 'WNBA', 'MLS', 'NWSL', 'Olympics', 'World Cup']
 ```
 
-Features:
-- Input field for Hero Title
-- Textarea for Hero Subtitle
-- Input field for About Title
-- Textarea for About Description
-- Single "Save All Changes" button
-- Loading states and success/error toasts
-- Character recommendations for optimal display
+Also update:
+- Mobile dropdown (around line 395-406)
+- Desktop dropdown (need to locate in file)
 
-#### 2. Update Settings Dashboard
+#### 3. Update Team Schedules Table Seed Data
 
-Add new tab/section to `src/components/admin/SettingsDashboard.tsx`:
+Add Portland Fire to the pre-configured teams:
 
-```typescript
-const sections = [
-  {
-    value: 'hours',
-    label: 'Hours of Operation',
-    icon: Clock,
-    content: <HoursOfOperationManager />,
-  },
-  {
-    value: 'homepage',
-    label: 'Homepage Text',
-    icon: Home,
-    content: <HomepageTextManager />,
-  },
-];
-```
-
-#### 3. New Custom Hook
-
-Create `src/hooks/useHomepageSettings.ts`:
-
-```typescript
-export interface HomepageSettings {
-  hero_title: string;
-  hero_subtitle: string;
-  about_title: string;
-  about_text: string;
-}
-
-export const useHomepageSettings = () => {
-  return useQuery({
-    queryKey: ['homepage-settings'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('hero_title, hero_subtitle, about_title, about_text')
-        .eq('id', 1)
-        .single();
-      // Return with fallback defaults
-    },
-    staleTime: 1000 * 60 * 5,
-  });
-};
-```
-
-#### 4. Update Homepage
-
-Update `src/pages/Index.tsx` to fetch and display dynamic text:
-
-```typescript
-const { data: homepageSettings } = useHomepageSettings();
-
-// Hero Section
-<h1>{homepageSettings?.hero_title || "Hillsboro's Sports Bar & Flavor Hub"}</h1>
-<p>{homepageSettings?.hero_subtitle || "Experience the thrill..."}</p>
-
-// About Section
-<h2>{homepageSettings?.about_title || "A Bar for Champions"}</h2>
-<p>{homepageSettings?.about_text || "We're more than just..."}</p>
+```sql
+INSERT INTO team_schedules (team_name, event_type, default_image_url) VALUES
+('Portland Fire', 'WNBA', NULL);
 ```
 
 ---
 
-### Files to Create/Modify
+### Complete Team List After Update
 
-| File | Action | Description |
-|------|--------|-------------|
-| `supabase/migrations/...` | Create | Add 4 columns to site_settings |
-| `src/components/admin/HomepageTextManager.tsx` | Create | New admin component for editing text |
-| `src/hooks/useHomepageSettings.ts` | Create | Hook to fetch homepage settings |
-| `src/components/admin/SettingsDashboard.tsx` | Modify | Add "Homepage Text" tab/section |
-| `src/pages/Index.tsx` | Modify | Use dynamic text from database |
-| `src/integrations/supabase/types.ts` | Auto-update | Types regenerated after migration |
-
----
-
-### User Experience
-
-1. Owner navigates to **Admin > Settings**
-2. Clicks on **"Homepage Text"** tab
-3. Edits any of the 4 text fields
-4. Clicks **"Save All Changes"**
-5. Homepage immediately shows updated text
+| Team | League | Notes |
+|------|--------|-------|
+| Portland Trail Blazers | NBA | Existing |
+| **Portland Fire** | **WNBA** | **New - Inaugural 2026 Season** |
+| Portland Timbers | MLS | Existing |
+| Portland Thorns | NWSL | Existing |
+| Oregon Ducks | NCAA FB | Existing |
+| Oregon State Beavers | NCAA FB | Existing |
 
 ---
 
-### Fallback Behavior
+### Files to Modify
 
-If database values are empty or null, the homepage will display the original hardcoded text. This ensures the site never shows blank content.
+| File | Change |
+|------|--------|
+| `supabase/migrations/...` | Add WNBA to event_type enum |
+| `src/components/admin/EventForm.tsx` | Add WNBA to Zod schema + dropdowns |
+| `src/integrations/supabase/types.ts` | Auto-regenerated after migration |
+| `supabase/migrations/...` (team_schedules) | Include Portland Fire in seed data |
+
+---
+
+### Implementation Note
+
+The Season Schedule Uploader component (from the previous plan) will automatically support WNBA/Portland Fire once:
+1. The WNBA enum value is added to the database
+2. Portland Fire is inserted into the team_schedules table
+
+This ensures the Portland Fire appears as a selectable team when uploading their inaugural 2026 season schedule.
 
