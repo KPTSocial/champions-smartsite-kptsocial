@@ -74,13 +74,21 @@ const HomepageTextManager: React.FC = () => {
       if (error) throw error;
     },
     onSuccess: () => {
+      // Invalidate both the admin and public homepage queries
+      // Use refetchType: 'all' to ensure all observers refetch immediately
+      queryClient.invalidateQueries({ 
+        queryKey: ['homepage-text-settings'],
+        refetchType: 'all'
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: ['homepage-settings'],
+        refetchType: 'all'
+      });
+      setHasChanges(false);
       toast({
         title: 'Success',
         description: 'Homepage text has been updated.',
       });
-      queryClient.invalidateQueries({ queryKey: ['homepage-text-settings'] });
-      queryClient.invalidateQueries({ queryKey: ['homepage-settings'] });
-      setHasChanges(false);
     },
     onError: (error: Error) => {
       toast({

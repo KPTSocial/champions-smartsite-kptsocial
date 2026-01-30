@@ -37,6 +37,7 @@ export const useHomepageSettings = () => {
         about_text: (data as any)?.about_text || DEFAULT_SETTINGS.about_text,
       };
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 1, // 1 minute - shorter for faster updates
+    refetchOnWindowFocus: true, // Refetch when user tabs back to homepage
   });
 };
