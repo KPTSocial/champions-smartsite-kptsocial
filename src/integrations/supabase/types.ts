@@ -1088,6 +1088,30 @@ export type Database = {
         }
         Relationships: []
       }
+      team_schedules: {
+        Row: {
+          created_at: string | null
+          default_image_url: string | null
+          event_type: string
+          id: string
+          team_name: string
+        }
+        Insert: {
+          created_at?: string | null
+          default_image_url?: string | null
+          event_type: string
+          id?: string
+          team_name: string
+        }
+        Update: {
+          created_at?: string | null
+          default_image_url?: string | null
+          event_type?: string
+          id?: string
+          team_name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
