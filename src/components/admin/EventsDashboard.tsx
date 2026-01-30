@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, Plus, Filter, MapPin, Clock, Users } from 'lucide-react';
+import { Calendar, Plus, Filter, MapPin, Clock, Users, CalendarDays } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Event } from '@/services/eventService';
 import EventsStats from './EventsStats';
@@ -10,7 +10,9 @@ import EventsFilters from './EventsFilters';
 import EventForm from './EventForm';
 import EventCalendarAdmin from './EventCalendarAdmin';
 import { SeasonalCardsManager } from './SeasonalCardsManager';
+import TeamScheduleUploader from './TeamScheduleUploader';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 const EventsDashboard: React.FC = () => {
   const [showEventForm, setShowEventForm] = useState(false);
@@ -279,10 +281,37 @@ const EventsDashboard: React.FC = () => {
               {selectedEvent ? 'Edit Event' : 'Create New Event'}
             </DialogTitle>
           </DialogHeader>
-          <EventForm
-            event={selectedEvent}
-            onClose={handleEventFormClose}
-          />
+          {selectedEvent ? (
+            <EventForm
+              event={selectedEvent}
+              onClose={handleEventFormClose}
+            />
+          ) : (
+            <Tabs defaultValue="single" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="single" className="gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Single Event
+                </TabsTrigger>
+                <TabsTrigger value="schedule" className="gap-2">
+                  <CalendarDays className="h-4 w-4" />
+                  Season Schedule
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="single">
+                <EventForm
+                  event={selectedEvent}
+                  onClose={handleEventFormClose}
+                />
+              </TabsContent>
+              <TabsContent value="schedule">
+                <TeamScheduleUploader
+                  onClose={handleEventFormClose}
+                  onEventsCreated={refetchEvents}
+                />
+              </TabsContent>
+            </Tabs>
+          )}
         </DialogContent>
       </Dialog>
     </div>
