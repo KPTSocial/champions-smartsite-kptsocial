@@ -50,6 +50,8 @@ interface PdfMenuUploadDialogProps {
   onImportComplete: () => void;
   defaultCategoryId?: string;
   allowSpecialScheduling?: boolean;
+  /** Auto-mark items as specials and upload file to storage. Use for Monthly Specials uploads. */
+  autoMarkAsSpecial?: boolean;
 }
 
 export default function PdfMenuUploadDialog({ 
@@ -58,7 +60,8 @@ export default function PdfMenuUploadDialog({
   categories,
   onImportComplete,
   defaultCategoryId,
-  allowSpecialScheduling = true
+  allowSpecialScheduling = true,
+  autoMarkAsSpecial = false
 }: PdfMenuUploadDialogProps) {
   const { toast } = useToast();
   const [step, setStep] = useState<'upload' | 'category' | 'options' | 'review'>('upload');
@@ -68,7 +71,7 @@ export default function PdfMenuUploadDialog({
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [clearExisting, setClearExisting] = useState(false);
   const [markFeatured, setMarkFeatured] = useState(false);
-  const [markAsSpecial, setMarkAsSpecial] = useState(false);
+  const [markAsSpecial, setMarkAsSpecial] = useState(autoMarkAsSpecial);
   const [duplicateHandling, setDuplicateHandling] = useState<DuplicateHandling>('update');
   const [processing, setProcessing] = useState(false);
   const [parsedItems, setParsedItems] = useState<ParsedMenuItem[]>([]);
@@ -433,7 +436,7 @@ export default function PdfMenuUploadDialog({
     setEndDate(undefined);
     setClearExisting(false);
     setMarkFeatured(false);
-    setMarkAsSpecial(false);
+    setMarkAsSpecial(autoMarkAsSpecial);
     setDuplicateHandling('update');
     setParsedItems([]);
     setEditedItems([]);

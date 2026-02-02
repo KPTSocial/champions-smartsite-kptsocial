@@ -551,8 +551,10 @@ const MonthlySpecialsManager: React.FC = () => {
         categories={categories || []}
         defaultCategoryId={monthlySpecialsCategory?.id}
         allowSpecialScheduling={true}
+        autoMarkAsSpecial={true}
         onImportComplete={() => {
           queryClient.invalidateQueries({ queryKey: ['monthly-specials-items'] });
+          queryClient.invalidateQueries({ queryKey: ['site-settings'] });
         }}
       />
 
