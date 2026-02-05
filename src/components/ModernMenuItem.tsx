@@ -20,18 +20,18 @@ const ModernMenuItem: React.FC<ModernMenuItemProps> = ({ item, sectionName }) =>
   };
 
   return (
-    <div className="group py-4 border-b border-border/50 last:border-0 hover:bg-accent/5 transition-colors px-4 sm:px-6 rounded-lg">
-      <div className="flex flex-col space-y-2">
+    <div className="group py-4 border-b border-border/50 last:border-0 hover:bg-accent/5 transition-colors px-4 sm:px-6 rounded-lg text-center">
+      <div className="flex flex-col items-center space-y-2">
         {/* Item Name and Tags */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1">
-            <h4 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
+        <div className="flex flex-col items-center">
+          <div>
+            <h4 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors text-center">
               {item.name}
             </h4>
             
             {/* Tags */}
             {item.tags && item.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-2">
+              <div className="flex flex-wrap gap-1.5 mt-2 justify-center">
                 {item.tags.map(tag => (
                   <Badge 
                     key={tag} 
@@ -51,10 +51,10 @@ const ModernMenuItem: React.FC<ModernMenuItemProps> = ({ item, sectionName }) =>
         </div>
 
         {/* Description and Price */}
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col items-center space-y-2">
           {/* Description with price inline */}
           {item.description ? (
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-sm text-muted-foreground leading-relaxed text-center">
               {item.description}
               {/* Only show price after description if no variants */}
               {(!item.variants || item.variants.length === 0) && (
@@ -78,7 +78,7 @@ const ModernMenuItem: React.FC<ModernMenuItemProps> = ({ item, sectionName }) =>
 
           {/* Variants - show all options */}
           {item.variants && item.variants.length > 0 && (
-            <div className="flex flex-wrap gap-3 mt-2">
+            <div className="flex flex-wrap gap-3 mt-2 justify-center">
               {item.variants.map(variant => (
                 <div 
                   key={variant.id} 
