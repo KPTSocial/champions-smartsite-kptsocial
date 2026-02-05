@@ -1,84 +1,80 @@
 
+# Plan: Center Menu Item Titles and Descriptions
 
-## Add Portland Fire (WNBA) Team Support
+## Overview
+Update all menu item components to center-align the item names (titles) and descriptions, creating a more elegant and traditional menu appearance per the owner's request.
 
-### Overview
-Add WNBA as a new event type category and include the Portland Fire as a pre-configured team in the Season Schedule Uploader feature.
+## Components to Update
 
----
+### 1. MenuItemDisplay.tsx
+The primary menu item component used in `EnhancedMenuCategorySection`.
 
-### Changes Required
+**Changes:**
+- Center the item name heading with `text-center`
+- Center the tags/badges row using `justify-center`
+- Center the description text with `text-center`
+- Center the price display
+- Center variant rows
 
-#### 1. Database Migration - Add WNBA to Event Type Enum
+### 2. ModernMenuItem.tsx
+Used in `ModernMenuCategory` for an alternate layout.
 
-```sql
-ALTER TYPE event_type ADD VALUE IF NOT EXISTS 'WNBA';
-```
+**Changes:**
+- Center the item name heading with `text-center`
+- Center the tags section using `justify-center`
+- Center the description and inline price with `text-center`
+- Center variant pills using `justify-center`
 
-This adds WNBA alongside the existing categories:
-- Live Music, Game Night, Specials
-- NCAA FB, Soccer
-- NBA, MLS, NWSL, Olympics, World Cup
-- **WNBA** (new)
+### 3. MenuItemCard.tsx
+Card-based layout component.
 
-#### 2. Update EventForm.tsx - Add WNBA Option
+**Changes:**
+- Center the card title content
+- Center the card description
+- Center the price display
 
-Update the Zod schema and dropdown selects to include WNBA:
+### 4. MenuItemAccordion.tsx
+Accordion-style layout component.
 
+**Changes:**
+- Center the accordion trigger content
+- Center the expanded description and price content
+
+## Technical Details
+
+### MenuItemDisplay Changes
 ```text
-Current enum in EventForm.tsx (line 31):
-['Live Music', 'Game Night', 'Specials', 'Soccer', 'NCAA FB', 
- 'NBA', 'MLS', 'NWSL', 'Olympics', 'World Cup']
+Before: <div className="flex items-start justify-between gap-4">
+After:  <div className="flex flex-col items-center text-center">
 
-Updated to include:
-['Live Music', 'Game Night', 'Specials', 'Soccer', 'NCAA FB', 
- 'NBA', 'WNBA', 'MLS', 'NWSL', 'Olympics', 'World Cup']
+Before: <h4 className="text-lg font-semibold...">
+After:  <h4 className="text-lg font-semibold... text-center">
+
+Before: <p className="text-base text-muted-foreground mt-2 leading-relaxed">
+After:  <p className="text-base text-muted-foreground mt-2 leading-relaxed text-center">
 ```
 
-Also update:
-- Mobile dropdown (around line 395-406)
-- Desktop dropdown (need to locate in file)
+### ModernMenuItem Changes
+```text
+Before: <h4 className="text-lg font-semibold text-foreground...">
+After:  <h4 className="text-lg font-semibold text-foreground... text-center">
 
-#### 3. Update Team Schedules Table Seed Data
+Before: <div className="flex flex-wrap gap-1.5 mt-2">
+After:  <div className="flex flex-wrap gap-1.5 mt-2 justify-center">
 
-Add Portland Fire to the pre-configured teams:
-
-```sql
-INSERT INTO team_schedules (team_name, event_type, default_image_url) VALUES
-('Portland Fire', 'WNBA', NULL);
+Before: <p className="text-sm text-muted-foreground leading-relaxed">
+After:  <p className="text-sm text-muted-foreground leading-relaxed text-center">
 ```
 
----
+## Visual Result
+- Item names will be prominently centered
+- Tags/badges will appear centered below or inline with names
+- Descriptions will flow as centered paragraphs
+- Prices will be centered (standalone or after description)
+- Variants will display as centered pill groups
 
-### Complete Team List After Update
-
-| Team | League | Notes |
-|------|--------|-------|
-| Portland Trail Blazers | NBA | Existing |
-| **Portland Fire** | **WNBA** | **New - Inaugural 2026 Season** |
-| Portland Timbers | MLS | Existing |
-| Portland Thorns | NWSL | Existing |
-| Oregon Ducks | NCAA FB | Existing |
-| Oregon State Beavers | NCAA FB | Existing |
-
----
-
-### Files to Modify
-
-| File | Change |
-|------|--------|
-| `supabase/migrations/...` | Add WNBA to event_type enum |
-| `src/components/admin/EventForm.tsx` | Add WNBA to Zod schema + dropdowns |
-| `src/integrations/supabase/types.ts` | Auto-regenerated after migration |
-| `supabase/migrations/...` (team_schedules) | Include Portland Fire in seed data |
-
----
-
-### Implementation Note
-
-The Season Schedule Uploader component (from the previous plan) will automatically support WNBA/Portland Fire once:
-1. The WNBA enum value is added to the database
-2. Portland Fire is inserted into the team_schedules table
-
-This ensures the Portland Fire appears as a selectable team when uploading their inaugural 2026 season schedule.
-
+## Files Modified
+1. `src/components/MenuItemDisplay.tsx`
+2. `src/components/ModernMenuItem.tsx`
+3. `src/components/MenuItemCard.tsx`
+4. `src/components/MenuItemAccordion.tsx`
