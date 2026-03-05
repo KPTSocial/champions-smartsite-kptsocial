@@ -15,6 +15,7 @@ import MenuCategoryManager from './MenuCategoryManager';
 import MenuItemManager from './MenuItemManager';
 import MonthlySpecialsManager from './MonthlySpecialsManager';
 import MenuStats from './MenuStats';
+import MenuOverviewCards from './MenuOverviewCards';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { 
   LayoutGrid, 
@@ -33,7 +34,7 @@ const MenuDashboard: React.FC = () => {
       value: 'overview', 
       label: 'Overview', 
       icon: LayoutGrid,
-      content: <MenuStats />
+      content: <><MenuStats /><div className="mt-6"><MenuOverviewCards /></div></>
     },
     { 
       value: 'monthly-specials', 
