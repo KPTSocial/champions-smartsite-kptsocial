@@ -24,6 +24,7 @@ interface EventCalendarAdminProps {
   onEditEvent: (event: Event) => void;
   onDeleteEvent: (eventId: string) => void;
   onPublishEvent: (eventId: string) => void;
+  onBulkPublish?: (eventIds: string[]) => void;
   onCreateEvent: () => void;
   statusFilter?: string;
 }
@@ -35,12 +36,14 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
   onEditEvent, 
   onDeleteEvent, 
   onPublishEvent, 
+  onBulkPublish,
   onCreateEvent,
   statusFilter = 'all'
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
   const [filteredPage, setFilteredPage] = useState(1);
+  const [showBulkPublishConfirm, setShowBulkPublishConfirm] = useState(false);
 
   // Reset page when filter changes
   useEffect(() => {
@@ -287,6 +290,16 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
             <CardHeader className="pb-3">
               <CardTitle className="text-base capitalize flex items-center justify-between">
                 <span>{statusFilter} Events ({filteredStatusEvents.length})</span>
+                {statusFilter === 'draft' && filteredStatusEvents.length > 0 && onBulkPublish && (
+                  <Button
+                    size="sm"
+                    className="h-7 text-xs gap-1.5"
+                    onClick={() => setShowBulkPublishConfirm(true)}
+                  >
+                    <Eye className="h-3 w-3" />
+                    Publish All ({filteredStatusEvents.length})
+                  </Button>
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -422,6 +435,29 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete Event
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Publish Confirmation Dialog */}
+      <AlertDialog open={showBulkPublishConfirm} onOpenChange={setShowBulkPublishConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Publish All Draft Events</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will publish <strong>{filteredStatusEvents.length}</strong> draft events, making them visible on the public calendar. Are you sure you want to continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                onBulkPublish?.(filteredStatusEvents.map(e => e.id));
+                setShowBulkPublishConfirm(false);
+              }}
+            >
+              Publish All
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
