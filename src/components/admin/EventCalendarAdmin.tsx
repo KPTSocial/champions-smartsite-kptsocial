@@ -43,12 +43,22 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
   const [filteredPage, setFilteredPage] = useState(1);
-  const [showBulkPublishConfirm, setShowBulkPublishConfirm] = useState(false);
+  const [bulkPublishTeam, setBulkPublishTeam] = useState<string | null>(null);
 
   // Reset page when filter changes
   useEffect(() => {
     setFilteredPage(1);
   }, [statusFilter]);
+
+  // Known team keywords for grouping bulk publish
+  const TEAM_KEYWORDS = ['Timbers', 'Thorns', 'Blazers', 'Trail Blazers', 'Fire', 'World Cup', 'Ducks', 'Beavers', 'Pilots', 'Vikings'];
+
+  const detectTeam = (title: string): string | null => {
+    for (const team of TEAM_KEYWORDS) {
+      if (title.toLowerCase().includes(team.toLowerCase())) return team;
+    }
+    return null;
+  };
 
   // Check if we should show the filtered events list
   const showFilteredList = statusFilter === 'draft' || 
@@ -61,6 +71,20 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
         .filter(e => e.status === statusFilter)
         .sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime())
     : [];
+
+  // Group draft events by team for bulk publish buttons
+  const draftTeamGroups = statusFilter === 'draft'
+    ? filteredStatusEvents.reduce<Record<string, Event[]>>((acc, event) => {
+        const team = detectTeam(event.event_title);
+        if (team) {
+          if (!acc[team]) acc[team] = [];
+          acc[team].push(event);
+        }
+        return acc;
+      }, {})
+    : {};
+
+  const bulkPublishEvents = bulkPublishTeam ? (draftTeamGroups[bulkPublishTeam] || []) : [];
 
   const totalPages = Math.ceil(filteredStatusEvents.length / ITEMS_PER_PAGE);
   const paginatedEvents = filteredStatusEvents.slice(
@@ -288,19 +312,25 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
         {showFilteredList && (
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base capitalize flex items-center justify-between">
+              <CardTitle className="text-base capitalize flex items-center justify-between flex-wrap gap-2">
                 <span>{statusFilter} Events ({filteredStatusEvents.length})</span>
-                {statusFilter === 'draft' && filteredStatusEvents.length > 0 && onBulkPublish && (
-                  <Button
-                    size="sm"
-                    className="h-7 text-xs gap-1.5"
-                    onClick={() => setShowBulkPublishConfirm(true)}
-                  >
-                    <Eye className="h-3 w-3" />
-                    Publish All ({filteredStatusEvents.length})
-                  </Button>
-                )}
               </CardTitle>
+              {/* Per-team bulk publish buttons */}
+              {statusFilter === 'draft' && onBulkPublish && Object.keys(draftTeamGroups).length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {Object.entries(draftTeamGroups).map(([team, teamEvents]) => (
+                    <Button
+                      key={team}
+                      size="sm"
+                      className="h-7 text-xs gap-1.5"
+                      onClick={() => setBulkPublishTeam(team)}
+                    >
+                      <Eye className="h-3 w-3" />
+                      Publish All {team} ({teamEvents.length})
+                    </Button>
+                  ))}
+                </div>
+              )}
             </CardHeader>
             <CardContent className="space-y-3">
               {paginatedEvents.length === 0 ? (
@@ -441,23 +471,23 @@ const EventCalendarAdmin: React.FC<EventCalendarAdminProps> = ({
       </AlertDialog>
 
       {/* Bulk Publish Confirmation Dialog */}
-      <AlertDialog open={showBulkPublishConfirm} onOpenChange={setShowBulkPublishConfirm}>
+      <AlertDialog open={!!bulkPublishTeam} onOpenChange={() => setBulkPublishTeam(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Publish All Draft Events</AlertDialogTitle>
+            <AlertDialogTitle>Publish All {bulkPublishTeam} Events</AlertDialogTitle>
             <AlertDialogDescription>
-              This will publish <strong>{filteredStatusEvents.length}</strong> draft events, making them visible on the public calendar. Are you sure you want to continue?
+              This will publish <strong>{bulkPublishEvents.length}</strong> {bulkPublishTeam} draft events, making them visible on the public calendar. Are you sure you want to continue?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                onBulkPublish?.(filteredStatusEvents.map(e => e.id));
-                setShowBulkPublishConfirm(false);
+                onBulkPublish?.(bulkPublishEvents.map(e => e.id));
+                setBulkPublishTeam(null);
               }}
             >
-              Publish All
+              Publish All {bulkPublishTeam}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
