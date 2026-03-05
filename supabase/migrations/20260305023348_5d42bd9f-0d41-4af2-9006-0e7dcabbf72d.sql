@@ -1,0 +1,1 @@
+UPDATE homepage_content SET title = 'Seasonally Inspired Flavors', description = 'Fresh, seasonal ingredients and bold flavors—curated in-house and crafted with care, no matter the season.' WHERE section_name = 'farm_to_table';

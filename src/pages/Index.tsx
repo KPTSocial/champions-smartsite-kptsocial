@@ -157,12 +157,10 @@ const Index = () => {
                         />
                       )}
                       <h3 className="text-2xl font-serif font-semibold">
-                        {content.title === "Scratch-Made Goodness" ? "Seasonally Inspired Flavors" : content.title}
+                        {content.title}
                       </h3>
                       <p className="mt-2 text-muted-foreground">
-                        {content.title === "Scratch-Made Goodness"
-                          ? "Fresh, seasonal ingredients and bold flavors—curated in-house and crafted with care, no matter the season."
-                          : content.description}
+                        {content.description}
                       </p>
                     </div>
                   ),
