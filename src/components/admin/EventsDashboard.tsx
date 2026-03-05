@@ -121,6 +121,31 @@ const EventsDashboard: React.FC = () => {
     }
   };
 
+  const handleBulkPublish = async (eventIds: string[]) => {
+    try {
+      const { error } = await supabase
+        .from('events')
+        .update({ status: 'published' })
+        .in('id', eventIds);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Events published",
+        description: `${eventIds.length} events are now live on the public calendar.`,
+      });
+      
+      refetchEvents();
+    } catch (error) {
+      console.error('Error bulk publishing events:', error);
+      toast({
+        title: "Error",
+        description: "Failed to publish events. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-96">
@@ -184,6 +209,7 @@ const EventsDashboard: React.FC = () => {
           onEditEvent={handleEditEvent}
           onDeleteEvent={handleDeleteEvent}
           onPublishEvent={handlePublishEvent}
+          onBulkPublish={handleBulkPublish}
           onCreateEvent={handleCreateEvent}
           statusFilter={filters.status}
         />
