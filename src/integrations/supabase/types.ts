@@ -1029,6 +1029,7 @@ export type Database = {
           hero_subtitle: string | null
           hero_title: string | null
           id: number
+          main_menu_url: string | null
           monthly_specials_label: string | null
           monthly_specials_url: string | null
           specials_end_date: string | null
@@ -1041,6 +1042,7 @@ export type Database = {
           hero_subtitle?: string | null
           hero_title?: string | null
           id?: number
+          main_menu_url?: string | null
           monthly_specials_label?: string | null
           monthly_specials_url?: string | null
           specials_end_date?: string | null
@@ -1053,6 +1055,7 @@ export type Database = {
           hero_subtitle?: string | null
           hero_title?: string | null
           id?: number
+          main_menu_url?: string | null
           monthly_specials_label?: string | null
           monthly_specials_url?: string | null
           specials_end_date?: string | null

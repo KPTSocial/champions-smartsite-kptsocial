@@ -27,13 +27,13 @@ const Menu = () => {
     retry: false,
   });
 
-  // Fetch site settings for monthly specials filename
+  // Fetch site settings for menu download filenames
   const { data: siteSettings } = useQuery({
     queryKey: ['site-settings'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('site_settings')
-        .select('monthly_specials_url')
+        .select('monthly_specials_url, main_menu_url')
         .eq('id', 1)
         .single();
       if (error) throw error;
@@ -211,9 +211,10 @@ const Menu = () => {
                         {/* Download link for Main Menu */}
                         {section.id === 'db2f01ba-7cb1-4221-895d-a63855748272' && (
                           <MenuDownloadLink 
-                            fileName="champions-menu-fall-2025.pdf"
+                            fileName={(siteSettings as any)?.main_menu_url || 'champions-menu-fall-2025.pdf'}
                             downloadName="Champions-Main-Menu.pdf"
                             displayText="Download Main Menu"
+                            isLocalFile={!(siteSettings as any)?.main_menu_url}
                           />
                         )}
                         
