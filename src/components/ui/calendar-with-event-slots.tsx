@@ -72,12 +72,7 @@ export function CalendarWithEventSlots({
         return '11:00 AM - 10:00 PM PT';
       }
 
-      // Portland Thorns games are currently stored 3 hours ahead — adjust display only
-      const isThorns = eventTitle?.toLowerCase().includes('thorns') ?? false;
-      let date = new Date(eventDate);
-      if (isThorns) {
-        date = new Date(date.getTime() - 3 * 60 * 60 * 1000);
-      }
+      const date = new Date(eventDate);
       
       // Convert to Pacific Time and format with consistent AM/PM capitalization
       const timeStr = formatInTimeZone(date, 'America/Los_Angeles', 'h:mm a');
