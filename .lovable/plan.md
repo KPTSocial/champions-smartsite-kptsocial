@@ -1,80 +1,36 @@
 
-# Plan: Center Menu Item Titles and Descriptions
 
-## Overview
-Update all menu item components to center-align the item names (titles) and descriptions, creating a more elegant and traditional menu appearance per the owner's request.
+# Fix: Incorrect Thorns Game Times on Events Display
 
-## Components to Update
+## Problem
+Both `EventCalendarAdmin.tsx` (admin) and `calendar-with-event-slots.tsx` (public) contain a hardcoded hack that subtracts 3 hours from any event with "thorns" in the title. This was likely added when Thorns games were initially imported with incorrect UTC offsets, but the actual database times are now correct (as confirmed by the Edit Event form showing 7:00 PM).
 
-### 1. MenuItemDisplay.tsx
-The primary menu item component used in `EnhancedMenuCategorySection`.
+The hack causes Thorns games to display 3 hours early (e.g., 4:00 PM instead of 7:00 PM).
 
-**Changes:**
-- Center the item name heading with `text-center`
-- Center the tags/badges row using `justify-center`
-- Center the description text with `text-center`
-- Center the price display
-- Center variant rows
+## Fix
+Remove the Thorns-specific time adjustment from both `formatEventTime` functions. The `formatInTimeZone` call with `America/Los_Angeles` already correctly converts UTC to Pacific Time — no manual offset is needed.
 
-### 2. ModernMenuItem.tsx
-Used in `ModernMenuCategory` for an alternate layout.
+### Files to change
 
-**Changes:**
-- Center the item name heading with `text-center`
-- Center the tags section using `justify-center`
-- Center the description and inline price with `text-center`
-- Center variant pills using `justify-center`
+**1. `src/components/admin/EventCalendarAdmin.tsx` (lines 83-88)**
+Remove the `isThorns` check and 3-hour subtraction. Keep only the standard `formatInTimeZone` conversion.
 
-### 3. MenuItemCard.tsx
-Card-based layout component.
+**2. `src/components/ui/calendar-with-event-slots.tsx` (lines 75-80)**
+Same fix — remove the identical Thorns hack.
 
-**Changes:**
-- Center the card title content
-- Center the card description
-- Center the price display
-
-### 4. MenuItemAccordion.tsx
-Accordion-style layout component.
-
-**Changes:**
-- Center the accordion trigger content
-- Center the expanded description and price content
-
-## Technical Details
-
-### MenuItemDisplay Changes
-```text
-Before: <div className="flex items-start justify-between gap-4">
-After:  <div className="flex flex-col items-center text-center">
-
-Before: <h4 className="text-lg font-semibold...">
-After:  <h4 className="text-lg font-semibold... text-center">
-
-Before: <p className="text-base text-muted-foreground mt-2 leading-relaxed">
-After:  <p className="text-base text-muted-foreground mt-2 leading-relaxed text-center">
+Both functions will simplify to:
+```typescript
+const formatEventTime = (dateString: string, eventTitle?: string) => {
+  try {
+    if (eventTitle && eventTitle.toLowerCase().includes('taco tuesday')) {
+      return '11:00 AM - 10:00 PM PT';
+    }
+    const date = new Date(dateString);
+    const timeStr = formatInTimeZone(date, 'America/Los_Angeles', 'h:mm a');
+    return timeStr.toUpperCase() + ' PT';
+  } catch { return ''; }
+};
 ```
 
-### ModernMenuItem Changes
-```text
-Before: <h4 className="text-lg font-semibold text-foreground...">
-After:  <h4 className="text-lg font-semibold text-foreground... text-center">
+This ensures all sports events (Thorns, Timbers, Blazers, etc.) use the same consistent UTC-to-Pacific conversion with no special-case hacks.
 
-Before: <div className="flex flex-wrap gap-1.5 mt-2">
-After:  <div className="flex flex-wrap gap-1.5 mt-2 justify-center">
-
-Before: <p className="text-sm text-muted-foreground leading-relaxed">
-After:  <p className="text-sm text-muted-foreground leading-relaxed text-center">
-```
-
-## Visual Result
-- Item names will be prominently centered
-- Tags/badges will appear centered below or inline with names
-- Descriptions will flow as centered paragraphs
-- Prices will be centered (standalone or after description)
-- Variants will display as centered pill groups
-
-## Files Modified
-1. `src/components/MenuItemDisplay.tsx`
-2. `src/components/ModernMenuItem.tsx`
-3. `src/components/MenuItemCard.tsx`
-4. `src/components/MenuItemAccordion.tsx`
