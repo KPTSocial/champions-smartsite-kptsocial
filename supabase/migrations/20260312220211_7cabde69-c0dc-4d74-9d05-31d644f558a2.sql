@@ -1,0 +1,1 @@
+TRUNCATE guest_feedback;
