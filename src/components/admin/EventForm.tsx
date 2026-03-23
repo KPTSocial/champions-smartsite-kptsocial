@@ -89,6 +89,33 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
   const [duplicateOption, setDuplicateOption] = useState<'draft' | 'future-date'>('draft');
   const [duplicateDate, setDuplicateDate] = useState<Date | undefined>();
   const [showDuplicateConfirm, setShowDuplicateConfirm] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  const handleImageUpload = async (file: File) => {
+    setIsUploadingImage(true);
+    try {
+      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+      const fileName = `event-images/${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('photos')
+        .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('photos')
+        .getPublicUrl(fileName);
+
+      form.setValue('image_url', publicUrl, { shouldDirty: true });
+      toast({ title: 'Image uploaded', description: 'Event image uploaded successfully.' });
+    } catch (error) {
+      console.error('Image upload error:', error);
+      toast({ title: 'Upload failed', description: 'Failed to upload image. Please try again.', variant: 'destructive' });
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
 
   const form = useForm<EventFormData>({
     resolver: zodResolver(eventFormSchema),
