@@ -101,6 +101,15 @@ const HomepageCardsManager: React.FC = () => {
     }
   };
 
+  const handleRemoveImage = (section: string) => {
+    setEditedCards((prev) => ({
+      ...prev,
+      [section]: { ...prev[section], image_url: null },
+    }));
+    setIsDirty(true);
+    toast.success('Image removed — click Save to apply');
+  };
+
   const handleRestoreDefault = (section: string) => {
     const card = editedCards[section];
     if (!card?.default_image_url) {
