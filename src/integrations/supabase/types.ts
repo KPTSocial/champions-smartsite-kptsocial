@@ -672,6 +672,36 @@ export type Database = {
         }
         Relationships: []
       }
+      hero_badges: {
+        Row: {
+          created_at: string
+          end_date: string | null
+          has_end_date: boolean
+          id: string
+          image_url: string
+          is_active: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          end_date?: string | null
+          has_end_date?: boolean
+          id?: string
+          image_url: string
+          is_active?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string | null
+          has_end_date?: boolean
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       homepage_content: {
         Row: {
           alt_text: string | null
