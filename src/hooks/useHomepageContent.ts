@@ -7,6 +7,7 @@ export interface HomepageContentItem {
   title: string;
   description: string;
   image_url: string | null;
+  default_image_url: string | null;
   alt_text: string | null;
   is_active: boolean;
   sort_order: number;

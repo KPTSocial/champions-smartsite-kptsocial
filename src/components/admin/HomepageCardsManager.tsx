@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Loader2, Upload } from 'lucide-react';
+import { Loader2, Upload, Star, RotateCcw } from 'lucide-react';
 
 interface CardData {
   id: string;
@@ -15,6 +15,7 @@ interface CardData {
   title: string;
   description: string;
   image_url: string | null;
+  default_image_url: string | null;
   alt_text: string | null;
 }
 
@@ -74,6 +75,40 @@ const HomepageCardsManager: React.FC = () => {
     } finally {
       setUploadingSection(null);
     }
+  };
+
+  const handleSetAsDefault = async (section: string) => {
+    const card = editedCards[section];
+    if (!card?.image_url) {
+      toast.error('No image to set as default');
+      return;
+    }
+    try {
+      const { error } = await supabase
+        .from('homepage_content')
+        .update({ default_image_url: card.image_url })
+        .eq('id', card.id);
+      if (error) throw error;
+      setEditedCards((prev) => ({
+        ...prev,
+        [section]: { ...prev[section], default_image_url: card.image_url },
+      }));
+      queryClient.invalidateQueries({ queryKey: ['homepage-cards-admin'] });
+      queryClient.invalidateQueries({ queryKey: ['homepage-content'] });
+      toast.success('Default image saved');
+    } catch (err: any) {
+      toast.error('Failed to set default: ' + err.message);
+    }
+  };
+
+  const handleRestoreDefault = (section: string) => {
+    const card = editedCards[section];
+    if (!card?.default_image_url) {
+      toast.error('No default image to restore');
+      return;
+    }
+    updateField(section, 'image_url', card.default_image_url);
+    toast.success('Default image restored — click Save to apply');
   };
 
   const handleSave = async () => {
@@ -145,7 +180,7 @@ const HomepageCardsManager: React.FC = () => {
                 />
               </div>
               <div>
-                <Label>Image</Label>
+                <Label>Current Image</Label>
                 {card.image_url && (
                   <img
                     src={card.image_url}
@@ -153,7 +188,7 @@ const HomepageCardsManager: React.FC = () => {
                     className="w-full max-w-xs h-32 object-cover rounded-md border mb-2"
                   />
                 )}
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Button
                     variant="outline"
                     size="sm"
@@ -176,8 +211,39 @@ const HomepageCardsManager: React.FC = () => {
                     )}
                     Upload Image
                   </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleSetAsDefault(section)}
+                    disabled={!card.image_url}
+                  >
+                    <Star className="h-4 w-4 mr-1" />
+                    Set Current as Default
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleRestoreDefault(section)}
+                    disabled={!card.default_image_url}
+                  >
+                    <RotateCcw className="h-4 w-4 mr-1" />
+                    Restore Default Image
+                  </Button>
                 </div>
               </div>
+
+              {/* Default image preview */}
+              {card.default_image_url && (
+                <div>
+                  <Label className="text-xs text-muted-foreground">Default (fallback) image</Label>
+                  <img
+                    src={card.default_image_url}
+                    alt="Default fallback"
+                    className="w-full max-w-[160px] h-20 object-cover rounded-md border border-dashed mt-1 opacity-75"
+                  />
+                </div>
+              )}
+
               <div>
                 <Label htmlFor={`${section}-alt`}>Alt Text</Label>
                 <Input

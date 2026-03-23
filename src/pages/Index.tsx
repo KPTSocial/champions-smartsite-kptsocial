@@ -151,11 +151,17 @@ const Index = () => {
                     </div>
                   ) : (
                     <div key={content.id} className="text-center p-6 border border-border rounded-lg bg-card shadow-sm">
-                      {content.image_url && (
+                      {(content.image_url || content.default_image_url) && (
                         <img
-                          src={content.image_url}
+                          src={content.image_url || content.default_image_url || ''}
                           className="w-full h-48 object-cover rounded-md mb-4"
                           alt={content.alt_text || content.title}
+                          onError={(e) => {
+                            const img = e.currentTarget;
+                            if (content.default_image_url && img.src !== content.default_image_url) {
+                              img.src = content.default_image_url;
+                            }
+                          }}
                         />
                       )}
                       <h3 className="text-2xl font-serif font-semibold">
