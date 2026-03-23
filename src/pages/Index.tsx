@@ -34,6 +34,7 @@ const Index = () => {
         {/* Hero Section */}
         <section className="relative min-h-[100dvh] pt-20 md:pt-24 w-full flex items-center justify-center text-center text-white">
           <div className="absolute inset-0 bg-black/50 z-10"></div>
+          <HeroBadge />
 
           {/* Video or clean background */}
           {isHeaderLoading ? (

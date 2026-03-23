@@ -36,6 +36,12 @@ const SettingsDashboard: React.FC = () => {
       icon: Image,
       content: <HomepageCardsManager />,
     },
+    {
+      value: 'badge',
+      label: 'Hero Badge',
+      icon: Award,
+      content: <HeroBadgeManager />,
+    },
   ];
 
   return (
