@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Loader2, Upload, Star, RotateCcw } from 'lucide-react';
+import { Loader2, Upload, Star, RotateCcw, Trash2 } from 'lucide-react';
 
 interface CardData {
   id: string;
