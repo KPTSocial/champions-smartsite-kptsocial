@@ -232,6 +232,15 @@ const HomepageCardsManager: React.FC = () => {
                   <Button
                     variant="outline"
                     size="sm"
+                    onClick={() => handleRemoveImage(section)}
+                    disabled={!card.image_url}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Remove Image
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleRestoreDefault(section)}
                     disabled={!card.default_image_url}
                   >
