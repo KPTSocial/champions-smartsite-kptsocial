@@ -706,6 +706,7 @@ export type Database = {
         Row: {
           alt_text: string | null
           created_at: string
+          default_image_url: string | null
           description: string
           id: string
           image_url: string | null
@@ -718,6 +719,7 @@ export type Database = {
         Insert: {
           alt_text?: string | null
           created_at?: string
+          default_image_url?: string | null
           description: string
           id?: string
           image_url?: string | null
@@ -730,6 +732,7 @@ export type Database = {
         Update: {
           alt_text?: string | null
           created_at?: string
+          default_image_url?: string | null
           description?: string
           id?: string
           image_url?: string | null
