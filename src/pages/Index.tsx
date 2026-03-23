@@ -9,6 +9,7 @@ import { SpeakableSchema } from "@/components/seo/SpeakableSchema";
 import { FAQSchema } from "@/components/seo/FAQSchema";
 import { HOMEPAGE_FAQS, BUSINESS_DATA } from "@/lib/seo-constants";
 import HomepageAlertBanner from "@/components/HomepageAlertBanner";
+import HeroBadge from "@/components/HeroBadge";
 
 const Index = () => {
   const { data: headerMedia, isLoading: isHeaderLoading, error } = useHeaderMedia();
