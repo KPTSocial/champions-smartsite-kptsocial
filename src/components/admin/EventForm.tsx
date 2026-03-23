@@ -981,13 +981,46 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
               name="image_url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Image URL</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="https://example.com/image.jpg"
-                      {...field}
-                    />
-                  </FormControl>
+                  <FormLabel>Event Image</FormLabel>
+                  {field.value && (
+                    <div className="relative w-full h-40 rounded-lg overflow-hidden border">
+                      <img src={field.value} alt="Event" className="w-full h-full object-cover" />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 h-7 w-7"
+                        onClick={() => form.setValue('image_url', '', { shouldDirty: true })}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={isUploadingImage}
+                      className="gap-2 shrink-0"
+                      onClick={() => {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'image/*';
+                        input.onchange = (e) => {
+                          const file = (e.target as HTMLInputElement).files?.[0];
+                          if (file) handleImageUpload(file);
+                        };
+                        input.click();
+                      }}
+                    >
+                      {isUploadingImage ? <span className="animate-spin">⏳</span> : <Upload className="h-4 w-4" />}
+                      Upload Image
+                    </Button>
+                    <FormControl>
+                      <Input placeholder="Or paste image URL..." {...field} />
+                    </FormControl>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
