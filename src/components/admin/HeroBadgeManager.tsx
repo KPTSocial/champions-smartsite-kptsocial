@@ -80,9 +80,9 @@ const HeroBadgeManager: React.FC = () => {
 
     let error;
     if (badge) {
-      ({ error } = await supabase.from('hero_badges').update(payload).eq('id', badge.id));
+      ({ error } = await db.from('hero_badges').update(payload).eq('id', badge.id));
     } else {
-      ({ error } = await supabase.from('hero_badges').insert(payload));
+      ({ error } = await db.from('hero_badges').insert(payload));
     }
 
     if (error) {
