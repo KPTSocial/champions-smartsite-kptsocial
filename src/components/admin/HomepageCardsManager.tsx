@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Loader2, Upload, Star, RotateCcw } from 'lucide-react';
+import { Loader2, Upload, Star, RotateCcw, Trash2 } from 'lucide-react';
 
 interface CardData {
   id: string;
@@ -99,6 +99,15 @@ const HomepageCardsManager: React.FC = () => {
     } catch (err: any) {
       toast.error('Failed to set default: ' + err.message);
     }
+  };
+
+  const handleRemoveImage = (section: string) => {
+    setEditedCards((prev) => ({
+      ...prev,
+      [section]: { ...prev[section], image_url: null },
+    }));
+    setIsDirty(true);
+    toast.success('Image removed — click Save to apply');
   };
 
   const handleRestoreDefault = (section: string) => {
@@ -219,6 +228,15 @@ const HomepageCardsManager: React.FC = () => {
                   >
                     <Star className="h-4 w-4 mr-1" />
                     Set Current as Default
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleRemoveImage(section)}
+                    disabled={!card.image_url}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Remove Image
                   </Button>
                   <Button
                     variant="outline"
