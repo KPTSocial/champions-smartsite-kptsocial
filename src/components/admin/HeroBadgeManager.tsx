@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useHeroBadgeAdmin, HeroBadge } from '@/hooks/useHeroBadge';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+
+const db = supabase as any;
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -78,9 +80,9 @@ const HeroBadgeManager: React.FC = () => {
 
     let error;
     if (badge) {
-      ({ error } = await supabase.from('hero_badges').update(payload).eq('id', badge.id));
+      ({ error } = await db.from('hero_badges').update(payload).eq('id', badge.id));
     } else {
-      ({ error } = await supabase.from('hero_badges').insert(payload));
+      ({ error } = await db.from('hero_badges').insert(payload));
     }
 
     if (error) {
@@ -96,7 +98,7 @@ const HeroBadgeManager: React.FC = () => {
 
   const handleDelete = async () => {
     if (!badge) return;
-    const { error } = await supabase.from('hero_badges').delete().eq('id', badge.id);
+    const { error } = await db.from('hero_badges').delete().eq('id', badge.id);
     if (error) {
       toast.error('Failed to delete: ' + error.message);
     } else {

@@ -11,12 +11,15 @@ export interface HeroBadge {
   updated_at: string;
 }
 
+// Cast to any to work with tables not yet in generated types
+const db = supabase as any;
+
 export const useHeroBadge = () => {
   return useQuery({
     queryKey: ['hero-badge'],
     queryFn: async (): Promise<HeroBadge | null> => {
       const today = new Date().toISOString().split('T')[0];
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('hero_badges')
         .select('*')
         .eq('is_active', true)
@@ -35,7 +38,7 @@ export const useHeroBadgeAdmin = () => {
   return useQuery({
     queryKey: ['hero-badge-admin'],
     queryFn: async (): Promise<HeroBadge | null> => {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('hero_badges')
         .select('*')
         .order('created_at', { ascending: false })
