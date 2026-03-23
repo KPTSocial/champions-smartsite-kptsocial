@@ -98,7 +98,7 @@ const HeroBadgeManager: React.FC = () => {
 
   const handleDelete = async () => {
     if (!badge) return;
-    const { error } = await supabase.from('hero_badges').delete().eq('id', badge.id);
+    const { error } = await db.from('hero_badges').delete().eq('id', badge.id);
     if (error) {
       toast.error('Failed to delete: ' + error.message);
     } else {
