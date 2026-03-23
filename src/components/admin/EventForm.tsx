@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
-import { Calendar, Clock, MapPin, Save, Eye, ChevronDown, ChevronUp, Copy } from 'lucide-react';
+import { Calendar, Clock, MapPin, Save, Eye, ChevronDown, ChevronUp, Copy, Upload, X, ImageIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Event, createDuplicateEvent } from '@/services/eventService';
 import { useToast } from '@/hooks/use-toast';
@@ -89,6 +89,33 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
   const [duplicateOption, setDuplicateOption] = useState<'draft' | 'future-date'>('draft');
   const [duplicateDate, setDuplicateDate] = useState<Date | undefined>();
   const [showDuplicateConfirm, setShowDuplicateConfirm] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  const handleImageUpload = async (file: File) => {
+    setIsUploadingImage(true);
+    try {
+      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+      const fileName = `event-images/${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('photos')
+        .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('photos')
+        .getPublicUrl(fileName);
+
+      form.setValue('image_url', publicUrl, { shouldDirty: true });
+      toast({ title: 'Image uploaded', description: 'Event image uploaded successfully.' });
+    } catch (error) {
+      console.error('Image upload error:', error);
+      toast({ title: 'Upload failed', description: 'Failed to upload image. Please try again.', variant: 'destructive' });
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
 
   const form = useForm<EventFormData>({
     resolver: zodResolver(eventFormSchema),
@@ -435,10 +462,46 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
                   name="image_url"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Image URL</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://example.com/image.jpg" {...field} />
-                      </FormControl>
+                      <FormLabel>Event Image</FormLabel>
+                      {field.value && (
+                        <div className="relative w-full h-32 rounded-lg overflow-hidden border">
+                          <img src={field.value} alt="Event" className="w-full h-full object-cover" />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-1 right-1 h-6 w-6"
+                            onClick={() => form.setValue('image_url', '', { shouldDirty: true })}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      )}
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          disabled={isUploadingImage}
+                          className="gap-1"
+                          onClick={() => {
+                            const input = document.createElement('input');
+                            input.type = 'file';
+                            input.accept = 'image/*';
+                            input.onchange = (e) => {
+                              const file = (e.target as HTMLInputElement).files?.[0];
+                              if (file) handleImageUpload(file);
+                            };
+                            input.click();
+                          }}
+                        >
+                          {isUploadingImage ? <span className="animate-spin">⏳</span> : <Upload className="h-3 w-3" />}
+                          Upload
+                        </Button>
+                        <FormControl>
+                          <Input placeholder="Or paste image URL..." {...field} className="text-xs" />
+                        </FormControl>
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -918,13 +981,46 @@ const EventForm: React.FC<EventFormProps> = ({ event, onClose }) => {
               name="image_url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Image URL</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="https://example.com/image.jpg"
-                      {...field}
-                    />
-                  </FormControl>
+                  <FormLabel>Event Image</FormLabel>
+                  {field.value && (
+                    <div className="relative w-full h-40 rounded-lg overflow-hidden border">
+                      <img src={field.value} alt="Event" className="w-full h-full object-cover" />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 h-7 w-7"
+                        onClick={() => form.setValue('image_url', '', { shouldDirty: true })}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={isUploadingImage}
+                      className="gap-2 shrink-0"
+                      onClick={() => {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'image/*';
+                        input.onchange = (e) => {
+                          const file = (e.target as HTMLInputElement).files?.[0];
+                          if (file) handleImageUpload(file);
+                        };
+                        input.click();
+                      }}
+                    >
+                      {isUploadingImage ? <span className="animate-spin">⏳</span> : <Upload className="h-4 w-4" />}
+                      Upload Image
+                    </Button>
+                    <FormControl>
+                      <Input placeholder="Or paste image URL..." {...field} />
+                    </FormControl>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
