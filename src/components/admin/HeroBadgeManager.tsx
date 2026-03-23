@@ -130,7 +130,7 @@ const HeroBadgeManager: React.FC = () => {
           <Label>Badge Image</Label>
           {imageUrl ? (
             <div className="flex items-center gap-4">
-              <img src={imageUrl} alt="Badge preview" className="h-24 w-auto rounded border object-contain bg-gray-100 p-1" />
+              <img src={imageUrl} alt="Badge preview" className="h-24 w-auto rounded border object-contain bg-muted p-1" />
               <label className="cursor-pointer">
                 <Button variant="outline" size="sm" asChild>
                   <span><Upload className="h-4 w-4 mr-1" /> Replace</span>
