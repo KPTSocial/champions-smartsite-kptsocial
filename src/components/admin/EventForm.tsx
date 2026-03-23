@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
-import { Calendar, Clock, MapPin, Save, Eye, ChevronDown, ChevronUp, Copy } from 'lucide-react';
+import { Calendar, Clock, MapPin, Save, Eye, ChevronDown, ChevronUp, Copy, Upload, X, ImageIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Event, createDuplicateEvent } from '@/services/eventService';
 import { useToast } from '@/hooks/use-toast';
