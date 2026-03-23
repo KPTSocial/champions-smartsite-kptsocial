@@ -7,10 +7,11 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Clock, Home, Image } from 'lucide-react';
+import { Clock, Home, Image, Award } from 'lucide-react';
 import HoursOfOperationManager from './HoursOfOperationManager';
 import HomepageTextManager from './HomepageTextManager';
 import HomepageCardsManager from './HomepageCardsManager';
+import HeroBadgeManager from './HeroBadgeManager';
 
 const SettingsDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('hours');
@@ -34,6 +35,12 @@ const SettingsDashboard: React.FC = () => {
       label: 'Homepage Cards',
       icon: Image,
       content: <HomepageCardsManager />,
+    },
+    {
+      value: 'badge',
+      label: 'Hero Badge',
+      icon: Award,
+      content: <HeroBadgeManager />,
     },
   ];
 

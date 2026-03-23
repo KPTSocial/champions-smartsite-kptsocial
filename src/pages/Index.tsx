@@ -9,6 +9,7 @@ import { SpeakableSchema } from "@/components/seo/SpeakableSchema";
 import { FAQSchema } from "@/components/seo/FAQSchema";
 import { HOMEPAGE_FAQS, BUSINESS_DATA } from "@/lib/seo-constants";
 import HomepageAlertBanner from "@/components/HomepageAlertBanner";
+import HeroBadge from "@/components/HeroBadge";
 
 const Index = () => {
   const { data: headerMedia, isLoading: isHeaderLoading, error } = useHeaderMedia();
@@ -33,6 +34,7 @@ const Index = () => {
         {/* Hero Section */}
         <section className="relative min-h-[100dvh] pt-20 md:pt-24 w-full flex items-center justify-center text-center text-white">
           <div className="absolute inset-0 bg-black/50 z-10"></div>
+          <HeroBadge />
 
           {/* Video or clean background */}
           {isHeaderLoading ? (
