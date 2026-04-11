@@ -147,10 +147,10 @@ export default function PdfMenuUploadDialog({
     setEndDate(endOfMonth(new Date()));
   };
 
-  // Convert PDF page to base64 image
+  // Convert PDF page to base64 image (JPEG for smaller payload)
   const convertPdfPageToImage = async (pdf: any, pageNum: number): Promise<string> => {
     const page = await pdf.getPage(pageNum);
-    const viewport = page.getViewport({ scale: 2.0 });
+    const viewport = page.getViewport({ scale: 1.5 });
     
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
@@ -162,7 +162,7 @@ export default function PdfMenuUploadDialog({
       viewport: viewport
     }).promise;
     
-    return canvas.toDataURL('image/png');
+    return canvas.toDataURL('image/jpeg', 0.7);
   };
 
   const handleProcessFiles = async () => {
@@ -188,9 +188,22 @@ export default function PdfMenuUploadDialog({
           // Handle PDF files
           setUploadProgress(`Processing PDF ${fileIndex + 1} of ${files.length}...`);
           
-          pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs`;
-          const arrayBuffer = await file.arrayBuffer();
-          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          try {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+              'pdfjs-dist/build/pdf.worker.min.mjs',
+              import.meta.url
+            ).toString();
+          } catch {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs`;
+          }
+          
+          let pdf;
+          try {
+            const arrayBuffer = await file.arrayBuffer();
+            pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          } catch (pdfError) {
+            throw new Error(`Could not read "${file.name}". The PDF may be corrupted or password-protected. Try re-saving it or converting to JPEG.`);
+          }
           
           for (let i = 1; i <= pdf.numPages; i++) {
             setUploadProgress(`Converting PDF page ${i} of ${pdf.numPages}...`);
@@ -205,45 +218,72 @@ export default function PdfMenuUploadDialog({
         }
       }
 
+      // Send images in batches of 2 to avoid payload size limits
       setUploadProgress('Parsing menu items from images...');
+      const BATCH_SIZE = 2;
+      const allItems: ParsedMenuItem[] = [];
+      let firstDetectedMonth: string | null = null;
 
-      const { data: parseData, error: parseError } = await supabase.functions.invoke('parse-menu-pdf', {
-        body: { images: pageImages }
-      });
+      for (let i = 0; i < pageImages.length; i += BATCH_SIZE) {
+        const batch = pageImages.slice(i, i + BATCH_SIZE);
+        const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+        const totalBatches = Math.ceil(pageImages.length / BATCH_SIZE);
+        
+        if (totalBatches > 1) {
+          setUploadProgress(`Parsing batch ${batchNum} of ${totalBatches}...`);
+        }
 
-      if (parseError) throw parseError;
+        const { data: parseData, error: parseError } = await supabase.functions.invoke('parse-menu-pdf', {
+          body: { images: batch }
+        });
 
-      if (!parseData.items || parseData.items.length === 0) {
+        if (parseError) {
+          const errorMsg = parseError.message || '';
+          if (errorMsg.includes('413') || errorMsg.includes('payload') || errorMsg.includes('too large')) {
+            throw new Error('The file is too large to process. Try uploading a smaller PDF or fewer pages at a time.');
+          }
+          throw new Error(`Failed to parse menu (batch ${batchNum}): ${errorMsg}`);
+        }
+
+        if (parseData?.items) {
+          allItems.push(...parseData.items);
+        }
+        if (!firstDetectedMonth && parseData?.detected_month) {
+          firstDetectedMonth = parseData.detected_month;
+        }
+      }
+
+      if (allItems.length === 0) {
         toast({
           title: "No items found",
-          description: "Could not extract menu items. Please check the file format.",
+          description: "Could not extract menu items. The file may not contain readable menu text. Try uploading a clearer image or PDF.",
           variant: "destructive"
         });
         setProcessing(false);
         return;
       }
 
-      setParsedItems(parseData.items);
-      setEditedItems(parseData.items);
+      setParsedItems(allItems);
+      setEditedItems(allItems);
       
       // Store detected month from parser
-      if (parseData.detected_month) {
-        setDetectedMonth(parseData.detected_month);
-        console.log('Detected month from PDF:', parseData.detected_month);
+      if (firstDetectedMonth) {
+        setDetectedMonth(firstDetectedMonth);
+        console.log('Detected month from PDF:', firstDetectedMonth);
       }
       
       setStep('review');
       
       toast({
         title: "Files processed successfully",
-        description: `Found ${parseData.items.length} menu items${parseData.detected_month ? ` for ${parseData.detected_month}` : ''}`
+        description: `Found ${allItems.length} menu items${firstDetectedMonth ? ` for ${firstDetectedMonth}` : ''}`
       });
 
     } catch (error) {
       console.error('Error processing files:', error);
       toast({
         title: "Processing failed",
-        description: error instanceof Error ? error.message : "Could not process files",
+        description: error instanceof Error ? error.message : "Could not process files. Please try again with a different file format.",
         variant: "destructive"
       });
     } finally {

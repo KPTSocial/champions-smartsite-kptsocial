@@ -85,13 +85,13 @@ export default function MainMenuUploadWizard({ open, onOpenChange, onImportCompl
 
   const convertPdfPageToImage = async (pdf: any, pageNum: number): Promise<string> => {
     const page = await pdf.getPage(pageNum);
-    const viewport = page.getViewport({ scale: 2.0 });
+    const viewport = page.getViewport({ scale: 1.5 });
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     canvas.width = viewport.width;
     canvas.height = viewport.height;
     await page.render({ canvasContext: ctx, viewport }).promise;
-    return canvas.toDataURL('image/png');
+    return canvas.toDataURL('image/jpeg', 0.7);
   };
 
   const handleParse = async () => {
@@ -105,9 +105,23 @@ export default function MainMenuUploadWizard({ open, onOpenChange, onImportCompl
         const file = files[i];
         if (file.type === 'application/pdf') {
           setProgress(`Processing PDF ${i + 1}/${files.length}...`);
-          pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs`;
-          const buf = await file.arrayBuffer();
-          const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+          try {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+              'pdfjs-dist/build/pdf.worker.min.mjs',
+              import.meta.url
+            ).toString();
+          } catch {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs`;
+          }
+          
+          let pdf;
+          try {
+            const buf = await file.arrayBuffer();
+            pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+          } catch (pdfError) {
+            throw new Error(`Could not read "${file.name}". The PDF may be corrupted or password-protected. Try re-saving it or converting to JPEG.`);
+          }
+          
           for (let p = 1; p <= pdf.numPages; p++) {
             setProgress(`Converting page ${p}/${pdf.numPages}...`);
             pageImages.push(await convertPdfPageToImage(pdf, p));
@@ -118,21 +132,46 @@ export default function MainMenuUploadWizard({ open, onOpenChange, onImportCompl
         }
       }
 
+      // Send images in batches of 2 to avoid payload size limits
       setProgress('Parsing menu items...');
-      const { data: parseData, error: parseError } = await supabase.functions.invoke('parse-menu-pdf', {
-        body: { images: pageImages },
-      });
-      if (parseError) throw parseError;
+      const BATCH_SIZE = 2;
+      const allItems: ParsedItem[] = [];
 
-      if (!parseData.items || parseData.items.length === 0) {
-        toast({ title: 'No items found', description: 'Could not extract items from the file.', variant: 'destructive' });
+      for (let i = 0; i < pageImages.length; i += BATCH_SIZE) {
+        const batch = pageImages.slice(i, i + BATCH_SIZE);
+        const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+        const totalBatches = Math.ceil(pageImages.length / BATCH_SIZE);
+        
+        if (totalBatches > 1) {
+          setProgress(`Parsing batch ${batchNum} of ${totalBatches}...`);
+        }
+
+        const { data: parseData, error: parseError } = await supabase.functions.invoke('parse-menu-pdf', {
+          body: { images: batch },
+        });
+        
+        if (parseError) {
+          const errorMsg = parseError.message || '';
+          if (errorMsg.includes('413') || errorMsg.includes('payload') || errorMsg.includes('too large')) {
+            throw new Error('The file is too large to process. Try uploading a smaller PDF or fewer pages at a time.');
+          }
+          throw new Error(`Failed to parse menu (batch ${batchNum}): ${errorMsg}`);
+        }
+
+        if (parseData?.items) {
+          allItems.push(...parseData.items);
+        }
+      }
+
+      if (allItems.length === 0) {
+        toast({ title: 'No items found', description: 'Could not extract items from the file. Try uploading a clearer image or PDF.', variant: 'destructive' });
         setStep('upload');
         return;
       }
 
       // Group items by detected section
       const sectionMap = new Map<string, ParsedItem[]>();
-      for (const item of parseData.items) {
+      for (const item of allItems) {
         const sectionName = (item as any).section || 'Uncategorized';
         if (!sectionMap.has(sectionName)) sectionMap.set(sectionName, []);
         sectionMap.get(sectionName)!.push(item);
@@ -153,7 +192,7 @@ export default function MainMenuUploadWizard({ open, onOpenChange, onImportCompl
       setCurrentSectionIdx(0);
       setStep('review');
 
-      toast({ title: 'Parsing complete', description: `Found ${parseData.items.length} items in ${parsedSections.length} sections.` });
+      toast({ title: 'Parsing complete', description: `Found ${allItems.length} items in ${parsedSections.length} sections.` });
     } catch (err) {
       console.error(err);
       toast({ title: 'Parsing failed', description: err instanceof Error ? err.message : 'Unknown error', variant: 'destructive' });

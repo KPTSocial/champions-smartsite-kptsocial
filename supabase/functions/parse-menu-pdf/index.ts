@@ -58,6 +58,7 @@ For each menu item, extract:
 - description: Brief description of the item
 - price: Price as a number (without $ symbol)
 - tags: Array of dietary tags if mentioned (GF, V, VG, CF, DF, etc.)
+- section: The section header this item falls under (e.g., "Seasonal Cocktails", "Appetizers", "Entrees")
 
 Return ONLY a valid JSON object in this exact format:
 {
@@ -68,6 +69,7 @@ Return ONLY a valid JSON object in this exact format:
       "description": "Item description",
       "price": 14.99,
       "tags": ["GF", "V"],
+      "section": "Appetizers",
       "confidence": 0.95
     }
   ]
@@ -77,6 +79,7 @@ Rules:
 - Extract the month/year from the menu title if present (e.g., "January 2026", "February", etc.)
 - If no month is visible, set detected_month to null
 - Extract ALL menu items you can find on this page
+- For each item, identify the section header it belongs to (e.g., "Seasonal Cocktails", "Appetizers", "Entrees", "Desserts"). If no section header is visible, use "Uncategorized"
 - If no description is visible, use empty string ""
 - If price is unclear, use 0
 - Set confidence between 0-1 based on how clear the information is
