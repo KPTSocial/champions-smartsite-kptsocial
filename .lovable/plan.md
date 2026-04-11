@@ -1,52 +1,74 @@
 
 
-# Plan: Default Homepage Card Images
+# Plan: Fix PDF Menu Upload Errors
 
-## Overview
+## Problem
+Champions is getting a "format not correct" error when uploading a PDF of spring/summer cocktail items. The upload feature exists and accepts PDFs, but the processing pipeline has technical bottlenecks that cause failures.
 
-Add a `default_image_url` column to the `homepage_content` table so each card has a fallback image. The current images will be copied into this column as the initial defaults. On the frontend, if `image_url` fails to load, the `default_image_url` is used instead. Admins get a "Set as Default" button to save the current image as the default.
+## Root Causes
+1. **Oversized payloads** — PDF pages are rendered at 2x scale as uncompressed PNG base64 (~2-5MB per page). Multi-page PDFs exceed the Supabase Edge Function ~6MB request body limit.
+2. **No image compression** — `canvas.toDataURL('image/png')` produces the largest possible output.
+3. **pdfjs-dist worker version** — Hardcoded CDN URL `4.0.379` must exactly match the installed npm version or PDF rendering silently fails.
+4. **Vague error messages** — Users see generic "Could not process files" instead of actionable feedback.
 
-## Database
+## Changes
 
-### Migration: Add `default_image_url` column
+### 1. `src/components/admin/PdfMenuUploadDialog.tsx`
+- Change `convertPdfPageToImage` to use JPEG at 0.7 quality and scale 1.5 instead of PNG at scale 2.0
+- Add batch processing: send images to the edge function in groups of 2 pages, merge results client-side
+- Dynamically set the pdfjs worker URL from the installed package version
+- Add specific error messages for payload-too-large and PDF parsing failures
 
-```sql
-ALTER TABLE public.homepage_content
-ADD COLUMN default_image_url text;
+### 2. `src/components/admin/MainMenuUploadWizard.tsx`
+- Same compression fix: JPEG 0.7 quality, scale 1.5
+- Same batch processing logic (2 pages per request)
+- Same dynamic pdfjs worker version alignment
+- Same improved error messages
 
--- Copy current images as the initial defaults
-UPDATE public.homepage_content
-SET default_image_url = image_url
-WHERE image_url IS NOT NULL;
+### 3. `supabase/functions/parse-menu-pdf/index.ts`
+- Add `section` field to the OpenAI prompt so items are returned with their section header (e.g., "Seasonal Cocktails") — the MainMenuUploadWizard already expects this field but the prompt doesn't request it
+- No other changes needed
+
+## Technical Details
+
+**Image compression (both files):**
+```typescript
+// Before
+const viewport = page.getViewport({ scale: 2.0 });
+return canvas.toDataURL('image/png');
+
+// After
+const viewport = page.getViewport({ scale: 1.5 });
+return canvas.toDataURL('image/jpeg', 0.7);
 ```
 
-No new RLS needed — existing policies already cover this table.
+**Batch processing (both files):**
+```typescript
+const BATCH_SIZE = 2;
+const allItems = [];
+for (let i = 0; i < pageImages.length; i += BATCH_SIZE) {
+  const batch = pageImages.slice(i, i + BATCH_SIZE);
+  const { data } = await supabase.functions.invoke('parse-menu-pdf', {
+    body: { images: batch }
+  });
+  allItems.push(...(data?.items || []));
+}
+```
 
-## Files to Modify
-
-### 1. `src/components/admin/HomepageCardsManager.tsx`
-
-- Add `default_image_url` to the `CardData` interface
-- Add a "Set Current as Default" button next to "Upload Image" — saves the current `image_url` into `default_image_url`
-- Show the default image thumbnail with a label "Default (fallback) image" so admins can see what's set
-- Add a "Restore Default Image" button that copies `default_image_url` back into `image_url`
-- Include `default_image_url` in the save logic when "Set as Default" is clicked
-
-### 2. `src/pages/Index.tsx`
-
-- For the non-QR cards, use an `onError` handler on the `<img>` tag to swap to `content.default_image_url` if the primary `image_url` fails to load
-- If neither URL exists, hide the image entirely (current behavior)
-
-### 3. `src/hooks/useHomepageContent.ts`
-
-- Add `default_image_url: string | null` to the `HomepageContentItem` interface
+**Worker version fix:**
+```typescript
+import * as pdfjsLib from 'pdfjs-dist';
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url
+).toString();
+```
 
 ## Summary
 
-| Area | Change |
+| File | Change |
 |------|--------|
-| Database | Add `default_image_url` column, seed with current images |
-| `HomepageCardsManager.tsx` | "Set as Default" + "Restore Default" buttons, show default thumbnail |
-| `Index.tsx` | `onError` fallback to `default_image_url` |
-| `useHomepageContent.ts` | Add field to interface |
+| `PdfMenuUploadDialog.tsx` | JPEG compression, batching, worker fix, better errors |
+| `MainMenuUploadWizard.tsx` | Same fixes |
+| `parse-menu-pdf/index.ts` | Add `section` to prompt |
 
