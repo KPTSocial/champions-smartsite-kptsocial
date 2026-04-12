@@ -158,6 +158,10 @@ export default function MainMenuUploadWizard({ open, onOpenChange, onImportCompl
           throw new Error(`Failed to parse menu (batch ${batchNum}): ${errorMsg}`);
         }
 
+        if (parseData?.error) {
+          throw new Error(parseData.error);
+        }
+
         if (parseData?.items) {
           allItems.push(...parseData.items);
         }
