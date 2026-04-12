@@ -35,6 +35,13 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY is not configured');
     }
 
+    // Debug: log key prefix/suffix to confirm which key is active
+    console.log('OpenAI API Key info:', {
+      length: openAIApiKey.length,
+      prefix: openAIApiKey.substring(0, 7),
+      suffix: openAIApiKey.substring(openAIApiKey.length - 4),
+    });
+
     console.log(`Processing ${images.length} page image(s)`);
 
     // Collect all menu items from all pages
@@ -115,6 +122,27 @@ Rules:
         if (!response.ok) {
           const errorText = await response.text();
           console.error(`OpenAI API error on page ${pageNum + 1}:`, response.status, errorText);
+          
+          // For auth/quota errors, fail fast with a clear message
+          if (response.status === 429 || response.status === 401 || response.status === 403) {
+            let errorMessage = 'OpenAI API error';
+            try {
+              const errorJson = JSON.parse(errorText);
+              errorMessage = errorJson.error?.message || errorMessage;
+            } catch { /* use default */ }
+            
+            return new Response(
+              JSON.stringify({
+                error: errorMessage,
+                error_type: response.status === 429 ? 'quota_exceeded' : 'auth_error',
+                items: [],
+                total_items: 0,
+                parsing_notes: [errorMessage]
+              }),
+              { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+          
           continue; // Skip this page but continue with others
         }
 
