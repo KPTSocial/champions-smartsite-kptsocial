@@ -60,12 +60,15 @@ serve(async (req) => {
 
 IMPORTANT: First, look for any month or date information in the menu title/header (e.g., "January Specials", "February 2026 Menu", etc.). Extract this as "detected_month".
 
+CRITICAL ORDERING RULE: Return items in the EXACT visual top-to-bottom, left-to-right reading order they appear on the page. For multi-column layouts, finish the left column completely before moving to the right column. DO NOT sort alphabetically, by price, or group items in any other way. The order matters and will be used to display the menu.
+
 For each menu item, extract:
 - name: The dish/item name
 - description: Brief description of the item
 - price: Price as a number (without $ symbol)
 - tags: Array of dietary tags if mentioned (GF, V, VG, CF, DF, etc.)
 - section: The section header this item falls under (e.g., "Seasonal Cocktails", "Appetizers", "Entrees")
+- position_index: Zero-based integer indicating this item's position on the page in reading order (0 = first item on page, 1 = second, etc.)
 
 Return ONLY a valid JSON object in this exact format:
 {
@@ -77,6 +80,7 @@ Return ONLY a valid JSON object in this exact format:
       "price": 14.99,
       "tags": ["GF", "V"],
       "section": "Appetizers",
+      "position_index": 0,
       "confidence": 0.95
     }
   ]
@@ -85,8 +89,9 @@ Return ONLY a valid JSON object in this exact format:
 Rules:
 - Extract the month/year from the menu title if present (e.g., "January 2026", "February", etc.)
 - If no month is visible, set detected_month to null
-- Extract ALL menu items you can find on this page
-- For each item, identify the section header it belongs to (e.g., "Seasonal Cocktails", "Appetizers", "Entrees", "Desserts"). If no section header is visible, use "Uncategorized"
+- Extract ALL menu items in visual reading order
+- position_index must increment by 1 for each item, starting at 0
+- For each item, identify the section header it belongs to. If no section header is visible, use "Uncategorized"
 - If no description is visible, use empty string ""
 - If price is unclear, use 0
 - Set confidence between 0-1 based on how clear the information is
