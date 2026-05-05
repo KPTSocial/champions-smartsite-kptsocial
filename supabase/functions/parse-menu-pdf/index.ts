@@ -160,16 +160,23 @@ Rules:
         try {
           const cleanedContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
           const parsedData = JSON.parse(cleanedContent);
-          const pageItems: ParsedMenuItem[] = parsedData.items || [];
-          
+          const pageItems: any[] = parsedData.items || [];
+
+          // Tag each item with its page index within this batch and ensure position_index
+          const taggedItems = pageItems.map((item, idx) => ({
+            ...item,
+            page_index: pageNum,
+            position_index: typeof item.position_index === 'number' ? item.position_index : idx,
+          }));
+
           // Capture detected month from first page that has it
           if (!detectedMonth && parsedData.detected_month) {
             detectedMonth = parsedData.detected_month;
             console.log(`Detected month from PDF: ${detectedMonth}`);
           }
           
-          console.log(`Extracted ${pageItems.length} items from page ${pageNum + 1}`);
-          allItems.push(...pageItems);
+          console.log(`Extracted ${taggedItems.length} items from page ${pageNum + 1}`);
+          allItems.push(...taggedItems);
         } catch (parseError) {
           console.error(`Failed to parse OpenAI response for page ${pageNum + 1}:`, content);
         }
