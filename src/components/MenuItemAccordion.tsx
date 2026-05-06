@@ -2,7 +2,7 @@ import React from 'react';
 import { MenuItem } from '@/types/menu';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, hasPrice } from '@/lib/utils';
 import { Sparkles, Crown, Wheat, Leaf } from 'lucide-react';
 
 interface MenuItemAccordionProps {
