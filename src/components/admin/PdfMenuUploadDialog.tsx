@@ -33,6 +33,8 @@ interface ParsedMenuItem {
   price: number;
   tags: string[];
   confidence: number;
+  page_index?: number;
+  position_index?: number;
 }
 
 interface MenuCategory {
