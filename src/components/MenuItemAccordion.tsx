@@ -42,9 +42,9 @@ const MenuItemAccordion: React.FC<MenuItemAccordionProps> = ({ item }) => {
               </p>
             ))}
           </div>
-        ) : (
+        ) : hasPrice(item.price) ? (
           <p className="text-muted-foreground leading-relaxed mt-2 text-center">{formatCurrency(item.price)}</p>
-        )}
+        ) : null}
       </AccordionContent>
     </AccordionItem>
   );
