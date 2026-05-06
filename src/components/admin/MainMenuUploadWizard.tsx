@@ -279,7 +279,7 @@ export default function MainMenuUploadWizard({ open, onOpenChange, onImportCompl
           is_available: true,
           is_special: false,
           is_featured: false,
-          sort_order: idx,
+          sort_order: idx * 10,
         }));
 
         const { error } = await supabase
