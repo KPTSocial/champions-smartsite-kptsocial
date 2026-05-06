@@ -30,7 +30,9 @@ const MenuItemCard = ({ item }: { item: MenuItem }) => {
       </CardHeader>
       <CardContent className="flex-grow flex flex-col items-center">
         <CardDescription className="text-center">{item.description}</CardDescription>
-        <p className="text-sm text-muted-foreground mt-2 text-center">{formatCurrency(item.price)}</p>
+        {hasPrice(item.price) && (
+          <p className="text-sm text-muted-foreground mt-2 text-center">{formatCurrency(item.price)}</p>
+        )}
       </CardContent>
     </Card>
   );
