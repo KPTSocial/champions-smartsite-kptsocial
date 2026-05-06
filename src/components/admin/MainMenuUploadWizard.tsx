@@ -24,6 +24,8 @@ interface ParsedItem {
   price: number;
   tags: string[];
   confidence: number;
+  page_index?: number;
+  position_index?: number;
 }
 
 interface ParsedSection {
