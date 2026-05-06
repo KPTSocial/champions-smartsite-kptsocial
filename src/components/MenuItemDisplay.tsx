@@ -33,7 +33,7 @@ const MenuItemDisplay: React.FC<MenuItemDisplayProps> = ({ item }) => {
         </div>
         
         {/* Price - Centered */}
-        {!item.variants || item.variants.length === 0 ? (
+        {(!item.variants || item.variants.length === 0) && hasPrice(item.price) ? (
           <span className="text-base text-muted-foreground whitespace-nowrap mt-1">
             {formatCurrency(item.price)}
           </span>
