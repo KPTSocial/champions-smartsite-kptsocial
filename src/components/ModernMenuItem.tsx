@@ -14,9 +14,12 @@ const ModernMenuItem: React.FC<ModernMenuItemProps> = ({ item, sectionName }) =>
                   sectionName?.toLowerCase().includes('beverage') ||
                   sectionName?.toLowerCase().includes('bar');
 
+  const hasPrice = (price: number | null | undefined): boolean =>
+    price != null && price !== 0 && !Number.isNaN(price);
+
   const formatPrice = (price: number | null | undefined) => {
-    if (price == null) return '0';
-    return price.toFixed(2).replace(/\.?0+$/, '');
+    if (!hasPrice(price)) return '';
+    return (price as number).toFixed(2).replace(/\.?0+$/, '');
   };
 
   return (
