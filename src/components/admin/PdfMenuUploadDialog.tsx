@@ -9,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, CalendarIcon, Loader2, FileText, ImageIcon, AlertCircle, CheckCircle2, X, Check, ChevronsUpDown } from "lucide-react";
+import { Upload, CalendarIcon, Loader2, FileText, ImageIcon, AlertCircle, CheckCircle2, X, Check, ChevronsUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { format, addMonths, startOfMonth, endOfMonth } from "date-fns";
 import { cn } from "@/lib/utils";
