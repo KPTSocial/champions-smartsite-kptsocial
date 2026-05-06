@@ -856,9 +856,17 @@ export default function PdfMenuUploadDialog({
                         </div>
                       )}
                     </div>
-                    <Button variant="ghost" size="sm" onClick={() => removeItem(index)}>
-                      <X className="h-4 w-4" />
-                    </Button>
+                    <div className="flex flex-col gap-1 ml-2">
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => moveItem(index, -1)} disabled={index === 0} aria-label="Move up">
+                        <ArrowUp className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => moveItem(index, 1)} disabled={index === editedItems.length - 1} aria-label="Move down">
+                        <ArrowDown className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => removeItem(index)} aria-label="Remove">
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}
