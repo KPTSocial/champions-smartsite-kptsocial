@@ -371,7 +371,7 @@ export default function PdfMenuUploadDialog({
         is_available: markAsSpecial ? (startDate && startDate <= new Date()) : true,
         special_start_date: markAsSpecial && startDate ? format(startDate, 'yyyy-MM-dd') : null,
         special_end_date: markAsSpecial && endDate ? format(endDate, 'yyyy-MM-dd') : null,
-        sort_order: index
+        sort_order: index * 10
       }));
 
       // Handle import based on duplicate handling preference
