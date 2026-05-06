@@ -174,7 +174,7 @@ const MenuCategoryManager: React.FC = () => {
     } else {
       const categoriesInSection = categories?.filter(c => c.section_id === formData.section_id) || [];
       const maxSortOrder = Math.max(...categoriesInSection.map(c => c.sort_order), 0);
-      createMutation.mutate({ ...formData, sort_order: maxSortOrder + 1 });
+      createMutation.mutate({ ...formData, sort_order: maxSortOrder + 1, is_visible: true });
     }
   };
 
