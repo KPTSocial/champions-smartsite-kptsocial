@@ -143,7 +143,8 @@ export default function MainMenuUploadWizard({ open, onOpenChange, onImportCompl
         const batch = pageImages.slice(i, i + BATCH_SIZE);
         const batchNum = Math.floor(i / BATCH_SIZE) + 1;
         const totalBatches = Math.ceil(pageImages.length / BATCH_SIZE);
-        
+        const batchPageOffset = i;
+
         if (totalBatches > 1) {
           setProgress(`Parsing batch ${batchNum} of ${totalBatches}...`);
         }
@@ -165,9 +166,21 @@ export default function MainMenuUploadWizard({ open, onOpenChange, onImportCompl
         }
 
         if (parseData?.items) {
-          allItems.push(...parseData.items);
+          const offsetItems = parseData.items.map((item: ParsedItem) => ({
+            ...item,
+            page_index: (item.page_index ?? 0) + batchPageOffset,
+          }));
+          allItems.push(...offsetItems);
         }
       }
+
+      // Stable sort by absolute (page, position) before grouping
+      allItems.sort((a, b) => {
+        const pa = a.page_index ?? 0;
+        const pb = b.page_index ?? 0;
+        if (pa !== pb) return pa - pb;
+        return (a.position_index ?? 0) - (b.position_index ?? 0);
+      });
 
       if (allItems.length === 0) {
         toast({ title: 'No items found', description: 'Could not extract items from the file. Try uploading a clearer image or PDF.', variant: 'destructive' });
