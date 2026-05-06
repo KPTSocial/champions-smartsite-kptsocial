@@ -71,7 +71,7 @@ export default function PdfMenuUploadDialog({
   const [selectedCategory, setSelectedCategory] = useState<string>(defaultCategoryId || '');
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
-  const [clearExisting, setClearExisting] = useState(false);
+  const [clearExisting, setClearExisting] = useState(autoMarkAsSpecial);
   const [markFeatured, setMarkFeatured] = useState(false);
   const [markAsSpecial, setMarkAsSpecial] = useState(autoMarkAsSpecial);
   const [duplicateHandling, setDuplicateHandling] = useState<DuplicateHandling>('update');
