@@ -92,7 +92,9 @@ const ModernMenuItem: React.FC<ModernMenuItemProps> = ({ item, sectionName }) =>
                   className="flex items-center gap-2 text-sm bg-secondary/20 rounded-md px-3 py-1.5"
                 >
                   <span className="font-medium text-foreground">{variant.name}</span>
-                  <span className="text-muted-foreground">${formatPrice(variant.price)}</span>
+                  {hasPrice(variant.price) && (
+                    <span className="text-muted-foreground">${formatPrice(variant.price)}</span>
+                  )}
                 </div>
               ))}
             </div>
