@@ -494,7 +494,7 @@ export default function PdfMenuUploadDialog({
     setSelectedCategory(defaultCategoryId || '');
     setStartDate(undefined);
     setEndDate(undefined);
-    setClearExisting(false);
+    setClearExisting(autoMarkAsSpecial);
     setMarkFeatured(false);
     setMarkAsSpecial(autoMarkAsSpecial);
     setDuplicateHandling('update');
