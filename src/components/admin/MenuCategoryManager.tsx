@@ -21,6 +21,7 @@ interface MenuCategory {
   description: string | null;
   sort_order: number;
   section_id: string;
+  is_visible: boolean;
   section?: {
     name: string;
   };
