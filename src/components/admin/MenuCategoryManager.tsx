@@ -347,25 +347,46 @@ const MenuCategoryManager: React.FC = () => {
                               {...provided.draggableProps}
                               className={`transition-shadow ${
                                 snapshot.isDragging ? 'shadow-lg opacity-90' : ''
-                              }`}
+                              } ${!category.is_visible ? 'opacity-60 border-dashed' : ''}`}
                             >
                               <CardHeader className="py-3">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
+                                <div className="flex items-center justify-between gap-3">
+                                  <div className="flex items-center gap-2 min-w-0">
                                     <div
                                       {...provided.dragHandleProps}
                                       className="cursor-grab active:cursor-grabbing"
                                     >
                                       <GripVertical className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
                                     </div>
-                                    <div>
-                                      <CardTitle className="text-base">{category.name}</CardTitle>
+                                    <div className="min-w-0">
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <CardTitle className="text-base">{category.name}</CardTitle>
+                                        {!category.is_visible && (
+                                          <Badge variant="outline" className="border-amber-500 text-amber-600 gap-1">
+                                            <EyeOff className="h-3 w-3" /> Hidden from public
+                                          </Badge>
+                                        )}
+                                      </div>
                                       {category.description && (
                                         <CardDescription className="text-sm">{category.description}</CardDescription>
                                       )}
                                     </div>
                                   </div>
-                                  <div className="flex gap-2">
+                                  <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1.5 mr-1" title={category.is_visible ? 'Visible to public' : 'Hidden from public'}>
+                                      {category.is_visible ? (
+                                        <Eye className="h-3.5 w-3.5 text-muted-foreground" />
+                                      ) : (
+                                        <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
+                                      )}
+                                      <Switch
+                                        checked={category.is_visible}
+                                        onCheckedChange={(checked) =>
+                                          toggleVisibilityMutation.mutate({ id: category.id, is_visible: checked })
+                                        }
+                                        aria-label="Toggle category visibility"
+                                      />
+                                    </div>
                                     <Button
                                       variant="outline"
                                       size="sm"
