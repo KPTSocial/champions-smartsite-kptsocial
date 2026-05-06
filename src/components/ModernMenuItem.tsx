@@ -14,9 +14,12 @@ const ModernMenuItem: React.FC<ModernMenuItemProps> = ({ item, sectionName }) =>
                   sectionName?.toLowerCase().includes('beverage') ||
                   sectionName?.toLowerCase().includes('bar');
 
+  const hasPrice = (price: number | null | undefined): boolean =>
+    price != null && price !== 0 && !Number.isNaN(price);
+
   const formatPrice = (price: number | null | undefined) => {
-    if (price == null) return '0';
-    return price.toFixed(2).replace(/\.?0+$/, '');
+    if (!hasPrice(price)) return '';
+    return (price as number).toFixed(2).replace(/\.?0+$/, '');
   };
 
   return (
@@ -56,23 +59,27 @@ const ModernMenuItem: React.FC<ModernMenuItemProps> = ({ item, sectionName }) =>
           {item.description ? (
             <p className="text-sm text-muted-foreground leading-relaxed text-center">
               {item.description}
-              {/* Only show price after description if no variants */}
-              {(!item.variants || item.variants.length === 0) && (
-              <span className="ml-2 text-muted-foreground">
-                ${formatPrice(item.price)}
-              </span>
+              {/* Only show price after description if no variants and price exists */}
+              {(!item.variants || item.variants.length === 0) && hasPrice(item.price) && (
+                <span className="ml-2 text-muted-foreground">
+                  ${formatPrice(item.price)}
+                </span>
               )}
             </p>
           ) : (
-            /* No description - show price standalone */
+            /* No description - show price standalone if available */
             (!item.variants || item.variants.length === 0) ? (
-              <span className="text-sm text-muted-foreground">
-                ${formatPrice(item.price)}
-              </span>
+              hasPrice(item.price) ? (
+                <span className="text-sm text-muted-foreground">
+                  ${formatPrice(item.price)}
+                </span>
+              ) : null
             ) : (
-              <span className="text-sm text-muted-foreground">
-                ${formatPrice(Math.min(...item.variants.map(v => v.price)))}
-              </span>
+              hasPrice(Math.min(...item.variants.map(v => v.price))) ? (
+                <span className="text-sm text-muted-foreground">
+                  ${formatPrice(Math.min(...item.variants.map(v => v.price)))}
+                </span>
+              ) : null
             )
           )}
 
@@ -85,7 +92,9 @@ const ModernMenuItem: React.FC<ModernMenuItemProps> = ({ item, sectionName }) =>
                   className="flex items-center gap-2 text-sm bg-secondary/20 rounded-md px-3 py-1.5"
                 >
                   <span className="font-medium text-foreground">{variant.name}</span>
-                  <span className="text-muted-foreground">${formatPrice(variant.price)}</span>
+                  {hasPrice(variant.price) && (
+                    <span className="text-muted-foreground">${formatPrice(variant.price)}</span>
+                  )}
                 </div>
               ))}
             </div>

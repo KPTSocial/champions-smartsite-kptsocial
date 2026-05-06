@@ -1,7 +1,7 @@
 import React from 'react';
 import { MenuItem } from '@/types/menu';
 import { Badge } from '@/components/ui/badge';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, hasPrice } from '@/lib/utils';
 import { Sparkles, Crown, Wheat, Leaf } from 'lucide-react';
 
 interface MenuItemDisplayProps {
@@ -33,7 +33,7 @@ const MenuItemDisplay: React.FC<MenuItemDisplayProps> = ({ item }) => {
         </div>
         
         {/* Price - Centered */}
-        {!item.variants || item.variants.length === 0 ? (
+        {(!item.variants || item.variants.length === 0) && hasPrice(item.price) ? (
           <span className="text-base text-muted-foreground whitespace-nowrap mt-1">
             {formatCurrency(item.price)}
           </span>

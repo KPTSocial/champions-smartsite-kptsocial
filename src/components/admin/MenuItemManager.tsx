@@ -366,6 +366,11 @@ const MenuItemManager: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     placeholder="12.99"
                   />
+                  {(!formData.price || parseFloat(formData.price) === 0) && (
+                    <p className="text-xs text-amber-600 mt-1">
+                      ⚠️ No price entered — this item will display with no price on the public site.
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -583,8 +588,12 @@ const MenuItemManager: React.FC = () => {
                                     <div className="flex-1">
                                       <div className="flex items-center gap-2 mb-2 flex-wrap">
                                         <CardTitle className="text-lg">{item.name}</CardTitle>
-                                        {item.price && (
+                                        {item.price ? (
                                           <Badge variant="secondary">${item.price}</Badge>
+                                        ) : (
+                                          <Badge variant="outline" className="border-amber-500 text-amber-600">
+                                            No price (hidden publicly)
+                                          </Badge>
                                         )}
                                         {item.is_featured && (
                                           <Badge variant="default">
