@@ -2,7 +2,7 @@
 import { MenuItem } from '@/types/menu';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, hasPrice } from '@/lib/utils';
 import { Sparkles, Crown, Wheat, Leaf } from 'lucide-react';
 
 const MenuItemCard = ({ item }: { item: MenuItem }) => {
