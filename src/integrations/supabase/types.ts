@@ -924,18 +924,21 @@ export type Database = {
         Row: {
           description: string | null
           id: string
+          is_visible: boolean
           name: string
           sort_order: number
         }
         Insert: {
           description?: string | null
           id?: string
+          is_visible?: boolean
           name: string
           sort_order: number
         }
         Update: {
           description?: string | null
           id?: string
+          is_visible?: boolean
           name?: string
           sort_order?: number
         }

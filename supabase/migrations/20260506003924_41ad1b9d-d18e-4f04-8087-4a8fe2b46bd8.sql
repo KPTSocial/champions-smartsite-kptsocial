@@ -1,0 +1,1 @@
+ALTER TABLE public.menu_sections ADD COLUMN IF NOT EXISTS is_visible boolean NOT NULL DEFAULT true;
