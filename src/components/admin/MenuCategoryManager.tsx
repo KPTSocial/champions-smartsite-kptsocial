@@ -8,7 +8,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Edit, Trash2, GripVertical } from 'lucide-react';
+import { Plus, Edit, Trash2, GripVertical, Eye, EyeOff } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
@@ -19,6 +21,7 @@ interface MenuCategory {
   description: string | null;
   sort_order: number;
   section_id: string;
+  is_visible: boolean;
   section?: {
     name: string;
   };
@@ -158,6 +161,25 @@ const MenuCategoryManager: React.FC = () => {
     }
   });
 
+  const toggleVisibilityMutation = useMutation({
+    mutationFn: async ({ id, is_visible }: { id: string; is_visible: boolean }) => {
+      const { error } = await supabase
+        .from('menu_categories')
+        .update({ is_visible })
+        .eq('id', id);
+      if (error) throw error;
+      return { id, is_visible };
+    },
+    onSuccess: ({ is_visible }) => {
+      queryClient.invalidateQueries({ queryKey: ['menu-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['menuData'] });
+      toast.success(is_visible ? 'Category is now visible to the public' : 'Category hidden from public site');
+    },
+    onError: (error: any) => {
+      toast.error(`Error updating visibility: ${error.message}`);
+    }
+  });
+
   const resetForm = () => {
     setFormData({ name: '', description: '', section_id: '', sort_order: 0 });
     setEditingCategory(null);
@@ -171,7 +193,7 @@ const MenuCategoryManager: React.FC = () => {
     } else {
       const categoriesInSection = categories?.filter(c => c.section_id === formData.section_id) || [];
       const maxSortOrder = Math.max(...categoriesInSection.map(c => c.sort_order), 0);
-      createMutation.mutate({ ...formData, sort_order: maxSortOrder + 1 });
+      createMutation.mutate({ ...formData, sort_order: maxSortOrder + 1, is_visible: true });
     }
   };
 
@@ -325,25 +347,46 @@ const MenuCategoryManager: React.FC = () => {
                               {...provided.draggableProps}
                               className={`transition-shadow ${
                                 snapshot.isDragging ? 'shadow-lg opacity-90' : ''
-                              }`}
+                              } ${!category.is_visible ? 'opacity-60 border-dashed' : ''}`}
                             >
                               <CardHeader className="py-3">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
+                                <div className="flex items-center justify-between gap-3">
+                                  <div className="flex items-center gap-2 min-w-0">
                                     <div
                                       {...provided.dragHandleProps}
                                       className="cursor-grab active:cursor-grabbing"
                                     >
                                       <GripVertical className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
                                     </div>
-                                    <div>
-                                      <CardTitle className="text-base">{category.name}</CardTitle>
+                                    <div className="min-w-0">
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <CardTitle className="text-base">{category.name}</CardTitle>
+                                        {!category.is_visible && (
+                                          <Badge variant="outline" className="border-amber-500 text-amber-600 gap-1">
+                                            <EyeOff className="h-3 w-3" /> Hidden from public
+                                          </Badge>
+                                        )}
+                                      </div>
                                       {category.description && (
                                         <CardDescription className="text-sm">{category.description}</CardDescription>
                                       )}
                                     </div>
                                   </div>
-                                  <div className="flex gap-2">
+                                  <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1.5 mr-1" title={category.is_visible ? 'Visible to public' : 'Hidden from public'}>
+                                      {category.is_visible ? (
+                                        <Eye className="h-3.5 w-3.5 text-muted-foreground" />
+                                      ) : (
+                                        <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
+                                      )}
+                                      <Switch
+                                        checked={category.is_visible}
+                                        onCheckedChange={(checked) =>
+                                          toggleVisibilityMutation.mutate({ id: category.id, is_visible: checked })
+                                        }
+                                        aria-label="Toggle category visibility"
+                                      />
+                                    </div>
                                     <Button
                                       variant="outline"
                                       size="sm"
