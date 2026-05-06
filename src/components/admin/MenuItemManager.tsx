@@ -366,6 +366,11 @@ const MenuItemManager: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     placeholder="12.99"
                   />
+                  {(!formData.price || parseFloat(formData.price) === 0) && (
+                    <p className="text-xs text-amber-600 mt-1">
+                      ⚠️ No price entered — this item will display with no price on the public site.
+                    </p>
+                  )}
                 </div>
               </div>
 
