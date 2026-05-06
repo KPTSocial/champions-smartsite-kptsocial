@@ -509,6 +509,14 @@ export default function PdfMenuUploadDialog({
     setEditedItems(editedItems.filter((_, i) => i !== index));
   };
 
+  const moveItem = (index: number, direction: -1 | 1) => {
+    const target = index + direction;
+    if (target < 0 || target >= editedItems.length) return;
+    const next = [...editedItems];
+    [next[index], next[target]] = [next[target], next[index]];
+    setEditedItems(next);
+  };
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
