@@ -1,13 +1,15 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Edit, Trash2, GripVertical } from 'lucide-react';
+import { Plus, Edit, Trash2, GripVertical, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
@@ -16,6 +18,7 @@ interface MenuSection {
   name: string;
   description: string | null;
   sort_order: number;
+  is_visible: boolean;
 }
 
 const MenuSectionManager: React.FC = () => {
@@ -36,11 +39,16 @@ const MenuSectionManager: React.FC = () => {
         .from('menu_sections')
         .select('*')
         .order('sort_order');
-      
+
       if (error) throw error;
       return data as MenuSection[];
     }
   });
+
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ['menu-sections'] });
+    queryClient.invalidateQueries({ queryKey: ['menuData'] });
+  };
 
   const createMutation = useMutation({
     mutationFn: async (newSection: Omit<MenuSection, 'id'>) => {
@@ -49,20 +57,16 @@ const MenuSectionManager: React.FC = () => {
         .insert(newSection)
         .select()
         .single();
-      
       if (error) throw error;
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['menu-sections'] });
-      queryClient.invalidateQueries({ queryKey: ['menuData'] });
+      invalidate();
       toast.success('Section created successfully');
       setIsDialogOpen(false);
       resetForm();
     },
-    onError: (error: any) => {
-      toast.error(`Error creating section: ${error.message}`);
-    }
+    onError: (error: any) => toast.error(`Error creating section: ${error.message}`)
   });
 
   const updateMutation = useMutation({
@@ -73,39 +77,44 @@ const MenuSectionManager: React.FC = () => {
         .eq('id', id)
         .select()
         .single();
-      
       if (error) throw error;
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['menu-sections'] });
-      queryClient.invalidateQueries({ queryKey: ['menuData'] });
+      invalidate();
       toast.success('Section updated successfully');
       setIsDialogOpen(false);
       resetForm();
     },
-    onError: (error: any) => {
-      toast.error(`Error updating section: ${error.message}`);
-    }
+    onError: (error: any) => toast.error(`Error updating section: ${error.message}`)
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('menu_sections')
-        .delete()
-        .eq('id', id);
-      
+      const { error } = await supabase.from('menu_sections').delete().eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['menu-sections'] });
-      queryClient.invalidateQueries({ queryKey: ['menuData'] });
+      invalidate();
       toast.success('Section deleted successfully');
     },
-    onError: (error: any) => {
-      toast.error(`Error deleting section: ${error.message}`);
-    }
+    onError: (error: any) => toast.error(`Error deleting section: ${error.message}`)
+  });
+
+  const toggleVisibilityMutation = useMutation({
+    mutationFn: async ({ id, is_visible }: { id: string; is_visible: boolean }) => {
+      const { error } = await supabase
+        .from('menu_sections')
+        .update({ is_visible })
+        .eq('id', id);
+      if (error) throw error;
+      return { id, is_visible };
+    },
+    onSuccess: ({ is_visible }) => {
+      invalidate();
+      toast.success(is_visible ? 'Section is now visible to the public' : 'Section hidden from public site');
+    },
+    onError: (error: any) => toast.error(`Error updating visibility: ${error.message}`)
   });
 
   const resetForm = () => {
@@ -115,12 +124,11 @@ const MenuSectionManager: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (editingSection) {
       updateMutation.mutate({ ...formData, id: editingSection.id });
     } else {
       const maxSortOrder = Math.max(...(sections?.map(s => s.sort_order) || [0]));
-      createMutation.mutate({ ...formData, sort_order: maxSortOrder + 1 });
+      createMutation.mutate({ ...formData, sort_order: maxSortOrder + 1, is_visible: true });
     }
   };
 
@@ -206,19 +214,46 @@ const MenuSectionManager: React.FC = () => {
 
       <div className="grid gap-4">
         {sections?.map((section) => (
-          <Card key={section.id}>
+          <Card
+            key={section.id}
+            className={!section.is_visible ? 'opacity-60 border-dashed' : ''}
+          >
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <GripVertical className="h-4 w-4 text-gray-400" />
-                  <div>
-                    <CardTitle className="text-lg">{section.name}</CardTitle>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <GripVertical className="h-4 w-4 text-muted-foreground" />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <CardTitle className="text-lg">{section.name}</CardTitle>
+                      {!section.is_visible && (
+                        <Badge variant="outline" className="border-amber-500 text-amber-600 gap-1">
+                          <EyeOff className="h-3 w-3" /> Hidden from public
+                        </Badge>
+                      )}
+                    </div>
                     {section.description && (
                       <CardDescription>{section.description}</CardDescription>
                     )}
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
+                  <div
+                    className="flex items-center gap-1.5 mr-1"
+                    title={section.is_visible ? 'Visible to public' : 'Hidden from public'}
+                  >
+                    {section.is_visible ? (
+                      <Eye className="h-3.5 w-3.5 text-muted-foreground" />
+                    ) : (
+                      <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />
+                    )}
+                    <Switch
+                      checked={section.is_visible}
+                      onCheckedChange={(checked) =>
+                        toggleVisibilityMutation.mutate({ id: section.id, is_visible: checked })
+                      }
+                      aria-label="Toggle section visibility"
+                    />
+                  </div>
                   <Button
                     variant="outline"
                     size="sm"
@@ -230,7 +265,7 @@ const MenuSectionManager: React.FC = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleDelete(section.id)}
-                    className="text-red-600 hover:text-red-700"
+                    className="text-destructive hover:text-destructive"
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
