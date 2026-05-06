@@ -230,7 +230,8 @@ export default function PdfMenuUploadDialog({
         const batch = pageImages.slice(i, i + BATCH_SIZE);
         const batchNum = Math.floor(i / BATCH_SIZE) + 1;
         const totalBatches = Math.ceil(pageImages.length / BATCH_SIZE);
-        
+        const batchPageOffset = i; // absolute starting page index for this batch
+
         if (totalBatches > 1) {
           setUploadProgress(`Parsing batch ${batchNum} of ${totalBatches}...`);
         }
@@ -252,12 +253,25 @@ export default function PdfMenuUploadDialog({
         }
 
         if (parseData?.items) {
-          allItems.push(...parseData.items);
+          // Offset page_index so it's absolute across batches
+          const offsetItems = parseData.items.map((item: ParsedMenuItem) => ({
+            ...item,
+            page_index: (item.page_index ?? 0) + batchPageOffset,
+          }));
+          allItems.push(...offsetItems);
         }
         if (!firstDetectedMonth && parseData?.detected_month) {
           firstDetectedMonth = parseData.detected_month;
         }
       }
+
+      // Stable-sort by (page_index, position_index) so batch boundaries don't reshuffle
+      allItems.sort((a, b) => {
+        const pa = a.page_index ?? 0;
+        const pb = b.page_index ?? 0;
+        if (pa !== pb) return pa - pb;
+        return (a.position_index ?? 0) - (b.position_index ?? 0);
+      });
 
       if (allItems.length === 0) {
         toast({
