@@ -9,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload, CalendarIcon, Loader2, FileText, ImageIcon, AlertCircle, CheckCircle2, X, Check, ChevronsUpDown } from "lucide-react";
+import { Upload, CalendarIcon, Loader2, FileText, ImageIcon, AlertCircle, CheckCircle2, X, Check, ChevronsUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { format, addMonths, startOfMonth, endOfMonth } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -33,6 +33,8 @@ interface ParsedMenuItem {
   price: number;
   tags: string[];
   confidence: number;
+  page_index?: number;
+  position_index?: number;
 }
 
 interface MenuCategory {
@@ -69,7 +71,7 @@ export default function PdfMenuUploadDialog({
   const [selectedCategory, setSelectedCategory] = useState<string>(defaultCategoryId || '');
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
-  const [clearExisting, setClearExisting] = useState(false);
+  const [clearExisting, setClearExisting] = useState(autoMarkAsSpecial);
   const [markFeatured, setMarkFeatured] = useState(false);
   const [markAsSpecial, setMarkAsSpecial] = useState(autoMarkAsSpecial);
   const [duplicateHandling, setDuplicateHandling] = useState<DuplicateHandling>('update');
@@ -228,7 +230,8 @@ export default function PdfMenuUploadDialog({
         const batch = pageImages.slice(i, i + BATCH_SIZE);
         const batchNum = Math.floor(i / BATCH_SIZE) + 1;
         const totalBatches = Math.ceil(pageImages.length / BATCH_SIZE);
-        
+        const batchPageOffset = i; // absolute starting page index for this batch
+
         if (totalBatches > 1) {
           setUploadProgress(`Parsing batch ${batchNum} of ${totalBatches}...`);
         }
@@ -250,12 +253,25 @@ export default function PdfMenuUploadDialog({
         }
 
         if (parseData?.items) {
-          allItems.push(...parseData.items);
+          // Offset page_index so it's absolute across batches
+          const offsetItems = parseData.items.map((item: ParsedMenuItem) => ({
+            ...item,
+            page_index: (item.page_index ?? 0) + batchPageOffset,
+          }));
+          allItems.push(...offsetItems);
         }
         if (!firstDetectedMonth && parseData?.detected_month) {
           firstDetectedMonth = parseData.detected_month;
         }
       }
+
+      // Stable-sort by (page_index, position_index) so batch boundaries don't reshuffle
+      allItems.sort((a, b) => {
+        const pa = a.page_index ?? 0;
+        const pb = b.page_index ?? 0;
+        if (pa !== pb) return pa - pb;
+        return (a.position_index ?? 0) - (b.position_index ?? 0);
+      });
 
       if (allItems.length === 0) {
         toast({
@@ -355,7 +371,7 @@ export default function PdfMenuUploadDialog({
         is_available: markAsSpecial ? (startDate && startDate <= new Date()) : true,
         special_start_date: markAsSpecial && startDate ? format(startDate, 'yyyy-MM-dd') : null,
         special_end_date: markAsSpecial && endDate ? format(endDate, 'yyyy-MM-dd') : null,
-        sort_order: index
+        sort_order: index * 10
       }));
 
       // Handle import based on duplicate handling preference
@@ -478,7 +494,7 @@ export default function PdfMenuUploadDialog({
     setSelectedCategory(defaultCategoryId || '');
     setStartDate(undefined);
     setEndDate(undefined);
-    setClearExisting(false);
+    setClearExisting(autoMarkAsSpecial);
     setMarkFeatured(false);
     setMarkAsSpecial(autoMarkAsSpecial);
     setDuplicateHandling('update');
@@ -491,6 +507,14 @@ export default function PdfMenuUploadDialog({
 
   const removeItem = (index: number) => {
     setEditedItems(editedItems.filter((_, i) => i !== index));
+  };
+
+  const moveItem = (index: number, direction: -1 | 1) => {
+    const target = index + direction;
+    if (target < 0 || target >= editedItems.length) return;
+    const next = [...editedItems];
+    [next[index], next[target]] = [next[target], next[index]];
+    setEditedItems(next);
   };
 
   return (
@@ -832,9 +856,17 @@ export default function PdfMenuUploadDialog({
                         </div>
                       )}
                     </div>
-                    <Button variant="ghost" size="sm" onClick={() => removeItem(index)}>
-                      <X className="h-4 w-4" />
-                    </Button>
+                    <div className="flex flex-col gap-1 ml-2">
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => moveItem(index, -1)} disabled={index === 0} aria-label="Move up">
+                        <ArrowUp className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => moveItem(index, 1)} disabled={index === editedItems.length - 1} aria-label="Move down">
+                        <ArrowDown className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => removeItem(index)} aria-label="Remove">
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}
