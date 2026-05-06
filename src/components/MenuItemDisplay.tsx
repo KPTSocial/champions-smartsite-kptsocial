@@ -1,7 +1,7 @@
 import React from 'react';
 import { MenuItem } from '@/types/menu';
 import { Badge } from '@/components/ui/badge';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, hasPrice } from '@/lib/utils';
 import { Sparkles, Crown, Wheat, Leaf } from 'lucide-react';
 
 interface MenuItemDisplayProps {
