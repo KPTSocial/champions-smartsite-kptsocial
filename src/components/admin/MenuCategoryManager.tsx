@@ -161,6 +161,25 @@ const MenuCategoryManager: React.FC = () => {
     }
   });
 
+  const toggleVisibilityMutation = useMutation({
+    mutationFn: async ({ id, is_visible }: { id: string; is_visible: boolean }) => {
+      const { error } = await supabase
+        .from('menu_categories')
+        .update({ is_visible })
+        .eq('id', id);
+      if (error) throw error;
+      return { id, is_visible };
+    },
+    onSuccess: ({ is_visible }) => {
+      queryClient.invalidateQueries({ queryKey: ['menu-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['menuData'] });
+      toast.success(is_visible ? 'Category is now visible to the public' : 'Category hidden from public site');
+    },
+    onError: (error: any) => {
+      toast.error(`Error updating visibility: ${error.message}`);
+    }
+  });
+
   const resetForm = () => {
     setFormData({ name: '', description: '', section_id: '', sort_order: 0 });
     setEditingCategory(null);
